@@ -68,5 +68,17 @@ text/csv for csv file</description>
         <type>Checkbox</type>
     </fields>
     <label>Report Export Settings</label>
+    <listViews>
+        <fullName>All_Columns</fullName>
+        <columns>NAME</columns>
+        <columns>Attachment_File_Name__c</columns>
+        <columns>Content_Type__c</columns>
+        <columns>Email_Body__c</columns>
+        <columns>Email_Recipient__c</columns>
+        <columns>Email_Subject__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All Columns</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Public</visibility>
 </CustomObject>

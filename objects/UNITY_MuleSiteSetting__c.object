@@ -54,5 +54,17 @@
         <unique>false</unique>
     </fields>
     <label>UNITY Mule Site Setting</label>
+    <listViews>
+        <fullName>all_fields</fullName>
+        <columns>NAME</columns>
+        <columns>Domain__c</columns>
+        <columns>Host__c</columns>
+        <columns>IsActive__c</columns>
+        <columns>Protocol__c</columns>
+        <columns>Content_Type__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>all fields</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Protected</visibility>
 </CustomObject>

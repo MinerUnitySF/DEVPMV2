@@ -48,5 +48,18 @@
         <unique>false</unique>
     </fields>
     <label>UNITY Email Domain Map</label>
+    <listViews>
+        <fullName>All_Fields</fullName>
+        <columns>NAME</columns>
+        <columns>Business_Unit__c</columns>
+        <columns>Case_Origin__c</columns>
+        <columns>To_Email_Domain__c</columns>
+        <columns>UPDATEDBY_USER.ALIAS</columns>
+        <columns>UPDATEDBY_USER</columns>
+        <columns>LAST_UPDATE</columns>
+        <filterScope>Everything</filterScope>
+        <label>All Fields</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Public</visibility>
 </CustomObject>

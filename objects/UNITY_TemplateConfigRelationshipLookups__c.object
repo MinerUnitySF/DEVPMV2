@@ -37,5 +37,16 @@
         <unique>false</unique>
     </fields>
     <label>UNITY_TemplateConfigRelationshipLookups</label>
+    <listViews>
+        <fullName>All_Fields</fullName>
+        <columns>NAME</columns>
+        <columns>UNITY_Child_Object__c</columns>
+        <columns>UNITY_Parent_Object__c</columns>
+        <columns>UNITY_Parent_Lookup_Field__c</columns>
+        <columns>LAST_UPDATE</columns>
+        <filterScope>Everything</filterScope>
+        <label>All Fields</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Public</visibility>
 </CustomObject>

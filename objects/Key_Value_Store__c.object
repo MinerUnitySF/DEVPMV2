@@ -16,5 +16,13 @@
         <unique>false</unique>
     </fields>
     <label>Key Value Store</label>
+    <listViews>
+        <fullName>all1</fullName>
+        <columns>NAME</columns>
+        <columns>Value__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>all</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Public</visibility>
 </CustomObject>

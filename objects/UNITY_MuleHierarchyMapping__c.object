@@ -43,5 +43,16 @@
         <unique>false</unique>
     </fields>
     <label>UNITY Mule Hierarchy Mapping</label>
+    <listViews>
+        <fullName>AllFields</fullName>
+        <columns>NAME</columns>
+        <columns>Child__c</columns>
+        <columns>Parent__c</columns>
+        <columns>Sibling_Tags__c</columns>
+        <columns>Tag__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>AllFields</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Protected</visibility>
 </CustomObject>

@@ -15,5 +15,15 @@
         <unique>false</unique>
     </fields>
     <label>CTI Values Map</label>
+    <listViews>
+        <fullName>All_columns</fullName>
+        <columns>NAME</columns>
+        <columns>InContact_Value__c</columns>
+        <columns>CREATED_DATE</columns>
+        <columns>LAST_UPDATE</columns>
+        <filterScope>Everything</filterScope>
+        <label>All - columns</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Public</visibility>
 </CustomObject>

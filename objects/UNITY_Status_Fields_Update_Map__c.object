@@ -82,5 +82,19 @@
         <unique>false</unique>
     </fields>
     <label>UNITY Status Fields Update Map</label>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>NAME</columns>
+        <columns>UNITY_Order__c</columns>
+        <columns>UNITY_Origin_Object__c</columns>
+        <columns>UNITY_Origin_Record_Type__c</columns>
+        <columns>UNITY_Origin_Value__c</columns>
+        <columns>UNITY_Target_Object__c</columns>
+        <columns>UNITY_Target_Record_Type__c</columns>
+        <columns>UNITY_Target_Value__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Public</visibility>
 </CustomObject>

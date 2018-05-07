@@ -14,5 +14,13 @@
         <unique>false</unique>
     </fields>
     <label>UNITY Mule Template</label>
+    <listViews>
+        <fullName>All_fields</fullName>
+        <columns>NAME</columns>
+        <columns>Template__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All fields</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Protected</visibility>
 </CustomObject>

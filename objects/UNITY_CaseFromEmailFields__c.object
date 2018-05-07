@@ -71,5 +71,21 @@ For line breaks use &quot;\n&quot;.</description>
         <unique>false</unique>
     </fields>
     <label>UNITY Case From Email Fields</label>
+    <listViews>
+        <fullName>All_Fields</fullName>
+        <columns>NAME</columns>
+        <columns>Field_Name__c</columns>
+        <columns>Search_Attribute__c</columns>
+        <columns>Template_Delimiter__c</columns>
+        <columns>Template_Key__c</columns>
+        <columns>Template_Name__c</columns>
+        <columns>Additional_Description__c</columns>
+        <columns>UPDATEDBY_USER.ALIAS</columns>
+        <columns>UPDATEDBY_USER</columns>
+        <columns>LAST_UPDATE</columns>
+        <filterScope>Everything</filterScope>
+        <label>All Fields</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Public</visibility>
 </CustomObject>

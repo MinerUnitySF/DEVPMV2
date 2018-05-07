@@ -24,5 +24,16 @@
         <unique>false</unique>
     </fields>
     <label>UNITY SC Activated Subs</label>
+    <listViews>
+        <fullName>All_Columns</fullName>
+        <columns>NAME</columns>
+        <columns>OBJECT_ID</columns>
+        <columns>Active__c</columns>
+        <columns>Customer_Name__c</columns>
+        <columns>CREATED_DATE</columns>
+        <filterScope>Everything</filterScope>
+        <label>All_Columns</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Public</visibility>
 </CustomObject>

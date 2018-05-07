@@ -62,5 +62,66 @@
         <type>Checkbox</type>
     </fields>
     <label>UNITY Mule Field Mapping</label>
+    <listViews>
+        <fullName>All_Fields</fullName>
+        <columns>NAME</columns>
+        <columns>SourceField__c</columns>
+        <columns>SourceType__c</columns>
+        <columns>TargetField__c</columns>
+        <columns>TargetType__c</columns>
+        <columns>isActive__c</columns>
+        <columns>Sibling_Tags__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All Fields</label>
+        <language>en_US</language>
+    </listViews>
+    <listViews>
+        <fullName>Case</fullName>
+        <columns>NAME</columns>
+        <columns>SourceField__c</columns>
+        <columns>TargetField__c</columns>
+        <columns>Sibling_Tags__c</columns>
+        <columns>isActive__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>NAME</field>
+            <operation>contains</operation>
+            <value>&quot;Case &quot;</value>
+        </filters>
+        <label>Case</label>
+        <language>en_US</language>
+    </listViews>
+    <listViews>
+        <fullName>Case_Comment</fullName>
+        <columns>NAME</columns>
+        <columns>SourceField__c</columns>
+        <columns>TargetField__c</columns>
+        <columns>isActive__c</columns>
+        <columns>Sibling_Tags__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>NAME</field>
+            <operation>contains</operation>
+            <value>Case Comment</value>
+        </filters>
+        <label>Case Comment</label>
+        <language>en_US</language>
+    </listViews>
+    <listViews>
+        <fullName>Vendor</fullName>
+        <columns>NAME</columns>
+        <columns>SourceField__c</columns>
+        <columns>TargetField__c</columns>
+        <columns>isActive__c</columns>
+        <columns>Sibling_Tags__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>NAME</field>
+            <operation>startsWith</operation>
+            <value>Vendor</value>
+        </filters>
+        <label>Vendor</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Protected</visibility>
 </CustomObject>

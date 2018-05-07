@@ -70,5 +70,21 @@
         <unique>false</unique>
     </fields>
     <label>UNITY SC to Case Field Mapping</label>
+    <listViews>
+        <fullName>All_Fields</fullName>
+        <columns>NAME</columns>
+        <columns>Description__c</columns>
+        <columns>CustomerId_Subscriber__c</columns>
+        <columns>SCField__c</columns>
+        <columns>SourceValue__c</columns>
+        <columns>TargetField__c</columns>
+        <columns>Value__c</columns>
+        <columns>LAST_UPDATE</columns>
+        <columns>UPDATEDBY_USER</columns>
+        <columns>UPDATEDBY_USER.ALIAS</columns>
+        <filterScope>Everything</filterScope>
+        <label>All Fields</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Public</visibility>
 </CustomObject>

@@ -64,5 +64,18 @@
         <unique>false</unique>
     </fields>
     <label>UNITY Mule Picklist Mapping</label>
+    <listViews>
+        <fullName>All_fields</fullName>
+        <columns>NAME</columns>
+        <columns>SourceField__c</columns>
+        <columns>SourceType__c</columns>
+        <columns>SourceValue__c</columns>
+        <columns>TargetField__c</columns>
+        <columns>TargetType__c</columns>
+        <columns>TargetValue__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All fields</label>
+        <language>en_US</language>
+    </listViews>
     <visibility>Protected</visibility>
 </CustomObject>
