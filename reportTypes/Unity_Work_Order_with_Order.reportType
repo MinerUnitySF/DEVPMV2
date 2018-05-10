@@ -142,6 +142,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Debrief_Agent__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Business_Unit__c</field>
             <table>WorkOrder</table>
         </columns>
@@ -202,6 +207,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Days_to_Debrief__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>City</field>
             <table>WorkOrder</table>
         </columns>
@@ -218,6 +228,11 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>Closed_Date__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Date_Time_Debrief_Completed__c</field>
             <table>WorkOrder</table>
         </columns>
         <columns>
@@ -1403,6 +1418,16 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Case__c.UNITY_Service_Channel_Category__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Accepted_Vendor__c.Type</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Case.Status</field>
             <table>WorkOrder</table>
         </columns>
         <masterLabel>Work Orders</masterLabel>

@@ -18,7 +18,7 @@
         <recipients>
             <type>owner</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Cancelled_Review_Email_Template</template>
     </alerts>
@@ -30,7 +30,7 @@
             <field>ContactEmail</field>
             <type>email</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Cancelled_Case</template>
     </alerts>
@@ -55,7 +55,7 @@
             <field>ContactEmail</field>
             <type>email</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Cancelled_Case</template>
     </alerts>
@@ -67,7 +67,7 @@
             <field>ContactEmail</field>
             <type>email</type>
         </recipients>
-        <senderAddress>customersupport@nsbs.net</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Cancelled_Case</template>
     </alerts>
@@ -78,7 +78,7 @@
         <recipients>
             <type>owner</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Escalation_Case_Created_but_Not_Assigned</template>
     </alerts>
@@ -125,6 +125,16 @@
         <name>SFPS GNC Set Default GNC Priority Date</name>
         <notifyAssignee>false</notifyAssignee>
         <operation>Formula</operation>
+        <protected>false</protected>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UNITYPM_Set_Case_to_Verified</fullName>
+        <description>PM Case status update to verified</description>
+        <field>Status</field>
+        <literalValue>Verified</literalValue>
+        <name>UNITYPM Set Case to Verified</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
         <protected>false</protected>
     </fieldUpdates>
     <fieldUpdates>
@@ -401,10 +411,7 @@ NOW()))))))</formula>
         </actions>
         <active>true</active>
         <description>Default Asset Down At IF Asset down has been checked and asset down at was not populated.</description>
-        <formula>AND(
- UNITY_Asset_Down__c = true,
- ISBLANK(UNITY_Asset_Down_At__c)
-)</formula>
+        <formula>AND(  UNITY_Asset_Down__c = true,  ISBLANK(UNITY_Asset_Down_At__c) )</formula>
         <triggerType>onCreateOrTriggeringUpdate</triggerType>
     </rules>
     <rules>
@@ -507,6 +514,17 @@ NOW()))))))</formula>
         <triggerType>onAllChanges</triggerType>
     </rules>
     <rules>
+        <fullName>UNITYPM Update Case Status To Verified</fullName>
+        <actions>
+            <name>UNITYPM_Set_Case_to_Verified</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <description>Update PM case status when the following are populated 1. SC 2. Location 3. Parent Case (program case)</description>
+        <formula>AND( RecordType.Name == &quot;Preventative Maintenance&quot;,  UNITY_Customer_Service_Contract__c != null,  Parent.RecordType.Name == &quot;Program Case&quot;,  AccountId != null,  ISPICKVAL(Status, &quot;New&quot;))</formula>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
         <fullName>UNITY_BU_Populate</fullName>
         <actions>
             <name>UNITY_BU_Populate_MNS</name>
@@ -582,7 +600,7 @@ NOW()))))))</formula>
         <criteriaItems>
             <field>Case.RecordTypeId</field>
             <operation>equals</operation>
-            <value>Service Request,Preventative Maintenance,Project Management,Site Survey,Project Phase</value>
+            <value>Project Phase,Project Management,Service Request,Site Survey</value>
         </criteriaItems>
         <description>Populate work window begin and end times based on case create date and priority</description>
         <triggerType>onCreateOnly</triggerType>
@@ -601,7 +619,7 @@ NOW()))))))</formula>
     <rules>
         <fullName>UNITY_Escalation - Case Created but Not Assigned - 12%2F24%2F48%2F72 Hour SLA</fullName>
         <active>true</active>
-        <formula>RecordType.Name = &apos;Service Request&apos; &amp;&amp; (ISPICKVAL( Priority , &apos;12 Hour Response&apos;)||ISPICKVAL(Priority, &apos;24 Hour Response&apos;)||ISPICKVAL(Priority, &apos;48 Hour Response&apos;)||ISPICKVAL(Priority, &apos;72 Hour Response&apos;)) &amp;&amp;   !ISBLANK(Owner:Queue.Id)</formula>
+        <formula>RecordType.Name = &apos;Service Request&apos; &amp;&amp; RecordType.Name != &apos;Preventative Maintenance&apos; &amp;&amp; RecordType.Name != &apos;Program Case&apos; &amp;&amp; (ISPICKVAL( Priority , &apos;12 Hour Response&apos;)||ISPICKVAL(Priority, &apos;24 Hour Response&apos;)||ISPICKVAL(Priority, &apos;48 Hour Response&apos;)||ISPICKVAL(Priority, &apos;72 Hour Response&apos;)) &amp;&amp;   !ISBLANK(Owner:Queue.Id)</formula>
         <triggerType>onCreateOrTriggeringUpdate</triggerType>
         <workflowTimeTriggers>
             <actions>
@@ -616,7 +634,7 @@ NOW()))))))</formula>
     <rules>
         <fullName>UNITY_Escalation - Case Created but Not Assigned - 2%2F4 Hour SLA</fullName>
         <active>true</active>
-        <formula>RecordType.Name = &apos;Service Request&apos; &amp;&amp; (ISPICKVAL( Priority , &apos;2 Hour Response&apos;)||ISPICKVAL(Priority, &apos;4 Hour Response&apos;)) &amp;&amp;  !ISBLANK(Owner:Queue.Id)</formula>
+        <formula>RecordType.Name = &apos;Service Request&apos; &amp;&amp; RecordType.Name != &apos;Preventative Maintenance&apos; &amp;&amp; RecordType.Name != &apos;Program Case&apos; &amp;&amp; (ISPICKVAL( Priority , &apos;2 Hour Response&apos;)||ISPICKVAL(Priority, &apos;4 Hour Response&apos;)) &amp;&amp;  !ISBLANK(Owner:Queue.Id)</formula>
         <triggerType>onCreateOrTriggeringUpdate</triggerType>
         <workflowTimeTriggers>
             <actions>

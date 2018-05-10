@@ -34,6 +34,7 @@ public class UNITY_AuraCOIExpiredNotifyController {
                                                 FROM UNITY_Insurance__c
                                                      WHERE UNITY_Account__c =:accountID
                                                      ORDER BY UNITY_Expiration_Date__c DESC];
+                  //remove duplicates                                   
                   vendorCIOList =  removeDuplicateCIO (vendorCIOList);
                   
                   for ( UNITY_Insurance__c insurance :vendorCIOList){   
@@ -57,7 +58,7 @@ public class UNITY_AuraCOIExpiredNotifyController {
                              message.noticeFax  = fax;   
                              message.expiredInsurance = true;
                              message.expiredInsuranceInDays = false;
-                             message.insuranceType =insuranceType;
+							 message.insuranceType =insuranceType;
                             
                             insuranceMessages.add(message);
                          } 
@@ -81,7 +82,6 @@ public class UNITY_AuraCOIExpiredNotifyController {
           return insuranceMessages;
     }
     
-    //Remove duplicates froim the list
      private static List<UNITY_Insurance__c> removeDuplicateCIO (List<UNITY_Insurance__c> duplicateInsurance ){
         List<UNITY_Insurance__c> distinctInsurance= new List<UNITY_Insurance__c>();
         

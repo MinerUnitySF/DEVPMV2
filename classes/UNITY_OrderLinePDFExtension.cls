@@ -6,6 +6,7 @@ public class UNITY_OrderLinePDFExtension  {
     public String MinerFooterDocument {get;set;}
     public  String WarningMessage {get;set;}
     public Boolean VendorAcceptedStatus {get;set;}
+    public Boolean WorkOrderPreventativeMaintenance {get;set;}
     
     public UNITY_OrderLinePDFExtension(ApexPages.StandardController controller) {
         order= (Order)controller.getRecord();
@@ -25,6 +26,7 @@ public class UNITY_OrderLinePDFExtension  {
         }
         
         VendorAcceptedStatus = false; 
+        WorkOrderPreventativeMaintenance = false;
         system.debug('>>>> delimitedInvoiceableStatuses >>> ' + delimitedInvoiceableStatuses);
         
        try{
@@ -38,14 +40,15 @@ public class UNITY_OrderLinePDFExtension  {
             order = new order();
        }
                              
-        system.debug('>>>> FSO__WorkOrder__r.Status >>>> ' + order.FSO__WorkOrder__r.Status);
+        system.debug('>>>> neli FSO__WorkOrder__r.Status >>>> ' + order.FSO__WorkOrder__r.Status);
+        system.debug('>>>> neli FSO__WorkOrder__c >>>> ' + order.FSO__WorkOrder__c);
         system.debug('>>>> Status >>>> ' + order.Status);
-        system.debug('>>>> id >>>> ' + order.id);
-        system.debug('>>>> OrderNumber >>>> ' + order.OrderNumber);
-        system.debug('>>>> order >>>> ' + order);
+        system.debug('>>>> neli id >>>> ' + order.id);
+        system.debug('>>>> neli OrderNumber >>>> ' + order.OrderNumber);
+        system.debug('>>>> neli order >>>> ' + order);
           
         if ( order.id != null){
-                workOrder = [SELECT ID, UNITY_Email_Logo_URL__c,UNITY_Assigned_Vendor__r.Name,
+                workOrder = [SELECT ID, UNITY_Email_Logo_URL__c,UNITY_Assigned_Vendor__r.Name,RecordTypeId,
                         UNITY_Assigned_Vendor__r.BillingStreet, UNITY_Assigned_Vendor__r.BillingCity, 
                         UNITY_Assigned_Vendor__r.BillingState, UNITY_Assigned_Vendor__r.BillingPostalCode,
                         RecordType.DeveloperName, Account.Name,Account.ShippingStreet,Account.UNITY_LOC__c,
@@ -59,6 +62,10 @@ public class UNITY_OrderLinePDFExtension  {
               
                if ( workOrder.UNITY_Vendor_Status__c == 'Accepted'){
                    VendorAcceptedStatus = true;
+               }
+               
+               if (workOrder.RecordTypeId == UNITY_Constants.WO_PREVENTATIVE_MAINTENANCE_RECORDTYPE){
+                   WorkOrderPreventativeMaintenance = true;
                }
           }
           WarningMessage = 'This Work Order has not been accepted. Please return to the Home tab to accept.';

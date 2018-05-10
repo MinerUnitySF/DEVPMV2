@@ -4,4 +4,9 @@
     <availableInTouch>false</availableInTouch>
     <confirmationTokenRequired>false</confirmationTokenRequired>
     <label>UNITY_PackingList</label>
+    <packageVersions>
+        <majorNumber>2</majorNumber>
+        <minorNumber>300</minorNumber>
+        <namespace>FSO</namespace>
+    </packageVersions>
 </ApexPage>

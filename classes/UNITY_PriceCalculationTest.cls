@@ -308,6 +308,12 @@ public with sharing class UNITY_PriceCalculationTest {
             UNITY_Product__c = PRODUCTID,
             UNTIY_Material_Cost__c = 25
         ); sclis.add(vendLine2);
+        UNITY_Service_Contract_Line_Item__c vendLine3 = new UNITY_Service_Contract_Line_Item__c(
+            UNITY_Service_Contract__c = vendSC.Id,
+            RecordTypeId = UNITY_Constants.SCLI_MENU_PRICING_RECORDTYPE,
+            UNITY_Product__c = PRODUCTID,
+            UNTIY_Material_Cost__c = 25
+        ); sclis.add(vendLine3);
         insert sclis;
         //Insert the Account Pricing Matrix
         UNITY_Account_Pricing_Matrix__c apm = new UNITY_Account_Pricing_Matrix__c();
@@ -345,6 +351,32 @@ public with sharing class UNITY_PriceCalculationTest {
         wo.OwnerId = UserInfo.getUserId();
         update wo;
 
+        FSO__Location__c loc = new FSO__Location__c();
+        loc.Name = 'Miner Nashville Warehouse';
+        loc.FSO__Geolocation__Latitude__s = 1.0;
+        loc.FSO__Geolocation__Longitude__s = 1.0;
+        insert(loc);
+
+        FSO__LocationStock__c locStock = new  FSO__LocationStock__c();
+        locStock.FSO__Location__c = loc.Id;
+        locStock.FSO__Product__c = PRODUCTID;
+        locStock.UNITY_Min__c = 500.0;
+        locStock.FSO__Quantity__c = 500;
+        insert(locStock); 
+
+        FSO__LocationStock__c locStock2 = new  FSO__LocationStock__c();
+        locStock2.FSO__Location__c = loc.Id;
+        locStock2.FSO__Product__c = PRODUCTID_L;
+        locStock2.UNITY_Min__c = 500.0;
+        locStock2.FSO__Quantity__c = 500;
+        insert(locStock2); 
+
+        FSO__LocationStock__c locStock3 = new  FSO__LocationStock__c();
+        locStock3.FSO__Location__c = loc.Id;
+        locStock3.FSO__Product__c = PRODUCTID_T;
+        locStock3.UNITY_Min__c = 500.0;
+        locStock3.FSO__Quantity__c = 500;
+        insert(locStock3); 
         //Start the test
         test.startTest();
         //Create an Order
@@ -401,10 +433,38 @@ public with sharing class UNITY_PriceCalculationTest {
         line6.UNITY_Type__c = 'Vendor Standard Labor';
         line6.UNITY_Number_of_Techs__c = '1 Technician + Apprentice';
         line6.UNITY_Customer_Holiday_Multiplier__c = true;
-        
+        UNITY_Proposal_Line_Item__c line7 = new UNITY_Proposal_Line_Item__c();
+        line7.UNITY_Proposal__c = p.Id;
+        line7.UNITY_Product__c = PRODUCTID;
+        line7.UNITY_Quantity__c = 2;
+        line7.UNITY_Activity_Type__c = 'Vendor Services';
+        line7.UNITY_Type__c = 'Part';
+        line7.UNITY_Number_of_Techs__c = '1 Technician + Apprentice';
+        line7.UNITY_Customer_Holiday_Multiplier__c = true;
+        UNITY_Proposal_Line_Item__c line8 = new UNITY_Proposal_Line_Item__c();
+        line8.UNITY_Proposal__c = p.Id;
+        line8.UNITY_Product__c = PRODUCTID;
+        line8.UNITY_Quantity__c = 2;
+        line8.UNITY_Activity_Type__c = 'Vendor Services';
+        line8.UNITY_Type__c = 'Non Billable';
+        line8.UNITY_Number_of_Techs__c = '1 Technician + Apprentice';
+        line8.UNITY_Customer_Holiday_Multiplier__c = true;
+        line8.UNITY_Part_Location__c = loc.Id;
+        UNITY_Proposal_Line_Item__c line9 = new UNITY_Proposal_Line_Item__c();
+        line9.UNITY_Proposal__c = p.Id;
+        line9.UNITY_Product__c = PRODUCTID;
+        line9.UNITY_Quantity__c = 2;
+        line9.UNITY_Activity_Type__c = 'Vendor Services';
+        line9.UNITY_Type__c = 'Non Billable';
+        line9.UNITY_Number_of_Techs__c = '1 Technician + Apprentice';
+        line9.UNITY_Customer_Holiday_Multiplier__c = true;
+        line9.UNITY_Part_Location__c = loc.Id;
+        line9.UNITY_Is_Vendor_Supply__c = true;
+        line9.UNITY_Not_Billable__c = true;
         pLines.add(line1);pLines.add(line2);
         //oLines.add(line3);
-        pLines.add(line4);pLines.add(line5);pLines.add(line6);
+        pLines.add(line4);pLines.add(line5);pLines.add(line6);pLines.add(line7);pLines.add(line8);
+        pLines.add(line9);
 
         insert pLines;
         update pLines;
@@ -884,6 +944,14 @@ public with sharing class UNITY_PriceCalculationTest {
             UNTIY_Material_Cost__c = 250,
             UNITY_Labor_Cost__c = 75
         ); sclis.add(custLine4);
+        UNITY_Service_Contract_Line_Item__c custLine5 = new UNITY_Service_Contract_Line_Item__c(
+            UNITY_Service_Contract__c = custSC.Id,
+            RecordTypeId = UNITY_Constants.SCLI_MENU_PRICING_RECORDTYPE,
+            UNITY_Product__c = PRODUCTID,
+            UNITY_Labor_Hours__c = 1,
+            UNTIY_Material_Cost__c = 250,
+            UNITY_Labor_Cost__c = 75
+        ); sclis.add(custLine5);
         UNITY_Service_Contract_Line_Item__c vendLine1 = new UNITY_Service_Contract_Line_Item__c(
             UNITY_Service_Contract__c = vendSC.Id,
             RecordTypeId = UNITY_Constants.SCLI_HOURLY_RATE_RECORDTYPE,
@@ -902,6 +970,12 @@ public with sharing class UNITY_PriceCalculationTest {
             UNITY_Product__c = PRODUCTID,
             UNTIY_Material_Cost__c = 25
         ); sclis.add(vendLine2);
+        UNITY_Service_Contract_Line_Item__c vendLine3 = new UNITY_Service_Contract_Line_Item__c(
+            UNITY_Service_Contract__c = vendSC.Id,
+            RecordTypeId = UNITY_Constants.SCLI_MENU_PRICING_RECORDTYPE,
+            UNITY_Product__c = PRODUCTID,
+            UNTIY_Material_Cost__c = 25
+        ); sclis.add(vendLine3);
         insert sclis;
         //Insert the Account Pricing Matrix
         UNITY_Account_Pricing_Matrix__c apm = new UNITY_Account_Pricing_Matrix__c();
@@ -950,6 +1024,33 @@ public with sharing class UNITY_PriceCalculationTest {
         o.Status = 'Draft';
         o.FSO__WorkOrder__c = wo.Id;
         o.EffectiveDate = Date.today();
+
+        FSO__Location__c loc = new FSO__Location__c();
+        loc.Name = 'Miner Nashville Warehouse';
+        loc.FSO__Geolocation__Latitude__s = 1.0;
+        loc.FSO__Geolocation__Longitude__s = 1.0;
+        insert(loc);
+
+        FSO__LocationStock__c locStock = new  FSO__LocationStock__c();
+        locStock.FSO__Location__c = loc.Id;
+        locStock.FSO__Product__c = PRODUCTID;
+        locStock.UNITY_Min__c = 500.0;
+        locStock.FSO__Quantity__c = 500;
+        insert(locStock); 
+
+        FSO__LocationStock__c locStock2 = new  FSO__LocationStock__c();
+        locStock2.FSO__Location__c = loc.Id;
+        locStock2.FSO__Product__c = PRODUCTID_L;
+        locStock2.UNITY_Min__c = 500.0;
+        locStock2.FSO__Quantity__c = 500;
+        insert(locStock2); 
+
+        FSO__LocationStock__c locStock3 = new  FSO__LocationStock__c();
+        locStock3.FSO__Location__c = loc.Id;
+        locStock3.FSO__Product__c = PRODUCTID_T;
+        locStock3.UNITY_Min__c = 500.0;
+        locStock3.FSO__Quantity__c = 500;
+        insert(locStock3); 
 
         //Start the test
         test.startTest();
@@ -1019,9 +1120,17 @@ public with sharing class UNITY_PriceCalculationTest {
         line7.UnitPrice = 10;
         line7.UNITY_Activity_Type__c = 'Parts - Service and Remodel';
         line7.UNITY_Type__c = 'Non Billable';
+        OrderItem line8 = new orderItem();
+        line8.OrderId = o.Id;
+        line8.PricebookEntryId = PRICEBOOKENTRYID_P;
+        line8.Quantity = 2;
+        line8.UnitPrice = 10;
+        line8.UNITY_Activity_Type__c = 'Parts - Service and Remodel';
+        line8.UNITY_Type__c = 'Parts';    
+        line8.UNITY_Part_Location__c =  loc.Id;   
         oLines.add(line1);oLines.add(line2);
         //oLines.add(line3);
-        oLines.add(line4);oLines.add(line5);oLines.add(line6);oLines.add(line7);
+        oLines.add(line4);oLines.add(line5);oLines.add(line6);oLines.add(line7);oLines.add(line8);
 
         insert oLines;
         update oLines;

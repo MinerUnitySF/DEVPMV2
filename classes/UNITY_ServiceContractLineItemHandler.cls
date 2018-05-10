@@ -30,10 +30,8 @@ public with sharing class UNITY_ServiceContractLineItemHandler implements UNITY_
     private Set<id> vendorPricesToUpdate  = new Set<id>();
     
     public void bulkBefore(){}
-
     public void bulkAfter(){
-
-        // aux set for query related Service contract US328
+    // aux set for query related Service contract US328
         Set<id> serviceContractIds  = new Set<id>();
         Set<id> aux_scliHourlyRateIDs   = new Set<id>();
         list<UNITY_Service_Contract_Line_Item__c> aux_scliHourlyRate = new list<UNITY_Service_Contract_Line_Item__c>();
@@ -42,14 +40,14 @@ public with sharing class UNITY_ServiceContractLineItemHandler implements UNITY_
 
             UNITY_Service_Contract_Line_Item__c  onSCLI = (UNITY_Service_Contract_Line_Item__c ) so;
 
-
+/*
             if((onSCLI.RecordTypeId == UNITY_Constants.SCLI_FLEET_TO_ACCOUNT_RECORDTYPE) || (onSCLI.RecordTypeId == UNITY_Constants.SCLI_DISTRIBUTOR_TO_FLEET_RECORDTYPE)){
 
                 serviceContractIds.add(onSCLI.UNITY_Service_Contract__c);
                 serviceContractLIIds.add(onSCLI.Id);
 
             }
-            
+ */           
             // check for hourly rate record type, that way we are going to check for price update for vendor trade 
             if(onSCLI.RecordTypeId == UNITY_Constants.SCLI_HOURLY_RATE_RECORDTYPE){
                aux_scliHourlyRateIDs.add(onSCLI.id);
@@ -59,11 +57,11 @@ public with sharing class UNITY_ServiceContractLineItemHandler implements UNITY_
         
         serviceContractsMap = new Map<id, UNITY_Service_Contract__c>([SELECT id, 
                                                                                 UNITY_Account__c, 
-                                                                                (	SELECT id FROM UNITY_Service_Contract_Line_Items__r 
-                                                                                 	WHERE UNITY_Is_Preferred_Part__c = true AND 
-                                                                                       	id NOT IN :Trigger.newMap.keySet()  AND 
-                                                                                       	( 	(RecordTypeId = :UNITY_Constants.SCLI_FLEET_TO_ACCOUNT_RECORDTYPE) OR
-                                                                                         	(RecordTypeId = :UNITY_Constants.SCLI_DISTRIBUTOR_TO_FLEET_RECORDTYPE) )
+                                                                                (   SELECT id FROM UNITY_Service_Contract_Line_Items__r 
+                                                                                    WHERE UNITY_Is_Preferred_Part__c = true AND 
+                                                                                        id NOT IN :Trigger.newMap.keySet()  AND 
+                                                                                        (   (RecordTypeId = :UNITY_Constants.SCLI_FLEET_TO_ACCOUNT_RECORDTYPE) OR
+                                                                                            (RecordTypeId = :UNITY_Constants.SCLI_DISTRIBUTOR_TO_FLEET_RECORDTYPE) )
                                                                                 ) 
                                                                           FROM UNITY_Service_Contract__c  
                                                                           WHERE id IN :serviceContractIds AND 
@@ -83,7 +81,12 @@ public with sharing class UNITY_ServiceContractLineItemHandler implements UNITY_
                                                                                    UNITY_Service_Contract__r.UNITY_IS_Active__c = true AND 
                                                                                    UNITY_Service_Contract__r.UNITY_Account_Record_Type__c = 'Vendor']);
         
-       
+
+    }
+    
+    public void bulkBefore(List<SObject> newList_SCLI, List<SObject> oldList_SCLI, Map<Id,SObject> oldMap_SCLI, Map<Id,SObject> newMap_SCLI){}
+
+    public void bulkAfter(List<SObject> newList_SCLI, List<SObject> oldList_SCLI, Map<Id,SObject> oldMap_SCLI, Map<Id,SObject> newMap_SCLI){   
         
     }
 
@@ -96,7 +99,7 @@ public with sharing class UNITY_ServiceContractLineItemHandler implements UNITY_
     public void afterInsert(SObject  so){
 
         UNITY_Service_Contract_Line_Item__c  onSCLI = (UNITY_Service_Contract_Line_Item__c ) so;
-
+/*
         if(serviceContractLIIds.contains(onSCLI.Id) && serviceContractsMap.get(onSCLI.UNITY_Service_Contract__c) != null ){
 
             id onAccountId = serviceContractsMap.get(onSCLI.UNITY_Service_Contract__c).UNITY_Account__c;
@@ -107,7 +110,7 @@ public with sharing class UNITY_ServiceContractLineItemHandler implements UNITY_
 
             }
         }
-        
+        */
         verifyVendorPrice(onSCLI,null);
 
     }
@@ -116,7 +119,7 @@ public with sharing class UNITY_ServiceContractLineItemHandler implements UNITY_
 
         UNITY_Service_Contract_Line_Item__c  oldSCLI = (UNITY_Service_Contract_Line_Item__c ) oldSo;
         UNITY_Service_Contract_Line_Item__c  newSCLI = (UNITY_Service_Contract_Line_Item__c ) so;
-        
+        /*
         if(serviceContractLIIds.contains(newSCLI.Id) && serviceContractsMap.get(newSCLI.UNITY_Service_Contract__c) != null ){
 
             if( newSCLI.UNITY_Is_Preferred_Part__c  && (newSCLI.UNITY_Is_Preferred_Part__c != oldSCLI.UNITY_Is_Preferred_Part__c)){
@@ -140,7 +143,7 @@ public with sharing class UNITY_ServiceContractLineItemHandler implements UNITY_
                 }
             }
         }
-        
+        */
         verifyVendorPrice(newSCLI,oldSCLI);
         
     }

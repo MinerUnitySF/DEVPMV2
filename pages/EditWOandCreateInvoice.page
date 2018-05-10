@@ -23,7 +23,7 @@
     <apex:form >
         
         <apex:sectionHeader title="Work Order" subtitle="Edit & Create Invoice"/>
-        
+        <apex:pageMessages />
         <div id="page-message">
             <div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
                 <p>
@@ -50,9 +50,9 @@
                                     reRender="values,lines-table,script,message" status="loadingStatus"/>-->
                 <apex:commandButton action="{!callAvatax}" value="Call Avatax" 
                                     reRender="values,lines-table,script,message" status="loadingStatus"/>
-                <apex:outputPanel rendered="{!isQuote}">
+                <!--<apex:outputPanel rendered="{!isQuote}">
                     <input type="button" value="Request Update Quoted Values" class="btn" onclick="confirmEditQuotedValues();"/>
-                </apex:outputPanel>
+                </apex:outputPanel>-->
                 <apex:commandButton value="Cancel" reRender="values,lines-table,script" immediate="true" onclick="window.location.href='/{!workOrder.Id}'"/>
                 <apex:commandButton value="Invoice Preview" immediate="true" rendered="{!previewButtonVisible}" onclick="window.open('/apex/SVMX_VF_Invoice_Preview?id={!workOrder.Id}','_blank','menubar=0, toolbar=1,resizable=1, width=1000, height=800'); return false;"/>
             </apex:pageBlockButtons>
@@ -116,9 +116,15 @@
                         <td>
                             <apex:pageBlockSection collapsible="false" columns="1">
                                 <apex:pageBlockSectionItem >
-                                    <apex:outputLabel >Revenue:</apex:outputLabel>
+                                    <apex:outputLabel >Estimated Revenue:</apex:outputLabel>
                                     <apex:outputText value="${0,number,###,###,##0.00}"><apex:param value="{!revenue}"/></apex:outputText>
+                                    
                                 </apex:pageBlockSectionItem>
+                                <apex:outputPanel id="hiddenblock">
+        <apex:outputText value="{0}" style="color: red; font-size: 13px;">
+                            <apex:param value="{!friendlyMsgEQUIP}" />
+                        </apex:outputText>
+    </apex:outputPanel>
                                 <apex:pageBlockSectionItem >
                                     <apex:outputLabel >Total Tax:</apex:outputLabel>
                                     <apex:outputText value="${0,number,###,###,##0.00}"><apex:param value="{!taxTotal}"/></apex:outputText>
@@ -131,13 +137,37 @@
                         </td>
                         <td>
                             <apex:pageBlockSection collapsible="false" columns="1">
-                                <apex:pageBlockSectionItem >
+                               <!-- <apex:pageBlockSectionItem >
                                     <apex:outputLabel >Margin $:</apex:outputLabel>
                                     <apex:outputText value="${0,number,###,###,##0.00}"><apex:param value="{!marginCurr}"/></apex:outputText>
                                 </apex:pageBlockSectionItem>
                                 <apex:pageBlockSectionItem >
                                     <apex:outputLabel >Margin %:</apex:outputLabel>
                                     <apex:outputText value="{0,number,##0.00}%"><apex:param value="{!marginPercent}"/></apex:outputText>
+                                </apex:pageBlockSectionItem> -->
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Invoiced Margin $:</apex:outputLabel>
+                                    <apex:outputText value="${0,number,###,###,##0.00}"><apex:param value="{!invMarginCurr}"/></apex:outputText>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Invoiced Margin %:</apex:outputLabel>
+                                    <apex:outputText value="{0,number,##0.00}%"><apex:param value="{!invMarginPercent}"/></apex:outputText>
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                        </td>
+                        <td>
+                            <apex:pageBlockSection collapsible="false" columns="1">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Invoiced Revenue:</apex:outputLabel>
+                                    <apex:outputText value="${0,number,###,###,##0.00}"><apex:param value="{!invRevenue}"/></apex:outputText>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Invoiced Total Tax:</apex:outputLabel>
+                                    <apex:outputText value="${0,number,###,###,##0.00}"><apex:param value="{!invTaxTotal}"/></apex:outputText>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Invoiced Total:</apex:outputLabel>
+                                    <apex:outputText value="${0,number,###,###,##0.00}"><apex:param value="{!invTotal}"/></apex:outputText>
                                 </apex:pageBlockSectionItem>
                             </apex:pageBlockSection>
                         </td>
@@ -166,7 +196,7 @@
                 -->
                 <apex:column headerValue="Line Type">
                     <apex:inputField value="{!lineWrap.line.SVMXC__Line_Type__c}" rendered="{!lineWrap.edit}">
-                        <apex:actionSupport event="onchange" action="{!lineWrap.togglePart}" rerender="part-col,prod-code-col,qoh-col,vendor-col,stock-loc,status-col,quote-col,script"/>
+                        <apex:actionSupport event="onchange" action="{!lineWrap.togglePart}" rerender="part-col,prod-code-col,qoh-col,vendor-col,stock-loc,status-col,invTotal-col,quote-col,script"/>
                     </apex:inputField>
                     <apex:outputField value="{!lineWrap.line.SVMXC__Line_Type__c}" rendered="{!NOT(lineWrap.edit)}"/>
                 </apex:column>
@@ -179,7 +209,7 @@
                         <apex:inputField value="{!lineWrap.line.SVMXC__Product__c}" rendered="{!AND(lineWrap.isPart, lineWrap.edit)}"
                                          style="width: 100px;" onkeydown="if(event.keyCode==13){this.blur();actionFunction();}">
                             <apex:actionSupport event="onchange" action="{!lineWrap.changePart}" oncomplete="calculateTotals();" 
-                                                rerender="part-col,qoh-col,prod-code-col,unit-cost-col,unit-price-col,subtotal-col,values,script">
+                                                rerender="part-col,qoh-col,prod-code-col,unit-cost-col,unit-price-col,subtotal-col,invTotal-col,values,script">
                                 <apex:param name="sc" value="{!workOrder.Super_Center__c}"/>
                             </apex:actionSupport>
                         </apex:inputField>
@@ -216,6 +246,7 @@
                         <apex:outputField value="{!lineWrap.line.Vendor__c}" rendered="{!AND(NOT(lineWrap.edit), lineWrap.line.SVMXC__Line_Type__c == 'Vendor Services')}"/>
                     </apex:outputPanel>
                 </apex:column>
+                <!-- Removing requirements for 'Quoted' work order type -- Josh Phillips 10-23-2017
                 <apex:column headerValue="{!$ObjectType.SVMXC__Service_Order_Line__c.fields.Quoted_Quantity__c.Label}" 
                              width="40" rendered="{!isQuote}">
                     <apex:outputPanel id="quoted-qty-col">
@@ -255,12 +286,13 @@
                         </apex:outputText>
                     </apex:outputPanel>
                 </apex:column>
+				-->
                 <apex:column width="40" headerValue="Actual Qty">
                     <apex:outputPanel id="qty-col">
                         <apex:inputField value="{!lineWrap.line.SVMXC__Actual_Quantity2__c}"  style="width: 40px;" 
                                          rendered="{!AND(lineWrap.edit,OR(NOT(isQuote),AND(isQuote,NOT(lineWrap.line.Quoted__c)),AND(isQuote,lineWrap.line.Quoted__c,NOT(ISBLANK(lineWrap.line.Id)),lineWrap.line.SVMXC__Line_Type__c != 'Labor')))}" 
                                          onkeydown="if(event.keyCode==13){this.blur();actionFunction();}">
-                            <apex:actionSupport event="onchange" action="{!calculateTotals}" rerender="values,subtotal-col" 
+                            <apex:actionSupport event="onchange" action="{!calculateTotals}" rerender="values,subtotal-col,hiddenblock" 
                                                 status="loadingStatusValues"/>
                         </apex:inputField>
                         <apex:outputText value="{0, number,###,###,##0.000}" style="width: 40px;" 
@@ -281,21 +313,19 @@
                         </apex:outputText>
                     </apex:outputPanel>
                 </apex:column>
-                <apex:column headerValue="Unit Price" width="60">
+                <apex:column headerValue="Estimated Unit Price" width="60">
                     <apex:outputPanel id="unit-price-col">
                         <apex:inputField value="{!lineWrap.line.SVMXC__Actual_Price2__c}"
                                          rendered="{!AND(lineWrap.edit,OR(NOT(isQuote),AND(isQuote,NOT(lineWrap.line.Quoted__c))))}"
                                          onkeydown="if(event.keyCode==13){this.blur();actionFunction();}" style="width: 60px;">
-                            <apex:actionSupport event="onchange" action="{!calculateTotals}" rerender="values,subtotal-col" status="loadingStatusValues"/>
+                            <apex:actionSupport event="onchange" action="{!calculateTotals}" rerender="values,subtotal-col,hiddenblock" status="loadingStatusValues"/>
                         </apex:inputField>
                         <apex:outputText value="{0, number,###,###,##0.000}" style="width: 40px;" rendered="{!OR(NOT(lineWrap.edit),AND(isQuote,lineWrap.line.Quoted__c))}">
                             <apex:param value="{!lineWrap.line.SVMXC__Actual_Price2__c}" />
                         </apex:outputText>
                     </apex:outputPanel>
                 </apex:column>
-                <apex:column headerValue="Sales Tax">
-                    <apex:outputField value="{!lineWrap.line.Sales_Tax__c}" />
-                </apex:column>
+                
                 <apex:column headerValue="Subtotal">
                     <apex:outputPanel id="subtotal-col">
                         <apex:outputText value="{0, number,$###,###,##0.000}">
@@ -306,7 +336,7 @@
                 <apex:column headerValue="Line Status">
                     <apex:outputPanel id="status-col">
                         <apex:inputField value="{!lineWrap.line.SVMXC__Line_Status__c}" rendered="{!OR(AND(lineWrap.edit,NOT(isQuote)),AND(isQuote,editQuote),AND(isQuote,ISBLANK(lineWrap.line.Id)))}" onkeydown="if(event.keyCode==13){this.blur();actionFunction();}">
-                            <apex:actionSupport event="onchange" action="{!lineWrap.enableCheckbox}" rerender="subtotal-col,unit-price-col,unit-cost-col,qty-col,script" status="row-status"></apex:actionSupport>
+                            <apex:actionSupport event="onchange" action="{!lineWrap.enableCheckbox}" rerender="subtotal-col,invTotal-col,unit-price-col,unit-cost-col,qty-col,script" status="row-status"></apex:actionSupport>
                         </apex:inputField>
                         <apex:outputField value="{!lineWrap.line.SVMXC__Line_Status__c}" rendered="{!OR(NOT(lineWrap.edit),AND(isQuote,NOT(ISBLANK(lineWrap.line.Id)),NOT(editQuote)))}"/>
                     </apex:outputPanel>
@@ -323,25 +353,58 @@
                     <apex:inputField style="width:90%;height:40px;" value="{!lineWrap.line.SVMXC__Work_Description__c}" rendered="{!lineWrap.edit}" onkeydown="if(event.keyCode==13){this.blur();actionFunction();}"/>
                     <apex:outputField style="width:90%;height:40px;" value="{!lineWrap.line.SVMXC__Work_Description__c}" rendered="{!NOT(lineWrap.edit)}"/>
                 </apex:column>
-                <apex:column headerValue="Billable">
-                    <apex:inputField value="{!lineWrap.line.SVMXC__Is_Billable__c}" rendered="{!AND(lineWrap.edit,NOT(isWarranty))}" onkeydown="if(event.keyCode==13){this.blur();actionFunction();}">
-                        <apex:actionSupport event="onchange" action="{!lineWrap.billableChanged}" rerender="values,quoted-price-col,unit-price-col,subtotal-col,script" 
-                                            status="loadingStatusValues" oncomplete="calculateTotals();"/>
-                    </apex:inputField>
-                    <apex:outputField value="{!lineWrap.line.SVMXC__Is_Billable__c}" rendered="{!OR(NOT(lineWrap.edit),isWarranty)}"/>
-                </apex:column>
                 <apex:column headerValue="Quoted?" rendered="{!isQuote}">
                     <apex:outputPanel id="quote-col">
                         <apex:inputField value="{!lineWrap.line.Quoted__c}"
                                             rendered="{!AND(lineWrap.edit,isQuote,lineWrap.line.SVMXC__Line_Type__c == 'Labor',OR(ISBLANK(lineWrap.line.Id),editQuote))}">
                             <apex:actionSupport event="onchange" action="{!lineWrap.quotedChanged}"
-                                                rerender="values,quoted-qty-col,quoted-cost-col,quoted-price-col,qty-col,unit-cost-col,unit-price-col,subtotal-col,script"
+                                                rerender="values,quoted-qty-col,quoted-cost-col,quoted-price-col,qty-col,unit-cost-col,unit-price-col,subtotal-col,invTotal-col,script"
                                                 status="loadingStatusValues"  oncomplete="calculateTotals();"/>
                         </apex:inputField>
                         <apex:outputField value="{!lineWrap.line.Quoted__c}" rendered="{!NOT(ISBLANK(lineWrap.line.Id))}"/>
                         <!--<apex:image value="/img/checkbox_checked.gif" rendered="{!AND(NOT(ISBLANK(lineWrap.line.Id)),lineWrap.line.Quoted__c)}"/>
                         <apex:image value="/img/checkbox_unchecked.gif" rendered="{!AND(NOT(ISBLANK(lineWrap.line.Id)),NOT(lineWrap.line.Quoted__c))}"/>-->
                     </apex:outputPanel>
+                </apex:column>
+                <apex:column headerValue="Invoice Qty" width="40">
+                    <apex:outputPanel id="invqty-col">
+                        <apex:inputField value="{!lineWrap.line.Invoice_Qty__c}"  style="width: 40px;" 
+                                         rendered="{!AND(lineWrap.edit,OR(NOT(isQuote),AND(isQuote,NOT(lineWrap.line.Quoted__c)),AND(isQuote,lineWrap.line.Quoted__c,NOT(ISBLANK(lineWrap.line.Id)),lineWrap.line.SVMXC__Line_Type__c != 'Labor')))}" 
+                                         onkeydown="if(event.keyCode==13){this.blur();actionFunction();}">
+                            <apex:actionSupport event="onchange" action="{!calculateTotals}" rerender="values,invtotal-col" 
+                                                status="loadingStatusValues"/>
+                        </apex:inputField>
+                        <apex:outputText value="{0, number,###,###,##0.000}" style="width: 40px;" rendered="{!OR(NOT(lineWrap.edit),AND(isQuote,lineWrap.line.Quoted__c))}">
+                            <apex:param value="{!lineWrap.line.Invoice_Qty__c}" />
+                        </apex:outputText>
+                    </apex:outputPanel>
+                </apex:column>
+                <apex:column headerValue="Invoice Unit Price" width="60">
+                    <apex:outputPanel id="inv-unit-price-col">
+                        <apex:inputField value="{!lineWrap.line.Invoice_Unit_Price__c}"  style="width: 60px;"
+                                         rendered="{!AND(lineWrap.edit,OR(NOT(isQuote),AND(isQuote,NOT(lineWrap.line.Quoted__c)),AND(isQuote,lineWrap.line.Quoted__c,NOT(ISBLANK(lineWrap.line.Id)),lineWrap.line.SVMXC__Line_Type__c != 'Labor')))}"
+                                         onkeydown="if(event.keyCode==13){this.blur();actionFunction();}">
+                            <apex:actionSupport event="onchange" action="{!calculateTotals}" rerender="values,invtotal-col,friendly" status="loadingStatusValues"/>
+                        </apex:inputField> 
+                        <apex:outputText value="{0, number,###,###,##0.000}" style="width: 40px;" rendered="{!OR(NOT(lineWrap.edit),AND(isQuote,lineWrap.line.Quoted__c))}">
+                            <apex:param value="{!lineWrap.line.Invoice_Unit_Price__c}" />
+                        </apex:outputText>
+                        <apex:outputPanel id="friendly">
+        <apex:outputText value="{0}" style="color: red">
+                            <apex:param value="{!lineWrap.friendlyMsg}" />
+                        </apex:outputText>
+    </apex:outputPanel>
+                    </apex:outputPanel>
+                </apex:column>
+                <apex:column headerValue="Sales Tax">
+                    <apex:outputField value="{!lineWrap.line.Sales_Tax__c}" />
+                </apex:column>
+                <apex:column headerValue="Invoice Price" width="60">
+                    <apex:outputPanel id="invtotal-col">
+                        <apex:outputText value="{0, number,$###,###,##0.000}">
+                            <apex:param value="{!lineWrap.invTotal}" />
+                        </apex:outputText>
+                    </apex:outputPanel> 
                 </apex:column>
             </apex:pageBlockTable>
             
@@ -355,8 +418,8 @@
         <apex:actionFunction action="{!quickSave}" name="quickSave" reRender="values,lines-table,script,message" status="loadingStatus"/>
         <apex:actionFunction action="{!saveAndClose}" name="saveAndClose" reRender="values,lines-table,script,message" status="loadingStatus"/>
         <apex:actionFunction action="{!updateAndCreateInvoice}" name="updateAndCreateInvoice" reRender="values,lines-table,script,message" status="loadingStatus"/>
-        <apex:actionFunction action="{!requestEditQuote}" name="requestEditQuote" reRender="values,lines-table,script,message" status="loadingStatus"/>
-        <apex:actionFunction action="{!requestUpdateQuotedTotal}" name="requestUpdateQuotedTotal" reRender="values,lines-table,script,message" status="loadingStatus"/>
+        <!--<apex:actionFunction action="{!requestEditQuote}" name="requestEditQuote" reRender="values,lines-table,script,message" status="loadingStatus"/>-->
+        <!--<apex:actionFunction action="{!requestUpdateQuotedTotal}" name="requestUpdateQuotedTotal" reRender="values,lines-table,script,message" status="loadingStatus"/>-->
         
     </apex:form>
     
@@ -526,7 +589,7 @@
             function confirmCreateInvoice(){
                 if({!isQuote}){
                     var qt =  {!IF(workOrder.Quoted_Total__c != null,workOrder.Quoted_Total__c,0)};
-                    var wt = {!revenue};
+                    var wt = {!invRevenue};
                     if(wt > qt){
                         $j('<div><p>The work order total is greater than the quoted total.</p><p><strong>Request to increase quoted total?</strong></p><p><em>*Note: The work order will be locked until the request has been answered.</em></p></div>').dialog({
                             modal:true,

@@ -220,6 +220,9 @@ private class UNITY_AttachmentMainTest{
         System.debug('@@@ur:'+ur);        
         Account acct = [select name from account where id = :ur[0].PortalAccountId];
         system.debug('@@@acct:'+acct);
+        
+        
+        UNITY_AttachmentUtilities.unShareAttachmentToVendor(new List<UNITY_Attachment__c> {attachment1});
         System.Test.stopTest();
     }   
     

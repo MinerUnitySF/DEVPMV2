@@ -103,6 +103,138 @@ public class UNITY_WorkOrderTriggerHandler_Miner_UT {
         }
     }
     
+    
+    
+     public static TestMethod void test2(){
+        
+        //Create a test user
+        User u = TestDataProvider.getUsers(1)[0];
+        u.Ignore_Validations__c = true;
+        insert u;
+        //create a queue
+        Group q = new Group(Name = 'NSBS Tier 1 Team 1',Type = 'Queue',DeveloperName='UNITY_Tier_1_Team_1');
+        insert q;
+        //Create a queue object
+        QueueSObject qso = new QueueSObject(QueueID = q.id, SobjectType = 'Case');
+        insert qso;
+        //create a regular group
+        Group g = new Group(
+            Name = 'NSBS Team 1',
+            Type = 'Regular'
+        );
+        insert g;
+        //Add the curremt user to the regular group
+        GroupMember gm = new GroupMember(
+            GroupId = g.Id,
+            UserOrGroupId = u.Id
+        );
+        insert gm;
+        //Add the regular group to the queue
+        GroupMember qm = new GroupMember(
+            GroupId = q.Id,
+            UserOrGroupId = g.Id
+        );
+        insert qm;
+        
+        System.runAs(u){
+            
+             UNITY_Constants.executionsPerTrigger.put('UNITY_WorkOrderTriggerHandler_Miner_UT',1);
+             
+            //Create BU SPecific Team field Map
+            UNITY_BU_Team_Field_Map__c nsbsTeamMap = new UNITY_BU_Team_Field_Map__c(
+                Name = 'NSBS',
+                UNITY_Field_API_Name__c = 'UNITY_Customer_Team__c'
+            );
+            insert nsbsTeamMap;
+            List<Account> accts = new List<Account>();
+            Account cust = TestDataProvider.getAccounts(1,'Customer', 'Customer')[0];
+            cust.Account_Status__c = 'Active';
+            cust.UNITY_Customer_Team__c = 'Team 1';
+            cust.UNITY_MNS_Customer_Team__c = 'Team 1';
+            cust.UNITY_Tier_Level__c = 'Tier 1';
+            accts.add(cust);
+            Account vend = TestDataProvider.getAccounts(1,'Vendor', 'Vendor')[0];
+            accts.add(vend);
+            Account buNSBS = TestDataProvider.getAccounts(1,'Miner','Business Unit')[0];
+            buNSBS.UNITY_Business_Unit__c = 'NSBS';
+            accts.add(buNSBS);
+            insert accts;
+            Account loc = TestDataProvider.getAccounts(1,'Customer', 'Site/Location')[0];
+            loc.Account_Status__c = 'Active';
+            loc.UNITY_Customer_Team__c = 'Team 1';
+            loc.UNITY_MNS_Customer_Team__c = 'Team 1';
+            loc.UNITY_Tier_Level__c = 'Tier 1';
+            loc.UNITY_Bill_To_Account__c = cust.Id;
+            loc.ParentId = cust.Id;
+            insert loc;
+            
+            Case c = UNITY_TestDataFactory.createCases(1,loc.Id,loc.Id)[0];
+            c.UNITY_Customer__c = loc.Id;
+            c.UNITY_Business_Unit__c = 'NSBS';
+            c.UNITY_Business_Unit_Account__c = buNSBS.Id;
+            c.UNITY_Skill_Broad__c = 'Glass';
+            
+            update c;
+            
+            String woRTId = UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE;
+            
+            Test.startTest();
+            
+              UNITY_Constants.executionsPerTrigger.put('UNITY_WorkOrderTriggerHandler_Miner_UT',1);
+            
+                WorkOrder wo = new WorkOrder();
+                wo.AccountId = loc.Id;
+                wo.UNITY_Assigned_Vendor__c = vend.Id;
+                wo.UNITY_Business_Unit_Account__c = buNSBS.Id;
+                wo.UNITY_Business_Unit__c = 'NSBS';
+                wo.UNITY_Customer__c = loc.Id;
+                wo.UNITY_Skill_Broad__c = 'Glass';
+                wo.UNITY_Skill_Group__c = 'Glass Installation/Repair';
+                wo.UNITY_Skill_Type__c = 'Glass, Board up, Mirrors & Displays';
+                wo.Priority = '24 Hour Response';
+                wo.Status = 'New';
+                wo.RecordTypeId = woRTId;
+                wo.CaseId = c.Id;
+                insert wo;
+                
+                wo.UNITY_Accepted_Vendor__c = vend.Id;
+                wo.UNITY_Vendor_Status__c = 'Accepted';
+                update wo;
+                
+                 system.debug('>>>>>  neli work order wo 1>>>>' + wo);
+                   
+                wo.UNITY_Work_Window_Begin__c = DateTime.now();
+                wo.UNITY_Work_Window_End__c = DateTime.now().addMinutes(60);
+                wo.Status = 'IVR Check Out - Agent Review Needed';
+                wo.SFPS_FS_LastCheckOut__c = DateTime.now().addMinutes(60);
+    	        update wo;
+                
+                system.debug('>>>>>  neli work order wo >>>> 2' + wo);
+                
+                c.UNITY_Attachment_Compliant__c = true;
+                update c;
+                
+                wo.UNITY_Attachment_Compliant__c=true;
+                 update wo;
+                
+                wo.Status ='IVR Check Out - Agent Review Needed'; 
+                wo.SFPS_FS_AllTasks_Completed__c ='All Tasks Completed/Verified';
+                wo.UNITY_Next_Step__c = 'Completion Confirmed';
+                update wo;
+                
+                system.debug('>>>>>  neli work order wo >>>> 3' + wo);
+                
+                UNITY_WorkOrderTriggerHandler_Miner.runTriggerOnce_After();
+                UNITY_WorkOrderTriggerHandler_Miner.runTriggerOnce_After();
+                UNITY_WorkOrderTriggerHandler_Miner.runTriggerOnce_Before();
+                UNITY_WorkOrderTriggerHandler_Miner.runTriggerOnce_Before();
+                
+            
+            
+            Test.stopTest();
+        }
+    }
+    
     private static void createuser(User runAsUser, Contact c, String username, String email){        
         
         system.runAs(runAsUser){

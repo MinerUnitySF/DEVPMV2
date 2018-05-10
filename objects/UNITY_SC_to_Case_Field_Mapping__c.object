@@ -4,6 +4,17 @@
     <description>Service Channel Request fields to case fields mappings. Used as key value pair.</description>
     <enableFeeds>false</enableFeeds>
     <fields>
+        <fullName>Category__c</fullName>
+        <description>This field represents the Service Channel category - PM, Project, Service etc. Used with SubID to have default mappings per category</description>
+        <externalId>false</externalId>
+        <label>Category</label>
+        <length>100</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>CustomerId_Subscriber__c</fullName>
         <description>If this field is populated, we will look for mappings based on this specific customer (SubscriberId in Service Channel).</description>
         <externalId>false</externalId>
@@ -74,6 +85,7 @@
         <fullName>All_Fields</fullName>
         <columns>NAME</columns>
         <columns>Description__c</columns>
+        <columns>Category__c</columns>
         <columns>CustomerId_Subscriber__c</columns>
         <columns>SCField__c</columns>
         <columns>SourceValue__c</columns>

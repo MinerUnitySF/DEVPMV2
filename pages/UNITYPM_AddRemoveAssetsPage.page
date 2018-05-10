@@ -1,0 +1,338 @@
+<apex:page standardController="WorkOrder" showHeader="false" sidebar="false" extensions="UNITYPM_AddRemoveWOAssetsCntrlExt"  id="AddAssetsPage">
+
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" />
+    <apex:includeScript value="https://code.jquery.com/jquery-1.12.4.js" />
+    <apex:includeScript value="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js" />
+    <apex:stylesheet value="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+      
+      <style>
+          .odd { 
+            background-color: #eeeeee;
+          }
+        .even {
+            background-color:  #FFFFFF;
+        }
+        .info {
+                border: 1px solid;
+                margin: 10px 0px;
+                padding:50px 30px 50px 50px;
+                background-repeat: no-repeat;
+                background-position: 10px center;
+                font-family:Arial, Helvetica, sans-serif; 
+                font-size:18px;
+                background-color: #BDE5F8;
+             }
+        
+   </style>
+   
+     <script>
+     var jq = jQuery.noConflict();
+     var table;
+     var table1;
+     
+     var initDataTable = function() {
+            var events = jq('#events');
+            table = jq('[id$="assetTable"]').DataTable(  {
+                    "order": [[ 2, "asc" ]],
+                    "paging": true,
+                    "pagingType": "full_numbers",
+                    "pageLength":  10,
+                    "stateSave": false,
+                     "lengthMenu": [[10, 15, 20, 25, 30, 40, 50, 100, 150, 200, -1], [10, 15, 20, 25, 30, 40, 50, 100, 150, 200, "All"]]
+                   
+                });
+        }
+        
+        jq(document).ready(function() {
+            initDataTable();
+        } );
+      
+         function selectAllAssets(chk){
+             var validateChk = false;
+            // alert (chk.id);
+             if(jq(chk).is(':checked')){
+                 validateChk = true;
+             }
+             
+              jq('.aFieldTable').each(function(){
+                    $(".cell-aId").each(function() {
+                    var checkbox = $(this).closest('tr').find("input[type=checkbox]");
+                    checkbox.prop('checked', validateChk);
+                  });
+               });
+           }
+        
+        /*  
+         function removeAllSelect(){
+            document.getElementById('AddAssetsPage:j_id6:j_id33:j_id52:assetTable:chkAll').checked = false;
+            jq('.aFieldTable').each(function(){
+                  // $(".cell-aId").each(function() {
+                      //var sa = $(this).closest('tr').find('chkAll').val(); 
+                       var sa = $(this).closest('tr').find("input:checkbox[name=chkAll]").val(); 
+                      // alert(sa);
+                  // });
+             });
+         } 
+         */
+         
+         Visualforce.remoting.timeout = 120000;
+         
+         function submitSelectedAssets()
+            {
+                var buttons = document.getElementsByTagName("input");
+                for(var i = 0; i < buttons.length; i++)
+                {
+                    if (buttons[i].type == "button"){
+                      if (buttons[i].value == 'Save & Close'){
+                         buttons[i].disabled = true;
+                         buttons[i].style.background='#A9A9A9';
+                         buttons[i].style.color = 'white';
+                         buttons[i].value = 'Saving... Please wait... ';
+                      } 
+                    }
+                }
+                
+                try
+                {
+                    var assetTable = jq('[id$="assetTable"]').DataTable();
+                    var data = assetTable.context[0].aoData;
+                    console.log($(data)); 
+                    // redraw the table to show all rows on one page
+                   // assetTable.page.len( -1 ).draw();
+                   var ids = $.map(assetTable.rows('.selected').data(), function (item) {
+                        return item[0]
+                    });
+                    console.log(ids)
+                   
+                    var selectValues = [];
+                    var workOrderID;
+                     
+                    jq('.aFieldTable').each(function(){
+                        $(".cell-aId").each(function() {
+                              
+                            var checkbox = $(this).closest('tr').find("input:checkbox:checked").val();
+                            
+                            if (checkbox) {
+                                var assetName = $(this).html();
+                                var aId = $(this).closest('tr').find("input:hidden[name=aId]").val();
+                                var wpId = $(this).closest('tr').find(":selected").val();
+                                var aselected = 1;
+                                
+                                selectValues.push({aId, wpId, aselected});
+                             }
+                             else {
+                                var aId = $(this).closest('tr').find("input:hidden[name=aId]").val();
+                                var wpId = $(this).closest('tr').find(":selected").val();
+                                var aselected = 0;
+                                
+                                selectValues.push({aId, wpId, aselected}); 
+                             }
+                              workOrderID = $(this).closest('tr').find("input:hidden[name=woIdName]").val();
+                          });
+                       });
+                   
+                        console.log(selectValues, workOrderID);
+                   
+                        Visualforce.remoting.Manager.invokeAction(
+                                    '{!$RemoteAction.UNITYPM_AddRemoveWOAssetsCntrlExt.handleAssetsSubmit}', selectValues,workOrderID,
+                        function(results, event) {
+                          if (event.status) 
+                            {
+                               console.log('>>>  result.Id >>> ' + results.Id);
+                               console.log('>>>  result.Name >>> ' + results.Name);
+                            }
+                           else if (event.type === 'exception') 
+                            {
+                              console.log('>>>  exception >>  event.message >>>> ' +  event.message);
+                            }
+                          else{
+                             console.log('>>>    event.message >>>> ' +  event.message);
+                           }
+                        });
+                       
+                    //return true;
+                }
+                catch (err)
+                {
+                    console.log(err.message);
+                   // return false;    
+                }
+            }
+            
+       function CloseWindow()
+        { 
+            javascript: setTimeout(function () { window.close();}, 3000);  //window.top.close(); 
+        }
+        
+         function checkResult()
+          {   
+              if ({!NOT(hasError)})
+                javascript: setTimeout(function () { window.close();}, 3000);  //javascript:CloseWindow();
+          }    
+    </script>
+    
+        <apex:outputPanel rendered="{!IF(AND(VendorAssignedStatus == true,WorkOrderNoPM == false,WorkOrderCanceled == false, WorkOrderCompleted == false), TRUE, FALSE)}">
+     <apex:form >
+    <apex:pageBlock >
+         <apex:pageBlockSection columns="1">
+            <apex:pageBlockSectionItem >
+              <apex:outputPanel >
+            <apex:outputLabel style="font-size: 15px; font-weight: bold;text-decoration: underline;" value="Customer Account:"></apex:outputLabel> &nbsp;
+            <apex:outputText style="font-size: 15px; font-weight: bold;" value="{!customeAccount}"/>  &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+            
+            <apex:outputLabel style="font-size: 15px; font-weight: bold; text-decoration: underline;" value="Site/Store#"></apex:outputLabel> &nbsp;
+            <apex:outputText style="font-size: 15px; font-weight: bold;" value="{!siteStoreNumber}"/>  &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+            
+             <apex:outputLabel style="font-size: 15px; font-weight: bold;text-decoration: underline;" value="Work Order Number:"></apex:outputLabel> &nbsp;
+            <apex:outputText style="font-size: 15px; font-weight: bold;" value="{!workOrderNumber}"/>
+           </apex:outputPanel>     
+          </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+        
+        <br/> 
+       <h1><span style ="font-size: 14px;text-decoration: underline;">New Asset Creation</span></h1>
+    
+          <apex:pageBlockSection columns="1" id="assetTypeCreate">
+              <apex:pageBlockSectionItem >
+                   <apex:outputPanel id="pna">
+                      <apex:outputLabel value="Asset Type" style="font-size: 12px;"/>&nbsp;&nbsp;
+                       <apex:selectList value="{!selectedAssetVal}" size="1"> 
+                        <apex:selectOptions value="{!DefaultAssetsList}" /> 
+                      </apex:selectList>
+                    
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                     <apex:outputLabel value="Count" style="font-size: 12px;"/>&nbsp;&nbsp;
+                       <apex:selectList value="{!selectedNumVal}" size="1"> 
+                        <apex:selectOptions value="{!NumbersList }" /> 
+                      </apex:selectList>
+                  
+                   &nbsp;&nbsp;&nbsp;&nbsp;  
+                   <apex:commandButton value="Create new blank asset(s)" action="{!addDefaultAssets}" reRender="assetTable"  status="saveDefaultAssets" style="background:LightCray;width:180px;font-size: 13px;"  oncomplete="javascript:window.top.location.reload()"></apex:commandButton>
+             </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+          </apex:pageBlockSection>
+          
+          <apex:outputPanel id="messages">
+              <apex:pageMessages ></apex:pageMessages>
+          </apex:outputPanel>
+          
+         
+           <apex:outputPanel >
+             <apex:actionStatus id="saveDefaultAssets" onStop="setTimeout(function () { window.close();}, 8000);" >
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <img src="/img/loading32.gif" width="45" height="45" />
+                            <apex:outputLabel value="(Saving ...)"/>
+                        </apex:outputPanel>            
+                    </apex:facet>
+                </apex:actionStatus> 
+        </apex:outputPanel>
+       
+        <br/><br/>
+        <h1><span style ="font-size: 14px;text-decoration: underline;">Assets to Select</span></h1>
+       
+        
+     <apex:pageBlockSection columns="1">
+      
+                
+           <div style="width:80%; margin-left:auto; margin-right:auto; margin-top:10px;">
+                <apex:pageBlockTable value="{!RecordsToDisplay}" var="rec"  id="assetTable" border="1" styleClass="aFieldTable" rowClasses="even,odd">
+                       
+                    <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Chk</span></apex:facet>
+                            <apex:outputText style="color:white;" value="{!rec.selected}"/>
+                    </apex:column>
+                       
+                      <apex:column >
+                         <apex:facet name="header" >
+                         <!-- <input type="checkbox" class="selectAll" checked=""/> -->
+                           <apex:inputCheckbox styleClass="selectAll" selected="false" onchange="selectAllAssets(this);" id="chkAll"/> 
+                        </apex:facet>
+                      
+                       <apex:outputPanel >
+                       <!--  <input id="chk{!rec.numberOfRow}" name="chk{!rec.numberOfRow}"  type="checkbox" styleClass="selected-checkbox"  checked="{!rec.selected}"  onclick="removeAllSelect();"/> -->
+                        <apex:inputCheckbox value="{!rec.selected}" id="chk" styleClass="selected-checkbox" />
+                         <input type="hidden" value="{!worOrderID}"  id="woId" name ="woIdName" />
+                       </apex:outputPanel>
+                      </apex:column> 
+                      
+                         
+                     <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Asset Name</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.Name}" styleClass="cell-aId"/>
+                             <input type="hidden" value="{!rec.asset.ID}"  name="aId" />
+                     </apex:column>
+                    
+                      <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Serial Number</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.UNITY_Serial_No__c}"/>
+                    </apex:column>
+                    
+                    <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Model Number</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.UNITY_Model_No__c}"/>
+                    </apex:column>
+
+                    <apex:column >
+                       <apex:facet name="header"><span style ="font-size: 13px;">Asset Type</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.UNITY_Asset_Type__c}"/>
+                    </apex:column>
+                    
+                     <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Work Plan</span></apex:facet>
+                             <apex:selectList size="1" multiselect="false"  value="{!rec.SelectedOption}" id="selectedAsset">
+                              <apex:selectOptions value="{!rec.wplist}"></apex:selectOptions>
+                            </apex:selectList> 
+                    </apex:column>
+            </apex:pageBlockTable>
+      
+           
+        <apex:outputPanel >
+             <apex:actionStatus id="pageStatus" onStop="CloseWindow()">
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <img src="/img/loading32.gif" width="45" height="45" />
+                            <apex:outputLabel value="(Saving ...)"/>
+                        </apex:outputPanel>            
+                    </apex:facet>
+                </apex:actionStatus> 
+        </apex:outputPanel>
+             
+            
+            <br/>
+               <apex:outputPanel id="buttonsBlock">
+                 <apex:commandButton onclick="submitSelectedAssets();"  oncomplete="checkResult();" reRender="messages,idSaving" value="Save & Close" style="background:LightCray;width:150px;font-size: 13px;"/>
+                  <br/><br/>
+                 <apex:outputPanel id="idSaving"  layout="block"  style="display: none" styleClass="getSaveMsg">
+                    <div>Saving... Please wait</div>
+                 </apex:outputPanel>
+            
+              </apex:outputPanel>
+        </div>
+       
+        </apex:pageBlockSection> 
+        </apex:pageBlock>
+            
+     </apex:form>
+     
+     </apex:outputPanel>
+      
+    <apex:outputPanel rendered="{!IF(AND(VendorAssignedStatus == false,WorkOrderNoPM == true,WorkOrderCanceled == false, WorkOrderCompleted == false), TRUE, FALSE)}">
+         <div class="info">
+              {!WarningWONoPM}
+             </div> 
+     </apex:outputPanel>
+     
+    <apex:outputPanel rendered="{!IF(AND(VendorAssignedStatus == false,WorkOrderNoPM == false,WorkOrderCanceled == true, WorkOrderCompleted == false), TRUE, FALSE)}">
+         <div class="info">
+              {!WarningWOCanceled}
+             </div> 
+     </apex:outputPanel>
+     
+     <apex:outputPanel rendered="{!IF(AND(VendorAssignedStatus == false,WorkOrderNoPM == false,WorkOrderCanceled == false, WorkOrderCompleted == true), TRUE, FALSE)}">
+         <div class="info">
+              {!WarningWOCompleted}
+             </div> 
+     </apex:outputPanel>
+     
+</apex:page>

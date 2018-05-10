@@ -122,6 +122,12 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Coordinator</displayNameOverride>
+            <field>Corporate_Contact__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Business_Unit_Account__c</field>
             <table>Case</table>
         </columns>
@@ -863,6 +869,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>Tech_ETA__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Service_Channel_CustomerID__c</field>
             <table>Case</table>
         </columns>
@@ -1523,12 +1534,6 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <displayNameOverride>Coordinator</displayNameOverride>
-            <field>Corporate_Contact__c</field>
-            <table>Case.WorkOrders</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
             <field>CountryCode</field>
             <table>Case.WorkOrders</table>
         </columns>
@@ -1540,6 +1545,12 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>CreatedBy</field>
+            <table>Case.WorkOrders</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Coordinator</displayNameOverride>
+            <field>Corporate_Contact__c</field>
             <table>Case.WorkOrders</table>
         </columns>
         <columns>
@@ -1935,6 +1946,16 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>FSO__IsNew__c</field>
+            <table>Case.WorkOrders</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Next_Action__c</field>
+            <table>Case.WorkOrders</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Next_Action_Date__c</field>
             <table>Case.WorkOrders</table>
         </columns>
         <columns>
@@ -2671,6 +2692,21 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>PostalCode</field>
+            <table>Case.WorkOrders</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Accepted_Vendor__c.Name</field>
+            <table>Case.WorkOrders</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Accepted_Vendor__c.BillingAddress</field>
+            <table>Case.WorkOrders</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Accepted_Vendor__c.ShippingAddress</field>
             <table>Case.WorkOrders</table>
         </columns>
         <masterLabel>Work Orders</masterLabel>

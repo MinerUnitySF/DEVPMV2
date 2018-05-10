@@ -12,18 +12,40 @@ public interface UNITY_ITrigger {
      * any data required into maps prior execution of the trigger.
      */
     void bulkBefore();     
+
+    ////////////////////////////////////////////////////////////////
+    /**
+     * bulkBefore with filtered records
+     * This method is called prior to execution of a BEFORE trigger. Use this to cache
+     * any data required into maps prior execution of the trigger.
+     */
+    void bulkBefore(List<SObject> newFilteredList, List<SObject> oldFilteredList, Map<Id,SObject> oldFilteredMap, Map<Id,SObject> newFilteredMap);   
+
+    ////////////////////////////////////////////////////////////////
     /**
      * bulkAfter
      * This method is called prior to execution of an AFTER trigger. Use this to cache
      * any data required into maps prior execution of the trigger.
      */
+     
     void bulkAfter();
+
+    ////////////////////////////////////////////////////////////////
+    /**
+     * bulkAfter with filtered records
+     * This method is called prior to execution of a BEFORE trigger. Use this to cache
+     * any data required into maps prior execution of the trigger.
+     */
+    void bulkAfter(List<SObject> newFilteredList, List<SObject> oldFilteredList, Map<Id,SObject> oldFilteredMap, Map<Id,SObject> newFilteredMap);   
+
     /**
      * beforeInsert
      * This method is called iteratively for each record to be inserted during a BEFORE trigger.
      * Never execute any SOQL/SOSL etc in this and other iterative methods.
      */
     void beforeInsert(SObject so);
+
+    /////////////////////////////////////////////////////////////////
     /**
      * beforeUpdate
      * This method is called iteratively for each record to be updated during a BEFORE trigger.

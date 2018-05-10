@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Role xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseAccessLevel>None</caseAccessLevel>
+    <contactAccessLevel>None</contactAccessLevel>
+    <description>FALCON IND/ RORY EIKLAND Customer User</description>
+    <mayForecastManagerShare>false</mayForecastManagerShare>
+    <name>FALCON IND/ RORY EIKLAND Customer User</name>
+    <opportunityAccessLevel>None</opportunityAccessLevel>
+    <parentRole>Miner_Corporate</parentRole>
+</Role>

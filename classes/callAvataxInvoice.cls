@@ -193,7 +193,7 @@ public with sharing class callAvataxInvoice {
 			}
 		}
 		//gtreq.DocDate = Date.Today();
-		gtreq.Commit_x=false;
+		gtreq.Commit_x= true;
 		
 		avataxAvalaraComServicesAlt.GetTaxResult gtres = null;
 		SampleResult = '';

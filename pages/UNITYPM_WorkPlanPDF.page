@@ -1,0 +1,535 @@
+<apex:page standardController="WorkOrder" renderAs="PDf" contentType="application/pdf" lightningStylesheets="true" 
+                              extensions="UNITY_WorkOrderPlanPDFCntrlExtension" showHeader="false" sidebar="false"
+                              standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" docType="html-5.0" >
+        <html>
+    <head>
+       <style type="text/css" >
+         @page :first {
+            // border: 1px solid black;
+             size: 8.5in 11in;
+             margin: 150px 20px 160px 20px;
+             @top-center {
+                 content: element(header);
+             }
+           //  @bottom-center {
+            //     content: element(footer);
+            // }
+         }
+         
+         @page {
+             //border: 1px solid black;
+             size: 8.5in 11in;
+             margin: 150px 20px 10px 20px;
+           //  @top-center {
+            //     content: element(header);
+            // }
+            @bottom-center {
+                 content: element(footerContainer);
+            }
+         }
+        
+         pageborder{
+          border: 1px solid black;
+         }
+         
+         div.header {
+             padding: 20px 0px 0px 0px;
+             margin: 0px;
+             position: running(header);
+             width: 100%;
+             height: 200px;
+             display: table;
+         }
+         div.footer {
+             padding: 0px 0px 10px 0px;
+             position: running(footer);
+             width: 100%;
+             display: table;
+         }
+         body {
+             margin: 0px;
+             padding: 0px;
+         }
+         .pagebreak {
+             page-break-before: always;
+             display: block;
+             width: 100%;
+         }
+         
+         .titleheader {
+             width: 100%;
+             height: 110px;
+             text-align: center;
+             position: relative;
+         }
+         .headerlabel {
+             margin: 0 auto;
+             heigth: 40px;
+             width: 350px;
+             font-size: 30px;
+         }
+         .row {
+             display: inline-block;
+             height: 100%;
+         }
+         .font1 {
+             font-size: 10px;
+         }
+         .font2,
+         .fontImportant2 {
+             font-size: 12px;
+         }
+         .font3,
+         .fontImportant3 {
+             font-size: 15px;
+         }
+         .font4,
+         .fontImportant4 {
+             font-size: 20px;
+             font-weight: bold;
+         }
+         .font5 {
+             font-size: 30px;
+             font-weight: bold;
+         }
+         .fontImportant1,
+         .fontImportant2,
+         .fontImportantHeader,
+         .fontImportant4 {
+             color: #ff0000;
+         }
+         .footerContainer{
+                    display: table-cell;
+                    vertical-align: top;
+                    text-align: center;
+                }
+                
+         
+         table {
+             width: 100%;
+             border-spacing:0;
+             border-collapse: collapse;
+         }
+         .table, table, th, td, tr {
+                    border: 2px solid black;
+                    cellspacing: 0; 
+                    cellpadding: 0;
+                    margin: 0px;
+                    padding: 0px;
+                }
+                
+                td table td{
+                    padding-left:2px;
+                    padding-right:2px;
+                }
+ 
+                td table th{
+                    padding-left:2px;
+                    padding-right:2px;
+                }
+ 
+         
+         th, tr {
+             border-collapse: collapse;
+         }
+        .tr2 {
+                    height:30px;
+                }
+        .tdInverse1{
+                    background-color:#000000;
+                    color:#ffffff;
+                    text-align:center;
+                }
+         #leftheader,
+         .leftblock {
+             float: left;
+         }
+         #leftheader {
+             width: 120px;
+             height: 100%;
+         }
+         .leftblock {
+             width: 40%;
+             position: relative;
+             height: 100%;
+         }
+         .centerblock {
+             margin: 0 auto;
+             width: 100%;
+             height: 100%;
+             background: #00ff00;
+         }
+                  .rightblock {
+             width: 40%;
+             height: 100%;
+         }
+         #proposalLabel {
+             color: #ffffff;
+             font-size: 40px;
+             border: 2px solid #ffffff;
+             background: #000000;
+             width: 100%;
+             height: 50px;
+             text-align:center;
+             vertical-align:middle;
+         }
+         #containerblock {
+             height: 150px;
+             tex-align: center;
+             display: block;
+              border: 2px solid #000000;
+         }
+         .noborder,
+         .noborder tr,
+         .noborder th,
+         .noborder td {
+             border: none;
+         }
+         .border1{
+             border: 2px solid #000000;
+         }
+         .border1 th {
+             border: 2px solid #000000;
+             background: #ff0000;
+         }
+         .border2 td{
+             border-top: 2px solid #000000;
+             margin-left: 5px;
+         }
+         .tableblock {
+             height: 140px;
+         }
+         .textcenter {
+             text-align: center;
+         }
+         .borderred {
+             border: 1px solid #ff0000;
+         }
+         .footerContainer{
+             display: table;
+             width: 100%;
+             vertical-align: top;
+             text-align: center;
+         }
+         .parentblock{
+             margin: 10px 0px 10px 0px;
+             position: relative;
+             overflow: hidden;
+         }
+         #termsandconditions p {
+             text-align: justify;
+             text-justify: inter-word;
+             display:table-row;
+             font-size: 8pt;
+             font-family: Arial, Helvetica, sans-serif;
+         }
+         li {
+             font-size:12px;
+         }
+         ol.a {
+             list-style-type: lower-alpha;
+         }
+         .noborder,
+         .noborder tr,
+         .noborder th,
+         .noborder td {
+             border: none;
+         }
+         .border1, .border1 th, .border3{
+             border: 2px solid #000000;
+         }
+         .border1 th, .border3 th {
+             background: #ff0000;
+             text-align: center;
+             height: 30px;
+         }
+
+         .noborder,
+         .noborder tr,
+         .noborder th,
+         .noborder td {
+             border: none;
+         }
+         .border1, .border1 th, .border3{
+             border: 2px solid #000000;
+         }
+         #leftheader,
+         .leftblock {
+             float: left;
+         }
+         #leftheader {
+             width: 200px;
+             height: 100%;
+         }
+         .leftblock {
+             width: 40%;
+             position: relative;
+             height: 100%;
+         }
+         .centerblock {
+             margin: 0 auto;
+             width: 120px;
+             height: 120px;
+             background: #00ff00;
+         }
+         
+         #rightheader,
+         .rightblock {
+             float: right;
+             position: relative;
+             width: 130px;
+             height: 50px;
+         }
+         #rightheader {
+             width: 200px;
+             height: 110px;
+             vertical-align: center;
+             
+         }
+         
+         #rightheader span {
+             display: inline-block;
+             vertical-align: middle;
+         }
+         
+         .rightblock {
+             width: 40%;
+             height: 100%;
+         }
+          .borderred {
+             border: 1px solid #ff0000;
+         }
+        .parentblock{
+             margin: 10px 0px 10px 0px;
+             position: relative;
+             overflow: hidden;
+         }
+         
+         .info {
+                    border: 1px solid;
+                    margin: 10px 0px;
+                    padding:50px 30px 50px 50px;
+                    background-repeat: no-repeat;
+                    background-position: 10px center;
+                    font-family:Arial, Helvetica, sans-serif; 
+                    font-size:18px;
+                    //background-color: #BDE5F8;
+                 }
+           .check-box{
+                    display:inline-block;
+                    width:7px;
+                    height:7px;
+                    border:1px solid #000;
+                    vertical-align:baseline;
+                }
+             .meter-reading-box{
+                    display:inline-block;
+                    width:185px;
+                    height:18px;
+                    border:1px solid #000;
+                    position:relative;
+                }
+             .store-free{
+                    border:2px solid #000;
+                    height:40px;
+                    margin:10px;
+                    position:relative;
+                }
+               .store-free-text{
+                    display:block;
+                    position:absolute;
+                    bottom:3px;
+                    left:3px;
+                }
+                .woli-column-left {
+                    float: left;
+                    width: 70%;
+                }
+                .woli-column-right {
+                    float: left;
+                    width: 30%;
+                }
+    </style> 
+    </head>
+    <body>
+     <apex:outputPanel rendered="{!VendorAcceptedStatus}">
+    <apex:form >
+      <div class="header">
+         <div class="titleheader">
+            <div id="leftheader">
+               <p id="proposalLabel">
+                  Work Plan
+               </p> 
+            </div>
+            
+            <div id="rightheader">
+                <apex:outputText value="{0, date,'Date: 'MMM d','  yyyy}">
+                    <apex:param value="{!workOrder.CreatedDate}" /> 
+                </apex:outputText> <br/>
+                
+                <apex:outputText value="{!workOrder.WorkOrderNumber}" /><br/>
+                
+                <apex:outputLabel value="{!$ObjectType.WorkOrder.fields.UNITY_Vendor_PIN__c.Label}: " for="venPin"/>
+                <span style="font-weight: bold;">{!workOrder.UNITY_Vendor_PIN__c}</span>
+            </div> 
+            
+            <div id="centerblock">
+                <apex:image styleClass="logo" url="{!workOrder.UNITY_Email_Logo_URL__c}"/>
+            </div>
+         </div>
+      </div>
+      <div class="pagebreak">
+         <div class="parentblock">
+             <div class="leftblock">
+                <table class=" border1 tableblock">
+                   <tr>
+                      <th>PREPARED FOR:</th>
+                   </tr>
+                   <tr>
+                      <td>
+                          <c:UNITY_UserInfo aId="{!workOrder.UNITY_Assigned_Vendor__r.Id}"/>
+                      </td>
+                   </tr>
+                </table>
+             </div>
+             <div class="rightblock">
+                <table class="border1 tableblock">
+                   <tr>
+                      <th>JOB SITE INFORMATION:</th>
+                   </tr>
+                   <tr>
+                      <td>
+                        <apex:outputText value="{!JobSite}" escape="false" />
+                      </td>
+                   </tr>
+                </table>
+             </div>
+         </div>
+       </div>
+       <div class="borderred"></div>
+       <br/><br/>
+          
+          <apex:outputPanel rendered="{!! AssetsDataAvailable}" >
+            <div>
+                <table>
+                    <tr class="tr2">
+                      <td class="tdInverse1">WORK PLAN ITEMS</td>
+                     </tr>
+                        
+                         <tr><td>
+                           <apex:dataTable value="{!woli}" var="wol">
+                               <apex:column >
+                                    <apex:facet name="header">Description</apex:facet>
+                                    <apex:outputText value=" {!wol.Description}"></apex:outputText> 
+                                 </apex:column>
+                           </apex:dataTable>
+                          </td></tr>
+          
+                </table>
+           </div>
+         </apex:outputPanel>
+            
+          <apex:outputPanel rendered="{!AssetsDataAvailable}" >
+          
+           <div>
+                <table>
+                    <tr class="tr2">
+                      <td class="tdInverse1">WORK PLAN ITEMS</td>
+                     </tr>
+                        
+                         <tr><td>
+                           <apex:dataTable value="{!woli}" var="wol">
+                               <apex:column >
+                                    <apex:facet name="header">Description</apex:facet>
+                                    <apex:outputText value=" {!wol.Description}"></apex:outputText> 
+                                 </apex:column>
+                           </apex:dataTable>
+                          </td></tr>
+                     
+                           <tr class="tr2">
+                               <td>
+                                <table>
+                                        
+                                    <tr>
+                                        <td class="tdInverse1"><strong>Type</strong></td>
+                                        <td class="tdInverse1"><strong>Manufacturer</strong></td>
+                                        <td class="tdInverse1"><strong>Model</strong></td>
+                                        <td class="tdInverse1"><strong>Serial #</strong></td>
+                                        <td class="tdInverse1">
+                                          <strong>
+                                             <apex:outputText value="{!IF(aType=='MHE','Hour Meter Reading','Position')}"></apex:outputText>
+                                          </strong>
+                                        </td>
+                                  </tr>
+                                  
+                                 <apex:repeat value="{!assets}" var="a">
+                                    <tr>
+                                        <td class="tdInverse1">
+                                            <apex:outputText value="{!a.Product2.Name}"  rendered="{!a.Product2 != null}"></apex:outputText>
+                                        </td>
+                                        <td class="tdInverse1">
+                                            <apex:outputText value="{!a.Product2.Make1__c}" rendered="{!a.Product2 != null}"></apex:outputText>
+                                        </td>
+                                        <td class="tdInverse1">
+                                            <apex:outputText value="{!a.Product2.Model__c}" rendered="{!a.Product2 != null}"></apex:outputText>
+                                        </td>
+                                        <td class="tdInverse1">{!a.SerialNumber}</td>
+                                        <td class="tdInverse1">
+                                            <apex:outputText value="{!a.UNITY_Asset_Location_On_Site__c}" rendered="{!a != null}"></apex:outputText>
+                                        </td>
+                                    </tr>
+                                  
+                                 <apex:repeat value="{!a.WorkOrderLineItems}" var="item"> 
+                                    <tr><td colspan="5">
+                                    <table>
+                                    <tr>
+                                      <td>
+                                        <apex:outputText value="{!item.Description}"></apex:outputText>
+                                        
+                                         
+                                       <div style =" float: right;width: 40%;">
+                                         <apex:outputText style="font-style:italic;text-align:right;width:70%;" 
+                                             value="{! if (item.UNITY_Render_Type__c == 'Yes/No', $Label.RenderYesNoWorkPlanType,
+                                                if (item.UNITY_Render_Type__c == 'Pass/Fail', $Label.RenderPassFailWorkPlanType,
+                                                If (item.UNITY_Render_Type__c == 'Good/Medium/Bad', $Label.RenderGoodMidBadWorkPlanType, 
+                                                if (item.UNITY_Render_Type__c == 'Meter Reading', $Label.RenderMeterReadingWorkPlanType, 
+                                                If (item.UNITY_Render_Type__c == 'Free Text', $Label.RenderFreeTextWorkPlanType,''))))
+                                            )}" escape="false">
+                                        </apex:outputText>
+                                       </div>  
+                                       
+                                       </td>
+                                    </tr>
+                                    </table>
+                                   </td></tr>
+                                </apex:repeat>
+                                  
+                            </apex:repeat>
+                            
+                                </table>
+                            </td>
+                           </tr>
+                 
+                </table>
+            </div>
+           
+         </apex:outputPanel>
+            
+            <br/><br/>
+        <div>
+        <div class="footerContainer">
+            <div><apex:outputText value="{!MinerFooterDocument}" escape="false"/></div>
+        </div>
+      </div>
+      </apex:form>
+       
+      <apex:outputPanel rendered="{!! VendorAcceptedStatus}" >
+             <div class="info">
+              {!WarningMessage}
+             </div>
+         </apex:outputPanel>
+         
+      </apex:outputPanel>
+      </body>
+    </html>
+</apex:page>

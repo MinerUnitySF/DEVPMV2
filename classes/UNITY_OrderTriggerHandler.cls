@@ -74,8 +74,12 @@ public class UNITY_OrderTriggerHandler extends UNITY_BaseHandler{
 
         Order onOrder = (Order) so;
 
-        if( (onOrder.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE ) && (onOrder.UNITY_PO_Template__c != null) ){
-            recordIdTemplateId.put(onOrder.id, onOrder.UNITY_PO_Template__c);
+        //UNITYPM Exclude PM Orders
+        if (!onOrder.UNITYPM_Is_WO_Preventative_Maintenance__c)
+        {
+            if( (onOrder.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE ) && (onOrder.UNITY_PO_Template__c != null) ){
+                recordIdTemplateId.put(onOrder.id, onOrder.UNITY_PO_Template__c);
+            }
         }
 
          modifiedOrderIdList.add(onOrder.Id);
@@ -116,7 +120,6 @@ public class UNITY_OrderTriggerHandler extends UNITY_BaseHandler{
 
         System.debug(LoggingLevel.INFO,'<AK> : ordersWithServiceFeePoliMap : '+ordersWithServiceFeePoliMap);
         System.debug(LoggingLevel.INFO,'<AK> : ordersWithServiceFeePoliMap.get(onOrder.Id) : '+ordersWithServiceFeePoliMap.get(onOrder.Id));
-        //System.debug(LoggingLevel.INFO,'<AK> : ordersWithServiceFeePoliMap.get(onOrder.Id).OrderItems : '+ordersWithServiceFeePoliMap.get(onOrder.Id).OrderItems);
 
         if(ordersWithServiceFeePoliMap!=null
             && ordersWithServiceFeePoliMap.get(onOrder.Id) !=null
@@ -195,24 +198,12 @@ public class UNITY_OrderTriggerHandler extends UNITY_BaseHandler{
         Order onOrder = (Order) so;
         Order onOldOrder = (Order) oldSo;
 
-        if( (onOldOrder.Status == 'Draft') && (onOrder.Status == 'Final') && (onOrder.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE) )
-           sendPOOrders.put(onOrder.id, onOrder.FSO__WorkOrder__c );
-
-        /*
-        if( onOrder.RecordTypeId == UNITY_Constants.ORDER_USAGE_REQUEST_RECORDTYPE ) {
-            // when user activate the product change the status to submitted to miner
-            if (onOldOrder.ActivatedDate == NULL && onOrder.ActivatedDate != NULL){
-                //onOrder.Status = UNITY_Constants.ORDER_STATUS_SUBMITTED_TO_MINER;
-            }
-            // when user deactivate the product change the status to draft
-            if (onOldOrder.ActivatedDate == NULL && onOrder.ActivatedDate != NULL) {
-                //onOrder.Status = UNITY_Constants.ORDER_STATUS_DRAFT;
-            }
+        //UNITYPM Exclude PM Orders
+        if (!onOrder.UNITYPM_Is_WO_Preventative_Maintenance__c)
+        {
+            if( (onOldOrder.Status == 'Draft') && (onOrder.Status == 'Final') && (onOrder.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE) )
+                 sendPOOrders.put(onOrder.id, onOrder.FSO__WorkOrder__c );
         }
-        */
-
-
-
     }
 
     public override void bulkAfter(){
@@ -222,7 +213,6 @@ public class UNITY_OrderTriggerHandler extends UNITY_BaseHandler{
         if (Trigger.isUpdate) {
             getExistingServiceFeePOLI();
             populateVendorServiceContractsMap();
-            //pushStockingAndDropshipPOForPartReceivedToSL((List<Order>)Trigger.old,(List<Order>)Trigger.new);
         }
     }
 
@@ -232,26 +222,9 @@ public class UNITY_OrderTriggerHandler extends UNITY_BaseHandler{
             setRelatedWorkOrderMap();
             System.debug('#populateVendorServiceContract ');
             UNITY_AutopopulateChildController.autopopulateFieldsIfApplicableBulkified(Trigger.New, 'Order');
-            //autoPopulateChildRecords();
             populateVendorServiceContract();
         }
-        if (trigger.isUpdate) {
-            //Izay: Deprecated 2/1/2017
-            //checkForUpdateLocationStock((Map<Id,Order>)Trigger.newMap,(Map<Id,Order>)Trigger.oldMap);
-        }
     }
-
-    /*
-    public void autoPopulateChildRecords(){
-            List<Order> ordersToAutoPopulate = new List<Order>();
-            for (sObject iter : trigger.new){
-              Order onOrder = (Order)iter;
-              if (onOrder.Status != UNITY_Constants.ORDER_STATUS_PART_SOURCE_NEEDED){
-                ordersToAutoPopulate.add(onOrder);
-              }
-            }
-            UNITY_AutopopulateChildController.autopopulateFieldsIfApplicableBulkified(ordersToAutoPopulate, 'Order');
-    }*/
 
     public override void andFinally(){
 
@@ -295,34 +268,6 @@ public class UNITY_OrderTriggerHandler extends UNITY_BaseHandler{
         if(!vendorSCIdList.isEmpty())
           vendorServiceContracts = new Map<Id, UNITY_Service_Contract__c>([Select Id, (Select id,  UNITY_Threshold_Start__c, UNITY_Threshold_End__c, UNITY_Service_Charge_Percentage__c, UNITY_Service_Charge_Amount__c from UNITY_Service_Contract_Line_Items__r where RecordTypeId=:UNITY_Constants.SCLI_SERVICE_CHARGE_RECORDTYPE) from UNITY_Service_Contract__c where Id in :vendorSCIdList]);
     }
-
-/*    @future
-    public static void createServiceFeePolis(String serviceFeePolisJSON){
-
-        System.debug(LoggingLevel.INFO,'<AK> : in Future Create POLI : serviceFeePolisJSON : '+serviceFeePolisJSON);
-
-        List<SObject> sObjs = new List<SObject>();
-
-        try {
-            sObjs = (List<SObject>) JSON.deserialize(serviceFeePolisJSON, List<SObject>.class);
-         System.debug(LoggingLevel.INFO,'<AK> : sObjs : '+sObjs);
-
-        } catch (Exception e) {
-            System.debug('Error in JSON deserialization');
-        }
-
-        if(!sObjs.isEmpty()) {
-            try {
-                insert sObjs;
-                System.debug(LoggingLevel.INFO,'<AK> : done with insert POLI : ');
-
-            } catch (Exception e) {
-                System.debug('Error inserting Service Fee POLIs');
-            }
-
-        }
-    }
-*/
 
     public void createServiceFeePolis(){
 
@@ -387,10 +332,6 @@ public class UNITY_OrderTriggerHandler extends UNITY_BaseHandler{
         if (relatedWorkOrderMap.get(orderRecord.FSO__WorkOrder__c) != null){
             orderRecord.UNITY_Business_Unit_Account__c = relatedWorkOrderMap.get(orderRecord.FSO__WorkOrder__c).UNITY_Business_Unit_Account__c;
         }
-        /*Izay: Commented Out to prevent BU Account from deleting on Stocking Pos
-        else{
-            orderRecord.UNITY_Business_Unit_Account__c = null;
-        }*/
     }
 
     public void applyTemplates(){
@@ -554,113 +495,5 @@ public class UNITY_OrderTriggerHandler extends UNITY_BaseHandler{
         }
         UNITY_MuleCalloutOperation.invokeCallOut(stockingPoIds,UNITY_MuleSiteSettingUtils.PURCHASE_ORDER);
     }
-
-    // Check for enought location stock for the part items for the purchase and usage request order,
-    // if the po is the case, decrement the stock from the location stock too.
-    /* Izay: Deprecated 2/1/2017: Handled at the line level 
-    private void checkForUpdateLocationStock(Map<Id,Order> newOrderMap, Map<Id,Order> oldOrderMap) {
-        List<Order> orderChangeStatusCandidates = new List<Order>();
-        System.debug(' >>> newOrderMap '+newOrderMap);
-        for(Order onOrder : newOrderMap.values()) {
-            Order onOldOrder = oldOrderMap.get(onOrder.Id);
-            if( ((onOldOrder.Status != 'Final') && (onOrder.Status == 'Final') &&
-                 onOrder.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE) ||
-                    ((onOldOrder.Status != UNITY_Constants.ORDER_STATUS_SUBMITTED_TO_MINER) &&
-                    (onOrder.Status == UNITY_Constants.ORDER_STATUS_SUBMITTED_TO_MINER) &&
-                 onOrder.RecordTypeId == UNITY_Constants.ORDER_USAGE_REQUEST_RECORDTYPE)){
-                orderChangeStatusCandidates.add(onOrder);
-            }
-        }
-        if(!orderChangeStatusCandidates.isEmpty()) {
-            System.debug(' >>> orderChangeStatusCandidates '+orderChangeStatusCandidates);
-            Set<FSO__LocationStock__c> locationStockToUpdate = new Set<FSO__LocationStock__c>();
-            Set<Id> locationStockIdSet = new Set<Id>();
-            Set<Id> productIdSet = new Set<Id>();
-            // retrieve the concerning order items related to the order
-            Map<Id,Order> ordersMap = new Map<Id,Order>();
-            for(Order order : [SELECT Id,
-                                       (SELECT Id, UNITY_Product_Id__c, UNITY_Part_Location__c, Quantity
-                                        FROM OrderItems
-                                        WHERE UNITY_Product_Id__c != NULL AND
-                                              PricebookEntry.Product2.UNITY_Product_Type__c = 'Part')
-                                FROM Order
-                                WHERE Id IN :UNITY_Utils.joiningByIdList(orderChangeStatusCandidates)])
-            {
-                Boolean discardOrder = false;
-                for(OrderItem orderItem : order.OrderItems) {
-                    if(orderItem.UNITY_Part_Location__c == null) {
-                        // get the original order add error message about there is no part location on this order item.
-                        Order newOrder = newOrderMap.get(order.Id);
-                        //newOrder.addError('The order status cannot be set to'+ UNITY_Constants.ORDER_STATUS_SUBMITTED_TO_MINER +' because of some part items have empty their part location.');
-                        discardOrder = true;
-                        break;
-                    }
-                    locationStockIdSet.add(orderItem.UNITY_Part_Location__c);
-                    productIdSet.add(orderItem.UNITY_Product_Id__c);
-                }
-                if(!discardOrder) {
-                    ordersMap.put(order.Id,order);
-                }
-            }
-            System.debug(' >>> locationStockIdSet '+locationStockIdSet);
-            System.debug(' >>> productIdSet '+productIdSet);
-            Map<Id,Map<Id,FSO__LocationStock__c>> locationProductStockMap = new Map<Id,Map<Id,FSO__LocationStock__c>>();
-
-            // locking the location stock record to be updated by any other process.
-            for(FSO__LocationStock__c locationStock :[SELECT Id ,FSO__Product__c ,FSO__Location__c ,FSO__Quantity__c
-                                                      FROM FSO__LocationStock__c
-                                                      WHERE FSO__Product__c IN: productIdSet AND
-                                                            FSO__Location__c IN :locationStockIdSet FOR UPDATE])
-            {
-                if (locationProductStockMap.get(locationStock.FSO__Location__c) == null) {
-                    locationProductStockMap.put(locationStock.FSO__Location__c, new Map<Id,FSO__LocationStock__c>());
-                }
-                locationProductStockMap.get(locationStock.FSO__Location__c).put(locationStock.FSO__Product__c,locationStock);
-            }
-            System.debug(' >>> locationProductStockMap '+locationProductStockMap);
-            // updating parting location stock quantity when all the part has not out of stock
-            for(Order order : ordersMap.values()){
-                Boolean outOfStock = false;
-                // temporal map to keep the partial quantity for the current order
-                Map<Id,Decimal> stockQuantityMap = new Map<Id,Decimal>();
-                Map<Id,FSO__LocationStock__c> locationStockSubSetMap = new Map<Id,FSO__LocationStock__c>();
-                for(OrderItem orderItem : order.OrderItems) {
-                    if(locationProductStockMap.containsKey(orderItem.UNITY_Part_Location__c)){
-                        if(locationProductStockMap.get(orderItem.UNITY_Part_Location__c).containsKey(orderItem.UNITY_Product_Id__c)){
-                            FSO__LocationStock__c currentLocationStock = locationProductStockMap.get(orderItem.UNITY_Part_Location__c).get(orderItem.UNITY_Product_Id__c);
-                            outOfStock = currentLocationStock.FSO__Quantity__c < orderItem.Quantity;
-                            if(outOfStock) {
-                                break;
-                            } else {
-                                locationStockSubSetMap.put(currentLocationStock.Id, currentLocationStock);
-                                stockQuantityMap.put(currentLocationStock.Id,  currentLocationStock.FSO__Quantity__c - orderItem.Quantity);
-                            }
-                        }
-                    }
-                }
-                if(outOfStock) {
-                    Order originalOrder = newOrderMap.get(order.Id);
-                    String Status;
-                    if (originalOrder.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE) {
-                        Status = 'Final';
-                        originalOrder.addError('The order status cannot be set to '+ Status +' because of insufficient stock.');
-                    } else {
-                        Status = UNITY_Constants.ORDER_STATUS_SUBMITTED_TO_MINER;
-                    }
-                    //originalOrder.addError('The order status cannot be set to '+ Status +' because of insufficient stock.');
-                } else {
-                    // update the temporal stock quantity in the location stock quantity
-                    for(Id locationStockId : stockQuantityMap.keySet()) {
-                        locationStockSubSetMap.get(locationStockId).FSO__Quantity__c = stockQuantityMap.get(locationStockId);
-                        locationStockSubSetMap.get(locationStockId).UNITY_Quantity_Update_Reason__c = 'PO Usage';
-                        locationStockSubSetMap.get(locationStockId).UNITY_Last_Action_PO__c = order.Id;
-                    }
-                    locationStockToUpdate.addAll(locationStockSubSetMap.values());
-                }
-            }
-            update new List<FSO__LocationStock__c>(locationStockToUpdate);
-        }
-    }
-    */
 
 }

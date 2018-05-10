@@ -120,7 +120,6 @@ public class UNITY_ServiceContractHandlerTest {
         
         // store all request types for vendor
         list<id> recordTypeIds = new list<id>{  UNITY_Constants.SC_SERVICE_REQUEST_RECORDTYPE,
-                                                UNITY_Constants.SC_PREVENTATIVE_MAINTENANCE_RECORDTYPE,
                                                 UNITY_Constants.SC_PROJECT_MANAGEMENT_RECORDTYPE,
                                                 UNITY_Constants.SC_SITE_SURVEY_RECORDTYPE};
         
@@ -180,7 +179,6 @@ public class UNITY_ServiceContractHandlerTest {
         
         // store all request types for vendor
         list<id> recordTypeIds = new list<id>{  UNITY_Constants.SC_SERVICE_REQUEST_RECORDTYPE,
-                                                UNITY_Constants.SC_PREVENTATIVE_MAINTENANCE_RECORDTYPE,
                                                 UNITY_Constants.SC_PROJECT_MANAGEMENT_RECORDTYPE,
                                                 UNITY_Constants.SC_SITE_SURVEY_RECORDTYPE};
         

@@ -103,7 +103,7 @@
 								<td width="20%" style="text-align: right;">Sub Totals:</td>
 								<td width="80%" style="width:60%;text-align:right;">
 			                        <apex:outputText value="{0, number, currency}">
-			                            <apex:param value="{!revenue}"></apex:param>
+			                            <apex:param value="{!invRevenue}"></apex:param>
 			                        </apex:outputText> 								
 			                    </td>
 							</tr>
@@ -113,7 +113,7 @@
 								<td style="width:60%;text-align:right;">
 									<div>
 				                        <apex:outputText value="{0, number, currency}">
-				                            <apex:param value="{!taxTotal}"></apex:param>
+				                            <apex:param value="{!invTaxTotal}"></apex:param>
 				                        </apex:outputText>
 				                        <hr/>
 			                        </div>
@@ -124,7 +124,7 @@
 								<td style="width:60%;text-align:right;vertical-align:top;padding:0px;margin:0px;">
 									<div>
 				                        <apex:outputText value="{0, number, currency}">
-				                            <apex:param value="{!orderTotal}"></apex:param>
+				                            <apex:param value="{!invTotal}"></apex:param>
 				                        </apex:outputText>
 			                        </div>
 			                    </td>
@@ -259,16 +259,16 @@
                     <apex:repeat value="{!workOrderLines}" var="woli"> 
                         <tr valign="top">
                             <td style="padding-left:5px;text-align:left;" height="40px;" class="borderedTable">{!woli.SVMXC__Work_Description__c}</td>
-                            <td style="text-align:center;" class="borderedTable">{!woli.SVMXC__Actual_Quantity2__c}</td>
+                            <td style="text-align:center;" class="borderedTable">{!woli.Invoice_Qty__c}</td>
                             <td style="text-align:center;" class="borderedTable">{!woli.Unit_of_Measure__c}</td>
                             <td style="text-align:right;" class="borderedTable">
                                 <apex:outputText value="{0, number, currency}">
-                                    <apex:param value="{!woli.Estimate_or_Actual_Price__c}" />
+                                    <apex:param value="{!woli.Invoice_Unit_Price__c}" />
                                 </apex:outputText>
                             </td>        
                             <td style="text-align:right;" class="borderedTable">
                                 <apex:outputText value="{0, number, currency}">
-                                    <apex:param value="{!woli.SVMXC__Total_Line_Price__c}" />
+                                    <apex:param value="{!woli.Total_Line_PriceMH__c}" />
                                 </apex:outputText>
                             </td>          
                         </tr>

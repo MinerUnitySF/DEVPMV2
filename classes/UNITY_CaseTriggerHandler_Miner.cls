@@ -4,26 +4,24 @@
  * @version: 0.1
  */
 public class UNITY_CaseTriggerHandler_Miner extends UNITY_BaseHandler{
-
-    public override void bulkBefore(){
-        //if(runTriggerOnce_Before()){
+    
+    public override void bulkBefore(List<SObject> newList_Case, List<SObject> oldList_Case, Map<Id,SObject> oldMap_Case, Map<Id,SObject> newMap_Case){
+        
             if(trigger.isInsert){
-                UNITY_TimeInput_Ctlr.verifyDateTimeChanged(trigger.new,null,'Case',true);
+                UNITY_TimeInput_Ctlr.verifyDateTimeChanged(newList_Case,null,'Case',true);
 
 
                 /////////////////////////////////////
                 //Build out a list of Service Channel Cases to pass into other methods:
                 List<Case> ScCases = new List<Case>();
                 List<String> ScTrades = new List<String>();
-                for (SObject obj : trigger.new){
+                for (SObject obj : newList_Case){
                     //cast our trigger list into cases
                     Case nc = (Case)obj;
                     if(nc.UNITY_Source_System__c == 'Service Channel' && nc.UNITY_Portal_Source__c == 'Service Channel' && nc.Origin == 'Web Portal'){
                         //need to add checking for origin
                         //add this case to SCcases
-
-                        //now we should check if this subscriber ID is set to activated. If not, we don't add it to the list?
-                        
+                        //now we should check if this subscriber ID is set to activated. If not, we don't add it to the list?                        
                         //custom method to check if case should be created
                         checkSubIdActive(nc);
                         ScCases.add(nc);
@@ -52,13 +50,15 @@ public class UNITY_CaseTriggerHandler_Miner extends UNITY_BaseHandler{
 
             }
             if(trigger.isUpdate){
-                UNITY_TimeInput_Ctlr.verifyDateTimeChanged(trigger.new,Trigger.oldMap,'Case',true);
+                UNITY_TimeInput_Ctlr.verifyDateTimeChanged(newList_Case,
+                                                           oldMap_Case,
+                                                           'Case',true);
                 //CLAY: Need to update work order check-in right here
                 /////////////////////////////////////
                 //Build out a list of Service Channel Cases to pass into other methods:
                 List<Case> ScCases = new List<Case>();
                 Map<Id,Case> oldCases = new Map<Id,Case>();
-                for (SObject obj : trigger.new){
+                for (SObject obj : newList_Case){
                     //cast our trigger list into cases
                     Case nc = (Case)obj;
                     if(nc.UNITY_Source_System__c == 'Service Channel' && nc.UNITY_Portal_Source__c == 'Service Channel'){
@@ -68,7 +68,7 @@ public class UNITY_CaseTriggerHandler_Miner extends UNITY_BaseHandler{
                     }     
                 }
                 //convert our sobject map to a case map
-                for (SObject obj : Trigger.oldMap.values()){
+                for (SObject obj : oldMap_Case.values()){
                     Case oc = (Case)obj;
                     if(oc.UNITY_Source_System__c == 'Service Channel' && oc.UNITY_Portal_Source__c == 'Service Channel'){
                         oldCases.put(oc.Id,oc);
@@ -83,7 +83,8 @@ public class UNITY_CaseTriggerHandler_Miner extends UNITY_BaseHandler{
 
             }//End if trigger.isUpdate
             if(runTriggerOnce_Before()){
-                UNITY_CaseTriggerHandler_Miner.setSkillIds(trigger.new,trigger.oldMap);
+                UNITY_CaseTriggerHandler_Miner.setSkillIds(newList_Case,
+                                                           oldMap_Case);
             }
         //}
     }
@@ -94,7 +95,7 @@ public class UNITY_CaseTriggerHandler_Miner extends UNITY_BaseHandler{
     *Used to search for and find current/active WO and stamps check in/out
     *CLay: Updated with more conditions - 2/16
     **/
-    public static void updateWOCheckin (List<Case> ScCases, Map<Id,Case> oldCases){
+   public static void updateWOCheckin (List<Case> ScCases, Map<Id,Case> oldCases){
         //our payload
         List<WorkOrder> updatedWos = new List<WorkOrder>();
         //our type for service channel time conversion:
@@ -112,93 +113,90 @@ public class UNITY_CaseTriggerHandler_Miner extends UNITY_BaseHandler{
         //look for any work orders with a CaseId in the keyset
         //This is our one query
         List<WorkOrder> checkedWos = new List<WorkOrder>();
-        checkedWos = [SELECT Id, CaseId, UNITY_Check_In_Date_Cust__c, UNITY_Check_Out_Date_Cust__c, StartDate, EndDate, FSO__Check_In_Date__c, FSO__Completed_Date__c, RecordType.Name, UNITY_Check_In_Source__c, UNITY_Check_Out_Source__c
-                                        FROM WorkOrder WHERE CaseId IN :checkedCases.keySet() AND RecordTypeId = :UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE AND Status != 'Canceled' AND Status != 'Completed'];
-
-        Map<Id, List<WorkOrder>> caseToWo = new Map<Id, List<WorkOrder>>();
-
-        for (WorkOrder wo: checkedWos){
-            List<WorkOrder> temp = new List<WorkOrder>();
-            if (!caseToWo.containsKey(wo.CaseId)){
-                temp.add(wo);
-                caseToWo.put(wo.CaseId, temp);
-            }else{
-                temp = caseToWo.get(wo.CaseId);
-                temp.add(wo);
-                caseToWo.put(wo.CaseId, temp);
-            }
-        }
-
-        for (Id cId : checkedCases.keySet()){
-            //if there is only one service request work order
-            //System.debug('<>< CLAY: Work order SC Check in/Out time stamp: Found case:' + cId);
-            //System.debug('<>< CLAY: case work order list size' + caseToWo.get(cId).size());
-            //System.debug('<>< CLAY: first work order in list: ' + caseToWo.get(cId)[0].Id);
-            if (caseToWo.get(cId).size() == 1){
-                System.debug('<>< CLAY: Work order we are going to check in/out' + caseToWo.get(cId)[0].Id);
-                Datetime checkIn;
-                Datetime checkOut;
-                //grab the case from the map
-                Case currentCase = checkedCases.get(cId);
-                WorkOrder wo = casetoWo.get(cId)[0];
-                //Split the check in vs check out logic
-                //if the check in has changed from the old case do the check in
-                if (currentCase.UNITY_Service_Channel_Current_Check_In__c != oldCases.get(cId).UNITY_Service_Channel_Current_Check_In__c){
-                    checkIn = (currentCase.UNITY_Service_Channel_Current_Check_In__c != null) ? UNITY_TimeInput_Ctlr.convertDateTime(currentCase.UNITY_Service_Channel_Current_Check_In__c, currentCase.UNITY_Account_Time_Zone__c, type) : null;
-                    if(wo.FSO__Check_In_Date__c != checkIn && checkIn != null){
-                        wo.FSO__Check_In_Date__c = checkIn;
-                        wo.UNITY_Check_In_Source__c = 'Service Channel';
-                        updatedWos.add(wo);
+        if ( checkedCases.size() > 0){
+                checkedWos = [SELECT Id, CaseId, UNITY_Check_In_Date_Cust__c, UNITY_Check_Out_Date_Cust__c, StartDate, EndDate, FSO__Check_In_Date__c, FSO__Completed_Date__c, RecordType.Name, UNITY_Check_In_Source__c, UNITY_Check_Out_Source__c
+                                                FROM WorkOrder WHERE CaseId IN :checkedCases.keySet() AND RecordTypeId = :UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE AND Status != 'Canceled' AND Status != 'Completed'];
+        
+                Map<Id, List<WorkOrder>> caseToWo = new Map<Id, List<WorkOrder>>();
+        
+                for (WorkOrder wo: checkedWos){
+                    List<WorkOrder> temp = new List<WorkOrder>();
+                    if (!caseToWo.containsKey(wo.CaseId)){
+                        temp.add(wo);
+                        caseToWo.put(wo.CaseId, temp);
+                    }else{
+                        temp = caseToWo.get(wo.CaseId);
+                        temp.add(wo);
+                        caseToWo.put(wo.CaseId, temp);
                     }
                 }
-                //if the checkout changed do the check out
-                if (currentCase.UNITY_Service_Channel_Current_Check_Out__c != oldCases.get(cId).UNITY_Service_Channel_Current_Check_Out__c) {
-                    checkOut = (currentCase.UNITY_Service_Channel_Current_Check_Out__c != null) ? UNITY_TimeInput_Ctlr.convertDateTime(currentCase.UNITY_Service_Channel_Current_Check_Out__c, currentCase.UNITY_Account_Time_Zone__c, type) : null;
-                    if(wo.FSO__Completed_Date__c != checkOut && checkOut != null){
-                        wo.FSO__Completed_Date__c = checkOut;
-                        wo.UNITY_Check_Out_Source__c = 'Service Channel';
-                        updatedWos.add(wo);
-                    }      
+        
+                for (Id cId : checkedCases.keySet()){
+                    //if there is only one service request work order
+                    //System.debug('<>< CLAY: Work order SC Check in/Out time stamp: Found case:' + cId);
+                    //System.debug('<>< CLAY: case work order list size' + caseToWo.get(cId).size());
+                    //System.debug('<>< CLAY: first work order in list: ' + caseToWo.get(cId)[0].Id);
+                    if (caseToWo.get(cId).size() == 1){
+                        System.debug('<>< CLAY: Work order we are going to check in/out' + caseToWo.get(cId)[0].Id);
+                        Datetime checkIn;
+                        Datetime checkOut;
+                        //grab the case from the map
+                        Case currentCase = checkedCases.get(cId);
+                        WorkOrder wo = casetoWo.get(cId)[0];
+                        //Split the check in vs check out logic
+                        //if the check in has changed from the old case do the check in
+                        if (currentCase.UNITY_Service_Channel_Current_Check_In__c != oldCases.get(cId).UNITY_Service_Channel_Current_Check_In__c){
+                            checkIn = (currentCase.UNITY_Service_Channel_Current_Check_In__c != null) ? UNITY_TimeInput_Ctlr.convertDateTime(currentCase.UNITY_Service_Channel_Current_Check_In__c, currentCase.UNITY_Account_Time_Zone__c, type) : null;
+                            if(wo.FSO__Check_In_Date__c != checkIn && checkIn != null){
+                                wo.FSO__Check_In_Date__c = checkIn;
+                                wo.UNITY_Check_In_Source__c = 'Service Channel';
+                                updatedWos.add(wo);
+                            }
+                        }
+                        //if the checkout changed do the check out
+                        if (currentCase.UNITY_Service_Channel_Current_Check_Out__c != oldCases.get(cId).UNITY_Service_Channel_Current_Check_Out__c) {
+                            checkOut = (currentCase.UNITY_Service_Channel_Current_Check_Out__c != null) ? UNITY_TimeInput_Ctlr.convertDateTime(currentCase.UNITY_Service_Channel_Current_Check_Out__c, currentCase.UNITY_Account_Time_Zone__c, type) : null;
+                            if(wo.FSO__Completed_Date__c != checkOut && checkOut != null){
+                                wo.FSO__Completed_Date__c = checkOut;
+                                wo.UNITY_Check_Out_Source__c = 'Service Channel';
+                                updatedWos.add(wo);
+                            }      
+                        }
+        
+                        //if the timestamp values are filled, we need to convert them and save them
+                        //checkIn = (currentCase.UNITY_Service_Channel_Current_Check_In__c != null) ? UNITY_TimeInput_Ctlr.convertDateTime(currentCase.UNITY_Service_Channel_Current_Check_In__c, currentCase.UNITY_Account_Time_Zone__c, type) : null;
+                        //checkOut = (currentCase.UNITY_Service_Channel_Current_Check_Out__c != null) ? UNITY_TimeInput_Ctlr.convertDateTime(currentCase.UNITY_Service_Channel_Current_Check_Out__c, currentCase.UNITY_Account_Time_Zone__c, type) : null;
+                        
+                        //if the check in or check values are different from what is on the work order, we need to update the work order
+                        //NOTE: This won't overwrite if an agent has modified the date on the work order manually, because these cases are only ones that had it changed via SC
+        
+                        /**if(wo.FSO__Check_In_Date__c != checkIn && checkIn != null){
+                            wo.FSO__Check_In_Date__c = checkIn;
+                            updatedWos.add(wo);
+                        }
+                        if(wo.FSO__Completed_Date__c != checkOut && checkOut != null){
+                            wo.FSO__Completed_Date__c = checkOut;
+                            updatedWos.add(wo);
+                        }                
+        
+                        **/
+                    }
                 }
-
-                //if the timestamp values are filled, we need to convert them and save them
-                //checkIn = (currentCase.UNITY_Service_Channel_Current_Check_In__c != null) ? UNITY_TimeInput_Ctlr.convertDateTime(currentCase.UNITY_Service_Channel_Current_Check_In__c, currentCase.UNITY_Account_Time_Zone__c, type) : null;
-                //checkOut = (currentCase.UNITY_Service_Channel_Current_Check_Out__c != null) ? UNITY_TimeInput_Ctlr.convertDateTime(currentCase.UNITY_Service_Channel_Current_Check_Out__c, currentCase.UNITY_Account_Time_Zone__c, type) : null;
-                
-                //if the check in or check values are different from what is on the work order, we need to update the work order
-                //NOTE: This won't overwrite if an agent has modified the date on the work order manually, because these cases are only ones that had it changed via SC
-
-                /**if(wo.FSO__Check_In_Date__c != checkIn && checkIn != null){
-                    wo.FSO__Check_In_Date__c = checkIn;
-                    updatedWos.add(wo);
-                }
-                if(wo.FSO__Completed_Date__c != checkOut && checkOut != null){
-                    wo.FSO__Completed_Date__c = checkOut;
-                    updatedWos.add(wo);
-                }                
-
-                **/
-            }
-        }
-
+         }
         //we need to loop through the work orders and get the case check in/out, if it has changed, 
         //we need to convert it and populate it
-        if (updatedWos.size() > 0){
-                                    
+        if (updatedWos.size() > 0){                                    
             //now we do a try/catch to update these work orders
             try {
-                update checkedWos;
+                update updatedWos;   
             } catch(Exception e) {
                 System.debug(e.getMessage());
             }
-
         }else{
             System.debug('CLAY: No work orders to update with check in or out');
-        }
-        
+        }       
 
     }
-
     /**
     * MapScCaseValues()
     * Used to populate Case values from field and trade mappings
@@ -256,34 +254,45 @@ public class UNITY_CaseTriggerHandler_Miner extends UNITY_BaseHandler{
         //This map will have keys based on unique subscribers to the settings that go with them 
         //TODO: potentially will need to also add by provider
 
-        for(UNITY_SC_to_Case_Field_Mapping__c setting : SC_Case_Map_List) {
+ for(UNITY_SC_to_Case_Field_Mapping__c setting : SC_Case_Map_List) {
+    String scMapKey = (setting.CustomerId_Subscriber__c == null ? 'Default' : setting.CustomerId_Subscriber__c);
+           scMapKey += (setting.Category__c == null ? '-Any' : '-' + setting.Category__c);
             //our temporary list for creating the mapping placeholder
             List<UNITY_SC_to_Case_Field_Mapping__c> tempList = new List<UNITY_SC_to_Case_Field_Mapping__c>();
-            if(setting.CustomerId_Subscriber__c == null) {
-                if(!subToValues.containsKey('Default')) { 
-                   //if we never created the default settings before
-                  tempList.add(setting);
-                  subToValues.put('Default', tempList);
-                }else{ 
-                    //add the current setting to the default settings list
-                    subToValues.get('Default').add(setting);
-                }
-            }else if(!subToValues.containsKey(setting.CustomerId_Subscriber__c)){ 
-              //if we dont have this specific key in there
+            if(!subToValues.containsKey(scMapKey)){
               tempList.add(setting);
-              subToValues.put(setting.CustomerId_Subscriber__c, tempList);
-            }else { 
-              //if(subToValues.containsKey(setting.CustomerId_Subscriber__c))
-              //we have this sub in here, lets add to the list of settings
-              subToValues.get(setting.CustomerId_Subscriber__c).add(setting);
-
+              subToValues.put(scMapKey, tempList);
+            }else{
+              subToValues.get(scMapKey).add(setting);
             }
         }
         //get our default settings:
-        List<UNITY_SC_to_Case_Field_Mapping__c> defaultSettings = subToValues.get('Default');
+       List<UNITY_SC_to_Case_Field_Mapping__c> defaultSettings = subToValues.get('Default-Any');
 
-        //loop through Sobjects, cast to case:
+
+//system.debug(JSON.serializePretty(defaultSettings, false));
+
+
+
+        //loop through Sobjects
         for (Case c : ScCases){
+            //These shouldnt be blank on any Service Channel case
+            String caseMapKey = c.UNITY_Subscriber_ID__c + '-' + c.UNITY_Service_Channel_Category__c;
+            System.debug('//Clay ==Looping through Cases== : ' + caseMapKey );
+            //empty lists (init everytime)
+            List<UNITY_SC_to_Case_Field_Mapping__c> defSubSettings = new List<UNITY_SC_to_Case_Field_Mapping__c>();
+            List<UNITY_SC_to_Case_Field_Mapping__c> defCatSettings = new List<UNITY_SC_to_Case_Field_Mapping__c>();
+            List<UNITY_SC_to_Case_Field_Mapping__c> catSubSettings = new List<UNITY_SC_to_Case_Field_Mapping__c>();
+            
+            //lets find our list of settings:
+            if(subToValues.containsKey(caseMapKey)) //caseMapKey example = 200512549-MAINTENANCE
+                catSubSettings = subToValues.get(caseMapKey); 
+            if(subToValues.containsKey(c.UNITY_Subscriber_ID__c)) //settings without a category
+                defSubSettings = subToValues.get(c.UNITY_Subscriber_ID__c);
+            if(subToValues.containsKey('Default-' + c.UNITY_Service_Channel_Category__c)) //settings without a sub
+                defCatSettings = subToValues.get('Default-' + c.UNITY_Service_Channel_Category__c);
+            
+
             //Loop through the default settings first, this way we set all of our baselines and then do the subscriber specific
             for (UNITY_SC_to_Case_Field_Mapping__c def : defaultSettings){
                 if(def.SourceValue__c == c.get(def.SCField__c)) {
@@ -292,20 +301,48 @@ public class UNITY_CaseTriggerHandler_Miner extends UNITY_BaseHandler{
                     c.put(def.TargetField__c, def.Value__c);           
                 }
             }
-            
-            //System.debug('Does our case have a subscriber Id found in the mapping? : ' + (subToValues.containsKey(c.UNITY_Subscriber_ID__c)));
-            if(subToValues.containsKey(c.UNITY_Subscriber_ID__c)){
-                //The set should prevent dupes (I hope)
-                for (UNITY_SC_to_Case_Field_Mapping__c mapVal : subToValues.get(c.UNITY_Subscriber_ID__c)){
-                    system.debug('regular settings:' + mapVal);
-                    if(mapVal.SourceValue__c == c.get(mapVal.SCField__c)) {
-                    //this means this setting SourceValue matches the case's value in the corresponding Service Channel field
-                    //We can now set the matched value to the targetfields it maps to
+
+            //our default category settings:
+            if (defCatSettings.size() > 0){
+                for (UNITY_SC_to_Case_Field_Mapping__c mapVal : defCatSettings){
+                        if (mapVal.SourceValue__c != null){ //source field has a value - lets check to see if it matches our case source field
+                            if(mapVal.SourceValue__c == c.get(mapVal.SCField__c)) {                      
+                                c.put(mapVal.TargetField__c, mapVal.Value__c);
+                                system.debug('//Clay - found Default Subscriber + Category setting: ' + mapVal.TargetField__c + ' = ' + mapVal.Value__c);           
+                            }               
+                        }else{ //no source field to match, just a default setting for this category
+                                c.put(mapVal.TargetField__c, mapVal.Value__c);
+                                system.debug('//Clay - found Default Category setting (no source field): ' + mapVal.TargetField__c + ' = ' + mapVal.Value__c);
+                        }
+                }
+
+            }
+            //our default subscriber settings:
+            if (defSubSettings.size() > 0){
+                for (UNITY_SC_to_Case_Field_Mapping__c mapVal : defSubSettings){                    
+                    if(mapVal.SourceValue__c != null){
+                        if(mapVal.SourceValue__c == c.get(mapVal.SCField__c)) {                      
+                            c.put(mapVal.TargetField__c, mapVal.Value__c);           
+                        }        
+                    }else{
                         c.put(mapVal.TargetField__c, mapVal.Value__c);
-                        
                     }
                 }
 
+            }
+            //our most specific settings:
+            if (catSubSettings.size() > 0){
+                for (UNITY_SC_to_Case_Field_Mapping__c mapVal : catSubSettings){
+                    if (mapVal.SourceValue__c != null){ //source field has a value - lets check to see if it matches our case source field
+                        if(mapVal.SourceValue__c == c.get(mapVal.SCField__c)) {                      
+                            c.put(mapVal.TargetField__c, mapVal.Value__c); 
+                            system.debug('//Clay - found Default Subscriber + Category setting: ' + mapVal.TargetField__c + ' = ' + mapVal.Value__c);                    
+                        }               
+                    }else{ //no source field to match, just a default setting for this category
+                            c.put(mapVal.TargetField__c, mapVal.Value__c);
+                            system.debug('//Clay - found Default Subscriber + Category setting (no source field): ' + mapVal.TargetField__c + ' = ' + mapVal.Value__c);
+                    }   
+                }
             }
 
             ////////////////////////////////////////////////////////
@@ -347,7 +384,21 @@ public class UNITY_CaseTriggerHandler_Miner extends UNITY_BaseHandler{
     //updates the agent on the case and returns the void
     //
     ///////////////////////////////
-    public static void updateAgentonWOs(Map<Id, Case> newCaseM, Map<Id, Case> oldCasesM){
+    public static void updateAgentonWOs(Map<Id, SObject> newSObject, Map<Id, SObject> oldSObject){
+        //UNITYPM replaced typecasting by converting collection manually
+        Map<Id, Case> newCaseM = new  Map<Id, Case>();
+        Map<Id, Case> oldCasesM =new  Map<Id, Case>();
+        
+        for(SObject sObj :  newSObject.values()){
+            Case c = (Case)sObj;
+            newCaseM.put(c.Id, c);
+        }
+        
+        for(SObject sObj :  oldSObject.values()){
+            Case c = (Case)sObj;
+            oldCasesM.put(c.Id, c);
+        }
+        
         //the set of ids we will query wos against
         Set<Id> cids = new Set<Id>();
         List<WorkOrder> changedWos = new List<WorkOrder>();

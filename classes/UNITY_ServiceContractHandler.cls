@@ -8,37 +8,16 @@ public with sharing class UNITY_ServiceContractHandler extends UNITY_BaseHandler
     
     Map<Id, Decimal> serviceContractNewValue = new Map<Id, Decimal>();
     
-    public override void bulkBefore(){
-        
-        /*if (trigger.isDelete){
-            
-            Set<Id> scToBeDeleted = new Set<Id>();
-            
-            for (SObject iter: trigger.old){
-                
-                scToBeDeleted.add(iter.Id);
-            }
-            
-            accountWithDeletedServiceContract = [select id, UNITY_Has_Preferred_Part__c, UNITY_Service_Contract__c from Account where id in: scToBeDeleted];
-        }*/
-        
-    }
+    public override void bulkBefore(List<SObject> newList_SC, List<SObject> oldList_SC, Map<Id,SObject> oldMap_SC, Map<Id,SObject> newMap_SC){}
     
-    public override void bulkAfter(){
+    public override void bulkAfter(List<SObject> newList_SC, List<SObject> oldList_SC, Map<Id,SObject> oldMap_SC, Map<Id,SObject> newMap_SC){
         
         if (!trigger.isDelete){
             
             //if UNITY_Has_Preferred_Part__c field has changed, update account
-            for (SObject iter: trigger.new){
-                
+            for (SObject iter: newList_SC){
                 //UNITY_Service_Contract__c oldSC = (UNITY_Service_Contract__c) iter;
-                UNITY_Service_Contract__c newSC = (UNITY_Service_Contract__c) trigger.newMap.get(iter.Id);
-                
-               /* if (trigger.isUpdate){
-                    
-                    if (oldSC.UNITY_Has_Preferred_Part__c != newSC.UNITY_Has_Preferred_Part__c)serviceContractNewValue.put(newSC.Id, newSC.UNITY_Has_Preferred_Part__c);
-                    
-                }*/
+                UNITY_Service_Contract__c newSC = (UNITY_Service_Contract__c) newMap_SC.get(iter.Id);
             }
         }
     }

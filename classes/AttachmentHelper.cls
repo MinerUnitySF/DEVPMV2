@@ -4,6 +4,9 @@
 ** @date: 6/17/2015
 */
 public without sharing class AttachmentHelper {
+    public static Boolean doNotRunAgain = false;
+    
+    
     /** This method manages service reports attached to work orders **/
     public static void manageServiceReport(List<Attachment> newList){
         List<Attachment> serviceReps = new List<Attachment>();//List to hold service report attachments
@@ -19,7 +22,7 @@ public without sharing class AttachmentHelper {
             //EDIT: And also does NOT contain 'Comprehensive'
             if (a.ParentId.getSobjectType() == SVMXC__Service_Order__c.SobjectType && String.isNotBlank(a.Name)){
                 System.debug('============= Atachment name: ' + a.Name);
-            	if(a.Name.contains('Service_Report') && a.Name.contains('.pdf')){
+                if(a.Name.contains('Service_Report') && a.Name.contains('.pdf')){
                     woIDs.add(a.ParentId);//Add the ParentId to the woIDs set
                     serviceReps.add(a);//Add the attachment to the serviceReps list
                 }
@@ -30,14 +33,14 @@ public without sharing class AttachmentHelper {
         if(woIDs.size() > 0){
             //Query the work orders and work detail lines in a map
             Map<Id, SVMXC__Service_Order__c> woMap = new Map<Id, SVMXC__Service_Order__c>([Select Id,Name,Email_Service_Report__c,Send_Service_Report_to_Customer__c,SVMXC__Service_Group__r.Company_Legal_Name__c,
-            	SVMXC__Service_Group__r.SVMXC__Street__c,SVMXC__Service_Group__r.SVMXC__City__c,SVMXC__Service_Group__r.SVMXC__State__c,SVMXC__Service_Group__r.SVMXC__Zip__c,SVMXC__Service_Group__r.SVMXC__Phone__c,
+                SVMXC__Service_Group__r.SVMXC__Street__c,SVMXC__Service_Group__r.SVMXC__City__c,SVMXC__Service_Group__r.SVMXC__State__c,SVMXC__Service_Group__r.SVMXC__Zip__c,SVMXC__Service_Group__r.SVMXC__Phone__c,
                 SVMXC__Service_Group__r.SVMXC__Email__c,Location__r.Name,Location__r.SVMXC__Street__c,Location__r.SVMXC__City__c,Location__r.SVMXC__State__c,Location__r.SVMXC__Zip__c,SVMXC__Contact__r.Name,
                 SVMXC__Contact__r.Phone,SVMXC__Contact__r.Email,Service_Report_Received__c,SVMXC__Scheduled_Date_Time__c,
                 (SELECT Id,Service_Report__c,Service_Report_Line__c FROM SVMXC__Service_Order_Line__r WHERE Service_Report_Line__c = 'Queued'),
                 (SELECT Id,Service_Report__c,Report_Status__c FROM Job_History__r WHERE Report_Status__c = 'Queued')
                 FROM SVMXC__Service_Order__c WHERE Id IN :woIDs]);
             System.debug('============= Work Orders count: ' + woMap.keySet().size());
-        	//For each work order... 
+            //For each work order... 
             for (SVMXC__Service_Order__c wo : woMap.Values()){
                 if (String.isNotBlank(wo.Email_Service_Report__c)){
                     //Add the email address on the work order to the emailSet
@@ -127,8 +130,8 @@ public without sharing class AttachmentHelper {
                     //If the work order has an email address...
                     if(String.isNotBlank(wo.Email_Service_Report__c)  && !(a.Name.contains('Comprehensive'))){
                         //Get the email from the work order
-                    	String email = wo.Email_Service_Report__c;
-                    	System.debug('============= Email on the work order to send to: ' + email);
+                        String email = wo.Email_Service_Report__c;
+                        System.debug('============= Email on the work order to send to: ' + email);
                         System.debug('============= Creating message for customer...');
                         //Create message for customer
                         Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
@@ -190,7 +193,7 @@ public without sharing class AttachmentHelper {
                         //List of service reports to update
                         List<Service_Report__c> toUpdateSrvReps = new List<Service_Report__c>();
                         //List of work order detail lines to update with the service report 
-                		List<SVMXC__Service_Order_Line__c> wodlToUpdate = new List<SVMXC__Service_Order_Line__c>();
+                        List<SVMXC__Service_Order_Line__c> wodlToUpdate = new List<SVMXC__Service_Order_Line__c>();
                         List<Work_Performed__c> jobNotesToUpdate = new List<Work_Performed__c>();
                         //Fetch all the service reports for the work orders in the transaction... Done to prevent duplication
                         List<Service_Report__c> reps = [SELECT Id,Work_Order__c,Date__c FROM Service_Report__c WHERE Work_Order__c IN :woMap.keySet()];
@@ -284,7 +287,88 @@ public without sharing class AttachmentHelper {
                     System.debug('============== Error: ' + e.getMessage());
                 }//End try catch
             }//end if messages
-      	}//End if woIds
+        }//End if woIds
     }//End method
     
+    /** splitting  attachments for document stging   **/     
+    
+    public static void uploadDocumentstaingAttachments(List<Attachment> newList){
+         Map<ID, List<Attachment>> attListForParentMap = new Map<ID, List<Attachment>>();
+        for (Attachment att: newList){
+            String sobjectType = att.ParentId.getSObjectType().getDescribe().getName();
+            if (sobjectType != 'Document_Staging__c')
+                continue;
+
+             if(attListForParentMap.containsKey(att.ParentId)) {
+                 List<Attachment> attList = attListForParentMap.get(att.ParentId);
+                 attList.add(att);
+                 attListForParentMap.put(att.ParentId, attList);
+              } else {
+                  attListForParentMap.put(att.ParentId, new List<Attachment> { att });
+            }
+          }
+         
+          Map<ID, Document_Staging__c> docStagingMap = new  Map<ID, Document_Staging__c>([SELECT ID,Incoming_Email_Address__c,Document_Source__c, Email_Subject__c,Status__c from Document_Staging__c WHERE ID IN:attListForParentMap.keySet()]);
+         
+          List<Document_Staging__c> newDocStagingList = new List<Document_Staging__c>();
+         
+           
+          for (ID parentID: attListForParentMap.keySet()){
+              List<Attachment>attList = attListForParentMap.get(parentID); 
+              Document_Staging__c docStg = docStagingMap.get(parentID);
+                
+              if (attList.size() > 1){
+                for (Integer i=1; i<attList.size(); i++){
+                   Document_Staging__c newDocStaging = new Document_Staging__c(Incoming_Email_Address__c = docStg.Incoming_Email_Address__c, Email_Subject__c =docStg.Email_Subject__c,Document_Source__c = docStg.Document_Source__c, Status__c =docStg.Status__c );
+                   newDocStagingList.add(newDocStaging);  
+                }
+               
+                if ( newDocStagingList.size()>0)
+                     insert newDocStagingList;
+                 
+                for (Attachment att: attList){
+                   for (Integer i = (newDocStagingList.size()-1) ; i>= 0 ; i--){
+                          ID pID = newDocStagingList[i].ID;
+                          att.ParentId = pID;
+                          newDocStagingList.remove(i);
+                          break;
+                     }
+                  
+                 }
+             }
+          }
+    }
+
+    /** upload attachments to DocParser */
+    public static void prepareFileUploadToDocParser(List<Attachment> attachmentList){
+
+        //Check if attachment is related to Document Staging
+        Map<Id, Attachment> attachmentForDocStagingMap = new Map<Id, Attachment>();
+        Set<Id> docStagingIds = new Set<Id>();
+
+        system.debug('@@@prepareFileUploadToDocParser attachmentList:'+attachmentList);
+
+        for (Attachment a: attachmentList){
+            String sobjectType = a.ParentId.getSObjectType().getDescribe().getName();
+            if (sobjectType == 'Document_Staging__c'){
+                attachmentForDocStagingMap.put(a.Id, a);
+                docStagingIds.add(a.ParentId);
+            }
+        }
+
+        //Fetch document staging records
+        Map<Id, Document_Staging__c> docStagingMap = new Map<Id, Document_Staging__c>([SELECT Id, Status__c
+                                                    FROM Document_Staging__c
+                                                    WHERE Status__c = 'New'
+                                                    AND DocParser_Id__c = null
+                                                    AND Id = :docStagingIds]);
+
+
+        for (Attachment a: attachmentForDocStagingMap.values()){
+            Document_Staging__c ds = docStagingMap.get(a.ParentId);
+            if (ds != null)
+                UNITY_DocParserUtility.UploadDocumentToDocParserF(ds.Id);
+        }
+
+    }
 }

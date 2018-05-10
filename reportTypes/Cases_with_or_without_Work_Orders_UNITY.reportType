@@ -227,6 +227,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Cancel_Date__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>Origin</field>
             <table>Case</table>
         </columns>
@@ -239,6 +244,11 @@
             <checkedByDefault>false</checkedByDefault>
             <field>Owner</field>
             <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Miner_Team_Assigned__c</field>
+            <table>Case.Work_Orders__r</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
@@ -257,6 +267,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_MultiTrip_Actual__c</field>
+            <table>Case.Work_Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Service_Channel_CustomerID__c</field>
             <table>Case</table>
         </columns>
@@ -272,6 +287,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Override_Attach_Compliance_Reason__c</field>
+            <table>Case.Work_Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>Reason</field>
             <table>Case</table>
         </columns>
@@ -282,8 +302,18 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Next_Action__c</field>
+            <table>Case.Work_Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Service_Channel_Current_Check_In__c</field>
             <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Override_Attachment_Compliance__c</field>
+            <table>Case.Work_Orders__r</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
@@ -1082,6 +1112,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>Tech_ETA__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>SVMXC__Time_to_Initial_Response__c</field>
             <table>Case</table>
         </columns>
@@ -1856,6 +1891,11 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>UNITY_RMA_Required__c</field>
+            <table>Case.Work_Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Next_Action_Date__c</field>
             <table>Case.Work_Orders__r</table>
         </columns>
         <columns>

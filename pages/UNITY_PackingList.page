@@ -1,4 +1,5 @@
-<apex:page standardController="Order" doctype="html-5.0" showHeader="false" sidebar="false" renderAs="pdf" applyHtmlTag="false" applyBodyTag="false"> 
+<apex:page standardController="Order" doctype="html-5.0" showHeader="false" sidebar="false" renderAs="pdf" applyHtmlTag="false" applyBodyTag="false"
+           extensions="UNITY_PackingListControllerExt"> 
     <html>
         <head>
             <style type="text/css">
@@ -180,7 +181,22 @@
                             </tr>
                         </table>
                     </td>
-                    <td></td>
+                    <td style="width:30%;" >
+                    	<table class="main-details" style="width:100%;">
+                    		<tr>
+                    			<td class="label">{!IF(relatedServiceWONo != null,'Service Provider WO: '+relatedServiceWONo,'' )}</td>
+                    		</tr>
+                    		<tr>
+                    			<td class="label">{!IF(relatedServiceWOPO != null,'Service Provider PO: '+relatedServiceWOPO,'' )}</td>
+                    		</tr>
+                    		<tr>
+                    			<td class="label">&nbsp;</td> 
+                    		</tr>
+                    		<tr>
+                    			<td class="label">&nbsp;</td>
+                    		</tr>
+                    	</table>
+                    </td>
                     <td style="width:35%;">
                         <table class="main-details" style="width:100%;">
                             <tr>
@@ -283,7 +299,13 @@
                         </tr>
                     </apex:repeat>
                 </tbody>
-            </table>
+            </table>        
+            <apex:form >
+            	<apex:inputHidden value="{!Order.FSO__WorkOrder__c}" />           
+            	<apex:inputHidden value="{!Order.UNITY_Originating_Usage_Request__c}" />           
+            	<apex:inputHidden value="{!Order.UNITY_Originating_Usage_Request__r.FSO__WorkOrder__r.WorkOrderNumber}" />           
+            	<apex:inputHidden value="{!Order.UNITY_Originating_Usage_Request__r.FSO__WorkOrder__r.UNITY_Customer_PO__c}" />           
+            </apex:form>
         </body>
     </html>
 </apex:page>

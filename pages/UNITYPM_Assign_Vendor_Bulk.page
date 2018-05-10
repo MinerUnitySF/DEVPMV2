@@ -1,0 +1,127 @@
+<apex:page standardController="WorkOrder" showHeader="false" sidebar="false" extensions="UNITYPM_AssignVendorBulkControllerExt"  recordSetVar="workOrders" id="assignVendorPage">
+    <apex:includeScript value="{!URLFOR($Resource.jquery_ui,'js/jquery.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jquery_ui,'js/jquery-ui.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jquery_ui,'moment/moment.min.js')}"/>
+    <apex:includeScript value="/support/console/35.0/integration.js"/>
+    <link rel="stylesheet" href="{!URLFOR($Resource.jquery_ui,'css/jquery-ui.smoothness.css')}"/>
+    <link rel="stylesheet" href="{!URLFOR($Resource.jquery_ui,'css/jquery-ui.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.UNITY_SLDS_100, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.UNITY_LightningDesignSystemV12, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+    
+    <apex:includeScript value="{!URLFOR($Resource.clookup)}"/>
+    <script type="text/javascript">
+        function testSetTabTitle() {
+            //Set the current tab's title
+            sforce.console.setTabTitle('Assign Vendor');
+        }
+        var pageLoad = window.onload;
+          window.onload = function() {
+                if (pageLoad) {
+                        pageLoad();
+                }
+                  testSetTabTitle();
+          }
+        function CloseWindow()
+        { 
+            window.top.close(); 
+        }          
+    </script>
+    <style type="text/css">
+        .info {
+            border: 1px solid;
+            margin: 10px 0px;
+            padding:50px 30px 50px 50px;
+            background-repeat: no-repeat;
+            background-position: 10px center;
+            font-family:Arial, Helvetica, sans-serif; 
+            font-size:18px;
+         }
+         span[id$="vendor-panel"] a{
+            font-weight: bold;
+            max-width: 100px;
+            width: 100px;
+            display: block;
+            overflow: hidden;
+            max-height: 18px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .cell-wrapper{
+            display: block;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            margin: 0px;
+            min-height: 26px;
+            max-width: 150px;
+            padding: 0px;
+            position: relative;
+            width: 100%;
+        }
+    </style>
+  <apex:form >
+        <div class="info">
+         <apex:pageBlock >
+    
+          <apex:outputPanel id="messages">
+              <apex:pageMessages ></apex:pageMessages>
+          </apex:outputPanel>
+          <apex:pageBlockSection columns="1" id="assignVendorPageBlock">
+          <apex:outputLabel style="font-size: 14px;text-decoration: underline;" value="Assign / Reassign Vendor"/>&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:pageBlockSectionItem >
+                  <apex:outputPanel id="vendor-panel" styleClass="cell-wrapper">
+                      
+                          <apex:outputPanel rendered="true" style="position:absolute;display:block;width:100%;height:100%;top:0px;">
+                                  <c:CustomLookupField field-name="Id" 
+                                                       field_id="vendor-lookup" 
+                                                       hidden_field_id="vendor-lookup-hidden"
+                                                       initial_field_value=""
+                                                       initial_field_data_id=""
+                                                       fields_to_return="Name, UNITY_Account_ID__c"
+                                                       fields_labels="{'Name':'Name', 'UNITY_Account_ID__c':'AccountID'}"
+                                                       like_fields="Name"
+                                                       where_clause="RecordType.Name = \'Vendor\' AND UNITY_Vendor_Status__c = \'Active\' AND UNITY_Vendor_Type_PM__c 
+= true"
+                                                       obj_name="Account"></c:CustomLookupField>
+                                  
+                                  <apex:inputHidden value="{!accountid}" required="true" html-data-id="vendor-lookup-hidden"></apex:inputHidden>
+                          </apex:outputPanel>   
+                  </apex:outputPanel>
+              </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+
+              <br/> <br/>
+              <apex:outputPanel >
+             <apex:actionStatus id="pageStatus" onStop="" >
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <img src="/img/loading32.gif" width="45" height="45" />
+                            <apex:outputLabel value="(Saving ...)"/>
+                        </apex:outputPanel>            
+                    </apex:facet>
+                </apex:actionStatus> 
+           </apex:outputPanel>
+          <apex:outputPanel id="resultJS">
+          <script>
+              function checkResult()
+              {   
+                  if ({!NOT(hasError)})
+                   window.history.back();
+              }                            
+          </script>
+        </apex:outputPanel>
+             <apex:pageBlockButtons location="bottom">
+               <apex:commandButton action="{!assignVendor}" reRender="messages, resultJS" styleClass="buttonStyle" style="background:LightCray;width:150px;font-size: 14px;" status="pageStatus" value="Save & Close" oncomplete="checkResult();"></apex:commandButton>   
+             </apex:pageBlockButtons>
+       
+      </apex:pageBlock>
+      </div>
+      </apex:form>
+      <style type="text/css">
+        input.custom-lookup-field[type="text"],.custom-lookup-field{
+            font-weight: bold;
+            background-position: right -5px;
+        }
+    </style>
+</apex:page>

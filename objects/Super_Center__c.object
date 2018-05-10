@@ -319,6 +319,11 @@
                     <label>Los Angeles</label>
                 </value>
                 <value>
+                    <fullName>Memphis</fullName>
+                    <default>false</default>
+                    <label>Memphis</label>
+                </value>
+                <value>
                     <fullName>Mesa</fullName>
                     <default>false</default>
                     <label>Mesa</label>
@@ -332,6 +337,11 @@
                     <fullName>Miner-Equipment</fullName>
                     <default>false</default>
                     <label>Miner-Equipment</label>
+                </value>
+                <value>
+                    <fullName>Nashville</fullName>
+                    <default>false</default>
+                    <label>Nashville</label>
                 </value>
                 <value>
                     <fullName>National</fullName>

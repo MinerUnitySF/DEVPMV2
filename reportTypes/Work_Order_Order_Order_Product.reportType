@@ -1312,6 +1312,26 @@
             <field>PostalCode</field>
             <table>WorkOrder</table>
         </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Customer__c.UNITY_Company__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Case.UNITY_Service_Channel_Category__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Assigned_Vendor__c.Name</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Trade__c.Name</field>
+            <table>WorkOrder</table>
+        </columns>
         <masterLabel>Work Orders</masterLabel>
     </sections>
     <sections>
@@ -2015,6 +2035,66 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>Work_Order_Priority__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Updated_Invoice__c.Name</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Updated_Invoice__c.Id</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Updated_Invoice__c.UNITY_Invoice_Status__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Updated_Invoice__c.UNITY_Invoice_Date__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Updated_Invoice__c.UNITY_Total_Price_With_Service_Charge__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Updated_Invoice__c.UNITY_Total_Cost__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Invoice__c.UNITY_Invoice_Status__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Invoice__c.UNITY_Invoice_Date__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Invoice__c.UNITY_Invoice_Margin__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Invoice__c.UNITY_Invoice_Margin_Amount__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Invoice__c.UNITY_Total_Cost__c</field>
+            <table>WorkOrder.FSO__Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Invoice__c.UNITY_Total_Price_With_Service_Charge__c</field>
             <table>WorkOrder.FSO__Orders__r</table>
         </columns>
         <masterLabel>Orders</masterLabel>

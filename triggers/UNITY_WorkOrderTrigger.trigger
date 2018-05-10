@@ -15,29 +15,27 @@ Date:           1/20/2016
 ------------------------------------------------------------*/
 trigger UNITY_WorkOrderTrigger on WorkOrder (after insert, after update, after delete, before insert, before update) {
     system.debug(LoggingLevel.INFO, '****** UNITY_WorkOrderTrigger');
-    UNITY_TriggerFactory.createAndExecuteHandler(UNITY_WorkOrderTriggerHandler.class);
-
-    /*
-    Hao - 5/3 Move Update Case Status to UNITY_WorkOrderTriggerHandler
-    if(Trigger.isInsert){
-        if(Trigger.isAfter){
-            UNITY_UpdateCaseStatus.onAfterInsert(Trigger.New);
-        }
-    }
-    else if(Trigger.isUpdate){
-        if(Trigger.isAfter){
-            UNITY_UpdateCaseStatus.onAfterUpdate(Trigger.New,Trigger.oldMap);
-        }
-    }
-    */
     
-    UNITY_TriggerFactory.createAndExecuteHandler(UNITY_WorkOrderTriggerHandler_Miner.class);
+    Private Set<Id> PMWorkOrderSet = new Set<Id>{UNITY_Constants.WO_PREVENTATIVE_MAINTENANCE_RECORDTYPE}; 
+    Public List<SObject> new_SR_WorkOrders = UNITY_Utils.excludeRecordType(trigger.new, PMWorkOrderSet);
+    Public Map<Id, SObject> newMap_SR_WorkOrders = UNITY_Utils.excludeRecordType(Trigger.newMap, PMWorkOrderSet);    
+    Public Map<Id, SObject> oldMap_SR_WorkOrders = UNITY_Utils.excludeRecordType(Trigger.oldMap, PMWorkOrderSet);    
+    
+    //Retrieve all record types except PMs        
+    Map<Id, Schema.RecordTypeInfo> defaultRecordTypeMap = Schema.SObjectType.WorkOrder.getRecordTypeInfosById().clone();
+    defaultRecordTypeMap.remove(UNITY_Constants.WO_PREVENTATIVE_MAINTENANCE_RECORDTYPE);
 
-    //Izay: Added to call the intercompany transfer process sharing after all UNITY code runs.
+    //Trigger Handler for PM Work Orders 
+    UNITY_TriggerFactory.createAndExecuteHandler(UNITYPM_WorkOrderTriggerHandler_Miner.class, PMWorkOrderSet);  
+    //Trigger Handler for non-PM Work Orders   
+    UNITY_TriggerFactory.createAndExecuteHandler(UNITY_WorkOrderTriggerHandler.class, defaultRecordTypeMap.keySet());
+    UNITY_TriggerFactory.createAndExecuteHandler(UNITY_WorkOrderTriggerHandler_Miner.class, defaultRecordTypeMap.keySet());
+
+    //Izay: Added to call the intercompany transfer process sharing after all UNITY code runs.  ????
     if(Trigger.isBefore && Trigger.isUpdate && MSPFS_WorkOrderHandler.handleIntercompanyTransferOnce()){
-        MSPFS_WorkOrderHandler.handleIntercompanyTransferSharing(Trigger.new,Trigger.oldMap);
+         MSPFS_WorkOrderHandler.handleIntercompanyTransferSharing(new_SR_WorkOrders, oldMap_SR_WorkOrders);
     }else if(Trigger.isAfter && Trigger.isInsert && MSPFS_WorkOrderHandler.handleIntercompanyTransferOnce()){
-        MSPFS_WorkOrderHandler.handleIntercompanyTransferSharing(Trigger.new,null);
+        MSPFS_WorkOrderHandler.handleIntercompanyTransferSharing(new_SR_WorkOrders,null);
     }
     
 }

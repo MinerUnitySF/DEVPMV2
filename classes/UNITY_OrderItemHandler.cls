@@ -62,20 +62,23 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
         
         OrderItem orderProd = (OrderItem) so;
         
-        orderProd.UNITY_Is_Part_Source_Identified__c = orderProd.UNITY_Part_Source__c != NULL;
-        
-        orderProd.UNITY_Invalid_Asset__c =  orderProd.UNITY_Type__c == 'Parts' &&
-                                            (orderProd.UNITY_Asset__c == null ||
-                                            orderWoMap.get(orderProd.OrderId) == null || 
-                                            workOrderAssetsMap.get(orderWoMap.get(orderProd.OrderId)) == null ||
-                                            !workOrderAssetsMap.get(orderWoMap.get(orderProd.OrderId)).contains(orderProd.UNITY_Asset__c));
-       
-        if(orderProd.UNITY_Order_Record_Type_Id__c == UNITY_Constants.ORDER_USAGE_REQUEST_RECORDTYPE) {
-            if(orderProd.UNITY_Order_All_Parts_On_Truck__c) {
-                orderProd.UNITY_Part_Location__c = orderProd.UNITY_WO_Truck_on_site__c;
-                orderProd.UNITY_Part_Source__c  = orderProd.UNITY_Truck_on_Site_Account__c;    
+        //UNITYPM Exclude PM Orders
+        if (!orderProd.UNITYPM_Is_WO_Preventative_Maintenance__c){
+            orderProd.UNITY_Is_Part_Source_Identified__c = orderProd.UNITY_Part_Source__c != NULL;
+            
+            orderProd.UNITY_Invalid_Asset__c =  orderProd.UNITY_Type__c == 'Parts' &&
+                                                (orderProd.UNITY_Asset__c == null ||
+                                                orderWoMap.get(orderProd.OrderId) == null || 
+                                                workOrderAssetsMap.get(orderWoMap.get(orderProd.OrderId)) == null ||
+                                                !workOrderAssetsMap.get(orderWoMap.get(orderProd.OrderId)).contains(orderProd.UNITY_Asset__c));
+           
+            if(orderProd.UNITY_Order_Record_Type_Id__c == UNITY_Constants.ORDER_USAGE_REQUEST_RECORDTYPE) {
+                if(orderProd.UNITY_Order_All_Parts_On_Truck__c) {
+                    orderProd.UNITY_Part_Location__c = orderProd.UNITY_WO_Truck_on_site__c;
+                    orderProd.UNITY_Part_Source__c  = orderProd.UNITY_Truck_on_Site_Account__c;    
+                }
+                populateLocationQuantityonOrderItem(orderProd);
             }
-            populateLocationQuantityonOrderItem(orderProd);
         }
     }
     
@@ -88,20 +91,22 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
         OrderItem orderProd = (OrderItem) so;
         OrderItem oldOrderProd = (OrderItem) so;
         
-        orderProd.UNITY_Is_Part_Source_Identified__c = orderProd.UNITY_Part_Source__c != NULL;
-        if(orderProd.UNITY_Order_Record_Type_Id__c == UNITY_Constants.ORDER_USAGE_REQUEST_RECORDTYPE) {
-             populateLocationQuantityonOrderItem(orderProd);
-        }
-        
-        
-        if(orderProd.UNITY_Asset__c != null && orderProd.UNITY_Asset__c != oldOrderProd.UNITY_Asset__c) {
-            orderProd.UNITY_Invalid_Asset__c =  orderProd.UNITY_Type__c == 'Parts' &&
-                                            (orderProd.UNITY_Asset__c == null ||
-                                            orderWoMap.get(orderProd.OrderId) == null || 
-                                            workOrderAssetsMap.get(orderWoMap.get(orderProd.OrderId)) == null ||
-                                            !workOrderAssetsMap.get(orderWoMap.get(orderProd.OrderId)).contains(orderProd.UNITY_Asset__c));   
-        }
+        //UNITYPM Exclude PM Orders
+        if (!orderProd.UNITYPM_Is_WO_Preventative_Maintenance__c){
+            orderProd.UNITY_Is_Part_Source_Identified__c = orderProd.UNITY_Part_Source__c != NULL;
+            if(orderProd.UNITY_Order_Record_Type_Id__c == UNITY_Constants.ORDER_USAGE_REQUEST_RECORDTYPE) {
+                 populateLocationQuantityonOrderItem(orderProd);
+            }
             
+            
+            if(orderProd.UNITY_Asset__c != null && orderProd.UNITY_Asset__c != oldOrderProd.UNITY_Asset__c) {
+                orderProd.UNITY_Invalid_Asset__c =  orderProd.UNITY_Type__c == 'Parts' &&
+                                                (orderProd.UNITY_Asset__c == null ||
+                                                orderWoMap.get(orderProd.OrderId) == null || 
+                                                workOrderAssetsMap.get(orderWoMap.get(orderProd.OrderId)) == null ||
+                                                !workOrderAssetsMap.get(orderWoMap.get(orderProd.OrderId)).contains(orderProd.UNITY_Asset__c));   
+            }
+        }
     }
     
     /*
@@ -120,7 +125,7 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
             //collect the orderId which order product are parts only
             List<Id> orderIds = new List<Id>();
             for(OrderItem orderItem : (List<OrderItem>)Trigger.new) {
-                if(orderItem.UNITY_Type__c == 'Parts')
+                if(orderItem.UNITY_Type__c == 'Parts' && !orderItem.UNITYPM_Is_WO_Preventative_Maintenance__c)
                     orderIds.add(orderItem.OrderId);
             }
             
@@ -162,20 +167,36 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
         Set<id> aux_orderItemsForPriceCalculation = new Set<id>();
         Set<id> aux_orderItemsForMultipliers      = new Set<id>();
         Set<id> aux_orderItemsForIsVendorSupply   = new Set<id>();
-        //Izay: Deprecated  2/1/2017
-        //Set<id> aux_orderItemsForPopulateShimpentReceived = new Set<id>();
         Set<id> aux_orderItemsUpdateStockQuantity = new Set<id>();
         Set<id> aux_ordersTopopulateFieldsFromServiceContractLineItems = new Set<Id>();
         
         Map<String,Set<id>> aux_useOrderItemFor   = new Map<String,Set<id>>();
         
+        //UNITYPM Exclude PM Orders - Map
+        Map<Id,OrderItem> newOINoPMMap = new Map<Id,OrderItem>();
+        if (Trigger.newMap != null){
+            for (SObject sobj: Trigger.newMap.values()){
+                OrderItem oi = (OrderItem)sobj;
+                if (!oi.UNITYPM_Is_WO_Preventative_Maintenance__c)
+                    newOINoPMMap.put(oi.Id, oi);
+            }
+        }
+        //UNITYPM Exclude PM Orders - List
+        List<OrderItem> newOINoPMList = new List<OrderItem>();
+        if (Trigger.new != null){
+            for (SObject sobj: Trigger.new){
+                OrderItem oi = (OrderItem)sobj;
+                if (!oi.UNITYPM_Is_WO_Preventative_Maintenance__c)
+                    newOINoPMList.add(oi);
+            }
+        }
+        
         if(Trigger.isInsert){
-            //updatedOrderLineItemIdSet.addAll(Trigger.newMap.keySet());
-            aux_orderItemsForPriceCalculation.addAll(Trigger.newMap.keySet());
-            aux_orderItemsForMultipliers.addAll(Trigger.newMap.keySet());
-            aux_ordersTopopulateFieldsFromServiceContractLineItems.addAll(Trigger.newMap.keySet());
+            aux_orderItemsForPriceCalculation.addAll(newOINoPMMap.keySet());
+            aux_orderItemsForMultipliers.addAll(newOINoPMMap.keySet());
+            aux_ordersTopopulateFieldsFromServiceContractLineItems.addAll(newOINoPMMap.keySet());
             
-            for(SObject so :Trigger.new){
+            for(SObject so :newOINoPMList){
                 OrderItem newOI =  (OrderItem)so;
                 if(!newOI.UNITY_Is_Vendor_Supply__c) 
                     aux_orderItemsForIsVendorSupply.add(newOI.id);
@@ -183,18 +204,13 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
                     aux_orderItemsUpdateStockQuantity.add(newOI.id);
             }
         }else if(Trigger.isUpdate){
-            //updatedOrderLineItemIdSet.addAll(Trigger.newMap.keySet());
-            aux_orderItemsForPriceCalculation.addAll(Trigger.newMap.keySet());
-            //Izay: Deprecated 2/1/2017:
-            //aux_orderItemsForPopulateShimpentReceived.addAll(Trigger.newMap.keySet());
-            //aux_orderItemsForMultipliers.addAll(Trigger.newMap.keySet());
+            aux_orderItemsForPriceCalculation.addAll(newOINoPMMap.keySet());
             if(!UNITY_Constants.isExecutingContext('synchronizeRelatedObjects'))
                 if(!System.isBatch() && !System.isFuture())
-                    synchronizeRelatedObjects((List<OrderItem>)Trigger.new);
+                    synchronizeRelatedObjects((List<OrderItem>)newOINoPMList);
 
-            for(SObject so :Trigger.new){
+            for(SObject so : newOINoPMList){
                 OrderItem newOI =  (OrderItem)so;
-                //Izay: Deprecated 2/1/2017: OrderItem oldOI =  (OrderItem)so;
                 OrderItem oldOI =  (OrderItem)Trigger.oldMap.get(so.Id);//Izay: U[pdated to look at the actual old line
                 if(!newOI.UNITY_Is_Vendor_Supply__c && (newOI.UNITY_Is_Vendor_Supply__c != oldOI.UNITY_Is_Vendor_Supply__c)) 
                     aux_orderItemsForIsVendorSupply.add(newOI.id);
@@ -229,34 +245,13 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
             }
 
             system.debug( '########## aux_useOrderItemFor.size(): '+aux_useOrderItemFor.size());
-
-            /*Izay: Deprecated 2/1/2017: 
-            aux_orderItemsIdToQueryFor.addAll(aux_orderItemsForPriceCalculation);
-            aux_orderItemsIdToQueryFor.addAll(aux_orderItemsForMultipliers);
-            aux_orderItemsIdToQueryFor.addAll(aux_orderItemsForIsVendorSupply);
-            aux_orderItemsIdToQueryFor.addAll(aux_orderItemsUpdateStockQuantity);
-            aux_orderItemsIdToQueryFor.addAll(aux_ordersTopopulateFieldsFromServiceContractLineItems);
-            aux_useOrderItemFor.put('pricecalculation',         aux_orderItemsForPriceCalculation);
-            aux_useOrderItemFor.put('multipliers',              aux_orderItemsForMultipliers);
-            aux_useOrderItemFor.put('isvendorsupply',           aux_orderItemsForIsVendorSupply);
-            aux_useOrderItemFor.put('populateFieldsFromSCLI',   aux_ordersTopopulateFieldsFromServiceContractLineItems);
-            if(aux_orderItemsForIsVendorSupply.size()>0) 
-                aux_useOrderItemFor.put('isvendorsupply'  , aux_orderItemsForIsVendorSupply);
-            if(aux_orderItemsUpdateStockQuantity.size()>0) 
-                aux_useOrderItemFor.put('updatestockquantity'  , aux_orderItemsUpdateStockQuantity);
-            */
-            //Izay: Deprecated 2/1/2017
-            //if(aux_orderItemsForPopulateShimpentReceived.size()>0) aux_useOrderItemFor.put('populateshimpentreceived'  , aux_orderItemsForPopulateShimpentReceived);
         }
 
         if(!aux_orderItemsIdToQueryFor.isEmpty())
             getOrderItems(aux_orderItemsIdToQueryFor);
         if(!aux_useOrderItemFor.isEmpty())
             collectOrderItems(aux_useOrderItemFor);
-
-        //populateShimpentReceivedOrderItems();
     }
-    
     
     /*
      * Name  : afterInsert
@@ -264,22 +259,28 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
     public override void afterInsert(Sobject so){
         
         System.debug('#newOrderItem '+so);
-        
-        relatedPricebookEntryList.add(((OrderItem)so).PricebookEntryId);
-        updatedOrderLineItemIdSet.add(((OrderItem)so).Id);
-        //updateStockQuantity(Trigger.New);
+        OrderItem oi = (OrderItem)so;
+        if (!oi.UNITYPM_Is_WO_Preventative_Maintenance__c){
+        	relatedPricebookEntryList.add(oi.PricebookEntryId);
+        	updatedOrderLineItemIdSet.add(oi.Id);
+        }
     }
     
     /*
      * Name  : afterUpdate
      */
     public override void afterUpdate(Sobject so, Sobject oldSo){
-        //updateStockQuantity(Trigger.New);
-        relatedPricebookEntryList.add(((OrderItem)so).PricebookEntryId);
-        relatedPricebookEntryList.add(((OrderItem)oldSo).PricebookEntryId);
+        OrderItem oi = (OrderItem)so;
+        OrderItem oiOld = (OrderItem)oldSo;
         
-        updatedOrderLineItemIdSet.add(so.Id);
-        
+        if (!oi.UNITYPM_Is_WO_Preventative_Maintenance__c){
+            
+            relatedPricebookEntryList.add(oi.PricebookEntryId);
+            relatedPricebookEntryList.add(oiOld.PricebookEntryId);
+            
+            updatedOrderLineItemIdSet.add(oi.Id);
+            
+        }
     }
     
     /*
@@ -391,15 +392,7 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
                 system.debug('######## ckeckUseFor(updatestockquantity,onOrderItem.id,userOrderItemFor): '+ check);
 
                 system.debug('######## updateStockQuantityFilter(onOrderItem): '+updateStockQuantityFilter(onOrderItem) );
-                /* ******************************************************************************************************
-                Izay: Deprecated 2/1/2017. Stocking and Part Sourcing inventory adjustments are handled by the code above
-                *********************************************************************************************************
-                if(ckeckUseFor('populateshimpentreceived',onOrderItem.id,userOrderItemFor) && populateShimpentReceivedOrderItemsFilter(onOrderItem)){
-                   //orderItemsPopulateShimpentReceived_map.put(onOrderItem.id, onOrderItem);
-                   orderItemsUpdateStockQuantity_map.put(onOrderItem.id,onOrderItem);
-                }
-                */
-                if(ckeckUseFor('populateFieldsFromSCLI',onOrderItem.id,userOrderItemFor))
+                 if(ckeckUseFor('populateFieldsFromSCLI',onOrderItem.id,userOrderItemFor))
                    orderItemToPopulateFieldsFromSCLI_map.put(onOrderItem.id, onOrderItem); 
             }
         }
@@ -491,73 +484,6 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
         
     }
     
-    /*
-     * Name  : updateStockQuantity
-     * Param : List<SObject> order item list 
-     */
-    /*public void updateStockQuantity(List<SObject> oItems){
-        List<RecordType> orderRecordTypes = [SELECT Id, DeveloperName FROM RecordType WHERE SobjectType = 'Order'];
-        List<Id> orderRTList = new List<Id>();
-        for(RecordType rt : orderRecordTypes){
-            if(rt.DeveloperName == 'UNITY_Stocking_Purchase_Order'){
-                orderRTList.add(rt.Id);
-            } else if (rt.DeveloperName == 'UNITY_Purchase_Order'){
-                orderRTList.add(rt.Id);
-            }
-        }
-        Set<Id> orderItemIdSet = new Set<Id>();
-        for(Sobject o : oItems){
-            OrderItem oi = (OrderItem)o;
-            orderItemIdSet.add(oi.Id);
-        }
-        List<OrderItem> orderItems = [SELECT Id, OrderId, Order.RecordTypeId, Order.Type, Order.FSO__WorkOrder__r.UNITY_Business_Unit__c, PricebookEntry.Product2Id, Quantity, UNITY_Part_Delivered__c, PricebookEntry.Product2.Unity_Is_Stockable__c, UNITY_Cost__c FROM OrderItem WHERE Id IN: orderItemIdSet AND Order.RecordTypeId IN: orderRTList];
-        
-        Set<Id> productIdSet = new Set<Id>();
-        Set<String> businessUnitSet = new Set<String>();
-        
-        for(OrderItem oi : orderItems){
-            productIdSet.add(oi.PricebookEntry.Product2Id);
-            businessUnitSet.add(oi.Order.FSO__WorkOrder__r.UNITY_Business_Unit__c);
-        }
-        
-        List<FSO__LocationStock__c> stockLocations = [SELECT Id, UNITY_Business_Unit__c, FSO__Quantity__c, FSO__Product__c FROM FSO__LocationStock__c WHERE FSO__Product__c IN: productIdSet AND UNITY_Business_Unit__c IN: businessUnitSet AND FSO__Location__r.UNITY_Parent_Location__c = null];
-        Map<Id, FSO__LocationStock__c> orderItemIdToLocation = new Map<Id, FSO__LocationStock__c>();
-        for(OrderItem oi : orderItems){
-            for(FSO__LocationStock__c ls : stockLocations){
-                if(ls.FSO__Product__c  == oi.PricebookEntry.Product2Id && ls.UNITY_Business_Unit__c == oi.Order.FSO__WorkOrder__r.UNITY_Business_Unit__c){
-                    orderItemIdToLocation.put(oi.Id, ls);
-                    break;
-                }
-            }
-        }
-        List<FSO__LocationStock__c> locationsToUpdate = new List<FSO__LocationStock__c>();
-        for(OrderItem oi : orderItems){
-            if(oi.UNITY_Part_Delivered__c && oi.PricebookEntry.Product2.Unity_Is_Stockable__c){
-                if(orderItemIdToLocation.get(oi.Id) == null){
-                    oi.addError('No stock location for this order item');
-                }
-                if(oi.Order.RecordTypeId == orderRTList.get(1)){
-                    orderItemIdToLocation.get(oi.Id).FSO__Quantity__c = orderItemIdToLocation.get(oi.Id).FSO__Quantity__c + oi.Quantity;
-                    orderItemIdToLocation.get(oi.Id).UNITY_Quantity_Update_Reason__c = 'Restocking';
-                    orderItemIdToLocation.get(oi.Id).UNITY_Last_Action_PO__c = oi.OrderId;
-                    orderItemIdToLocation.get(oi.Id).UNITY_Last_Purchase_Order_Quantity__c = oi.Quantity;
-                    orderItemIdToLocation.get(oi.Id).UNITY_Last_Purchase_Order_Unit_Cost__c = oi.UNITY_Cost__c;
-                    locationsToUpdate.add(orderItemIdToLocation.get(oi.Id));
-                } else if(oi.Order.RecordTypeId == orderRTList.get(0)){
-                    if(orderItemIdToLocation.get(oi.Id).FSO__Quantity__c < oi.Quantity){
-                        oi.addError('Quantity is bigger than the stock');
-                    }
-                    orderItemIdToLocation.get(oi.Id).FSO__Quantity__c = orderItemIdToLocation.get(oi.Id).FSO__Quantity__c - oi.Quantity;
-                    orderItemIdToLocation.get(oi.Id).UNITY_Quantity_Update_Reason__c = 'PO Usage';
-                    orderItemIdToLocation.get(oi.Id).UNITY_Last_Action_PO__c = oi.OrderId;
-                    orderItemIdToLocation.get(oi.Id).UNITY_Last_Purchase_Order_Quantity__c = oi.Quantity;
-                    orderItemIdToLocation.get(oi.Id).UNITY_Last_Purchase_Order_Unit_Cost__c = oi.UNITY_Cost__c;
-                    locationsToUpdate.add(orderItemIdToLocation.get(oi.Id));
-                }
-            }
-        }
-        update locationsToUpdate;
-    }*/
     /* ********************************************************************
     ******** Izay: Check if line is good to adjust inventory **************
     ********************************************************************* */
@@ -715,40 +641,6 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
     }
     
     /*
-     * Name  : populateShimpentReceivedOrderItems 
-     *//*
-    public void populateShimpentReceivedOrderItems(){
-        
-        shipmentReceivedOrderItems = new List<Id>();
-                
-        //Map<Id, OrderItem> orderItemMap = new Map<Id, OrderItem>([select id, Order.RecordTypeId from OrderItem where id in: trigger.new]);
-        Map<Id, OrderItem> orderItemMap = orderItemsPopulateShimpentReceived_map;
-        if (Trigger.isUpdate){
-            
-            for (sObject iter: trigger.new){
-                
-                OrderItem newOrderItem = (OrderItem)iter;
-                OrderItem oldOrderItem = (OrderItem)trigger.oldMap.get(iter.id);
-                
-                System.debug('#newOrderItem '+newOrderItem);
-                
-                
-                System.debug('#stocking record type '+orderItemMap.get(newOrderItem.Id).Order.RecordTypeId == UNITY_Constants.ORDER_STOCKING_PURCHASE_ORDER_RECORDTYPE);
-                    
-                if (orderItemMap.get(newOrderItem.Id).Order.RecordTypeId == UNITY_Constants.ORDER_STOCKING_PURCHASE_ORDER_RECORDTYPE){ 
-                    
-                    if ((newOrderItem.UNITY_Shipment_Received__c != oldOrderItem.UNITY_Shipment_Received__c) && newOrderItem.UNITY_Shipment_Received__c == true){
-                        
-                        shipmentReceivedOrderItems.add(newOrderItem.Id);
-                    }
-                }        
-            }
-            
-            System.debug('#shipmentReceivedOrderItems '+shipmentReceivedOrderItems);
-        }
-    }*/
-    
-    /*
      * Name   : shimpentReceivedOrderItemsFilter 
      * Param  : OrderItem to filter
      * Note   : this method should be called for update only 
@@ -781,10 +673,6 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
             //UNITY_PriceCalculation.updateLocationStock(orderItemsPopulateShimpentReceived_map);
         }    
     }
-    
-/*    
-
-*/
     
     /**
      *  Keep synchronized the poli related by field UNIYT_Order_Product field.
@@ -855,10 +743,7 @@ public with sharing class UNITY_OrderItemHandler extends UNITY_BaseHandler{
                 update toUpdateStatus;
             }
         }
-            
-        
     }
-    
   
     private void synchronizeRelatedObjects(List<OrderItem> orderItemList) {
         Set<Id> orderItemChangedFieldsList = new Set<Id>();

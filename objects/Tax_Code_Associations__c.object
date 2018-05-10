@@ -3115,7 +3115,10 @@
             </values>
         </picklistValues>
     </recordTypes>
-    <searchLayouts/>
+    <searchLayouts>
+        <searchResultsAdditionalFields>Activity_Type__c</searchResultsAdditionalFields>
+        <searchResultsAdditionalFields>Tax_Code__c</searchResultsAdditionalFields>
+    </searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

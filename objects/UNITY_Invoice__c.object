@@ -935,7 +935,7 @@ UNITY_Case__r.RecordType.DeveloperName = &quot;UNITY_Preventative_Maintenance&qu
         <externalId>false</externalId>
         <label>Tax Posted</label>
         <trackFeedHistory>false</trackFeedHistory>
-        <trackHistory>false</trackHistory>
+        <trackHistory>true</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
@@ -1624,7 +1624,8 @@ ISCHANGED( UNITY_Discount_Amount__c )
  ),
  AND(
   NOT(ISCHANGED(UNITY_Tax_Processed__c)),
-  NOT(ISCHANGED(UNITY_Tax_Posted__c))
+  NOT(ISCHANGED(UNITY_Tax_Posted__c)),
+  NOT(ISCHANGED(UNITY_Agent__c))
  )
 )</errorConditionFormula>
         <errorMessage>The invoice has been disputed and it is locked.</errorMessage>
@@ -1646,6 +1647,7 @@ ISCHANGED( UNITY_Discount_Amount__c )
   NOT(ISCHANGED(UNITY_Missing_Required_Documentation__c)),
   NOT(ISCHANGED(UNITY_SL_Process_Complete__c)),
   NOT(ISCHANGED(UNITY_Last_Payment_Date_Time__c)),
+  NOT(ISCHANGED(UNITY_Agent__c)),
   NOT(ISCHANGED(UNITY_Invoice_Balance__c)),
   ISPICKVAL(UNITY_Invoice_Status__c,&quot;Invoice Finalized&quot;),
   ISPICKVAL(PRIORVALUE(UNITY_Invoice_Status__c),&quot;Invoice Finalized&quot;)

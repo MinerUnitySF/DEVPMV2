@@ -86,7 +86,7 @@
                 </apex:outputPanel>
             </apex:outputPanel>-->
         </div>
-        <apex:outputText rendered="{!IF(noOrders,"True","False")}" value="One or more work orders are not attachment compliant. Please see customer service contract for specific document requirements."/>   
+        <apex:outputText rendered="{!IF(noOrders,"True","False")}" value="One or more work orders are not attachment compliant or cannot be invoiced under a PM Case. Please see customer service contract for specific document requirements."/>   
         
             <apex:outputPanel id="oP1">
                 <apex:repeat value="{!wrappers}" var="workOrder">

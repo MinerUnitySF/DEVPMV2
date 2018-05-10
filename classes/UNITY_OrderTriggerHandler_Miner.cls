@@ -50,16 +50,28 @@ public class UNITY_OrderTriggerHandler_Miner extends UNITY_BaseHandler{
             List<Order> setGLOrders = new List<Order>();//Order that need the gl sub account populated
             List<Order> setShippingInfo = new List<Order>();//Orders that need shipping info from usage request
             List<Order> setVendorContract = new List<Order>();//Orders that need the vendor service contract populated... Stocking POs Only
+            List<Order> finalPMOrders = new List<Order>();//The PM orders which status changed to final  added by neli
+            	
             for(SObject s :trigger.new){
                 Order o = (Order)s;
                 if(String.isBlank(o.UNITY_GL_Segment_Account__c) || String.isBlank(o.UNITY_GL_Sub_Account__c)){
                     setGLOrders.add(o);
                 }
-                if(Trigger.isInsert && String.isNotBlank(o.UNITY_Originating_Usage_Request__c) && (o.RecordTypeId == poRTId || o.RecordTypeId == poPSRTId)){
+                if(Trigger.isInsert && String.isNotBlank(o.UNITY_Originating_Usage_Request__c) && (o.RecordTypeId == poRTId || o.RecordTypeId == poPSRTId) && !o.UNITYPM_Is_WO_Preventative_Maintenance__c){
                     setShippingInfo.add(o);
                 }
-                if(Trigger.isUpdate && String.isNotBlank(o.UNITY_Vendor__c) && String.isBlank(o.UNITY_Vendor_Contract__c)){
+                if(Trigger.isUpdate && String.isNotBlank(o.UNITY_Vendor__c) && String.isBlank(o.UNITY_Vendor_Contract__c) && !o.UNITYPM_Is_WO_Preventative_Maintenance__c){
                     setVendorContract.add(o);
+                }
+                
+                if(Trigger.isUpdate && o.UNITYPM_Is_WO_Preventative_Maintenance__c){
+                    Order oldO = (Order)trigger.oldMap.get(o.Id);
+                     system.debug('#####   neli BEFORE o.Status >>  #### ' + o.Status);
+                    if(o.Status != oldO.Status){
+                        if(o.Status == 'Final'){
+                            finalPMOrders.add(o);
+                        }
+                    }
                 }
             }
             if(!setGLOrders.isEmpty()){
@@ -71,6 +83,13 @@ public class UNITY_OrderTriggerHandler_Miner extends UNITY_BaseHandler{
             if(!setVendorContract.isEmpty()){
                 setVendorContract(setVendorContract,UNITY_Constants.ContractType.SERVICE_REQUEST);
             }
+             if(!setShippingInfo.isEmpty()){
+                setShippingInfo(setShippingInfo);
+            }
+            
+            system.debug('#####   neli BEFORE finalPMOrders >>  #### ' + finalPMOrders.size());
+            if (!finalPMOrders.isEmpty())
+               updatePMorder(finalPMOrders);
         }
     }
     /**Method to execute on Order trigger AFTER context
@@ -91,36 +110,63 @@ public class UNITY_OrderTriggerHandler_Miner extends UNITY_BaseHandler{
             Set<Id> partSourceIdentified = new Set<Id>();//Holds order ids for part sourcing POs that go to Parts Source Identified
             List<Order> intercompanyShare = new List<Order>();//Hold orders that may need to be sharing with MSP or Asset Light BUs
 			List<Order> shareToVendorOrderList = new List<Order>(); //Orders that has a vendor
-			List<Order> unshareToVendorOrderList = new List<Order>(); //Orders that no longer belong to a certain vendor            
+			List<Order> unshareToVendorOrderList = new List<Order>(); //Orders that no longer belong to a certain vendor 
+			
+			List<Order> finalPMOrders = new List<Order>();//The PM orders which status changed to final  added by neli
+			Set<Id> pmWoIds = new Set<Id>();//Holds the PM work order ids for the changed orders.  
+			 
             //Get work order id for any order that changed status or any new order
             for(SObject s :trigger.new){
                 Order o = (Order)s;
                 if(trigger.isInsert){
-                    if (o.FSO__WorkOrder__c != null){
-                        changedStatus.add(o);
-                        woIds.add(o.FSO__WorkOrder__c);
-                        if(String.isNotBlank(o.UNITY_Related_Work_Order_Id__c))
-                            woIds.add(o.UNITY_Related_Work_Order_Id__c);
-                    }    
-                    intercompanyShare.add(o);
-					if ((o.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE || o.RecordTypeId == UNITY_Constants.PART_SOURCING_PURCHASE_ORDER_RECORDTYPE) 
-                        && (o.UNITY_Vendor__c != null)  
-                    	&& isInvoiceable(o.Status)){
-                    	shareToVendorOrderList.add(o);
-                    }                    
-                }else if(trigger.isUpdate){
-                    Order oldO = (Order)trigger.oldMap.get(o.Id);
-                    if(o.Status != oldO.Status){
+                    //UNITYPM Exclude PM Orders
+                    if (!o.UNITYPM_Is_WO_Preventative_Maintenance__c){
                         if (o.FSO__WorkOrder__c != null){
                             changedStatus.add(o);
                             woIds.add(o.FSO__WorkOrder__c);
                             if(String.isNotBlank(o.UNITY_Related_Work_Order_Id__c))
                                 woIds.add(o.UNITY_Related_Work_Order_Id__c);
+                        }    
+                        intercompanyShare.add(o);
+                    }
+					//if ((o.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE || o.RecordTypeId == UNITY_Constants.PART_SOURCING_PURCHASE_ORDER_RECORDTYPE) 
+                    //    && (o.UNITY_Vendor__c != null)  
+                    //	&& isInvoiceable(o.Status)){
+                    //	shareToVendorOrderList.add(o);
+                    //} 
+                    
+                    //added by neli
+                	if ((o.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE || 
+                	        o.RecordTypeId == UNITY_Constants.PART_SOURCING_PURCHASE_ORDER_RECORDTYPE || o.UNITYPM_Is_WO_Preventative_Maintenance__c) 
+                                  && (o.UNITY_Vendor__c != null)  
+                                          	&& isInvoiceable(o.Status)){
+                    	shareToVendorOrderList.add(o);
+                    }    
+                    
+                }else if(trigger.isUpdate){
+                    Order oldO = (Order)trigger.oldMap.get(o.Id);
+                    if(o.Status != oldO.Status){
+                        //UNITYPM Exclude PM Orders 
+                        if (o.FSO__WorkOrder__c != null && !o.UNITYPM_Is_WO_Preventative_Maintenance__c){
+                            changedStatus.add(o);
+                            woIds.add(o.FSO__WorkOrder__c);
+                            if(String.isNotBlank(o.UNITY_Related_Work_Order_Id__c))
+                                woIds.add(o.UNITY_Related_Work_Order_Id__c);
+                        }
+                        if ( oldO.Status == 'Draft' && o.Status == 'Accepted'){
+                           system.debug('##### added by neli      ####');
+                            if (o.UNITYPM_Is_WO_Preventative_Maintenance__c) {   
+                                   finalPMOrders.add(o);
+                                   pmWoIds.add(o.FSO__WorkOrder__c);
+                            }
                         }
                         if(o.Status == 'Final'){ // UNITY_Constants.ORDER_STATUS_FINAL){
                             finalOrderIds.add(o.Id);
-                            if(o.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE)
+                            //UNITYPM Exclude PM Orders - no NTE Checking
+                            if(o.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE && !o.UNITYPM_Is_WO_Preventative_Maintenance__c){
+                                pmWoIds.add(o.FSO__WorkOrder__c);
                                 finalOrders.add(o);
+                            }
                         }else if(o.Status == UNITY_Constants.ORDER_STATUS_PART_ORDER_REQUIRED && o.RecordTypeId == UNITY_Constants.ORDER_STOCKING_PURCHASE_ORDER_RECORDTYPE){
                             finalOrderIds.add(o.Id);
                         }else if(o.Status == 'Parts Being Delivered' && o.RecordTypeId == UNITY_Constants.ORDER_STOCKING_PURCHASE_ORDER_RECORDTYPE){
@@ -133,7 +179,9 @@ public class UNITY_OrderTriggerHandler_Miner extends UNITY_BaseHandler{
                        o.UNITY_Expected_Arrival_Date__c != oldO.UNITY_Expected_Arrival_date__c || 
                        o.UNITY_Tracking_Number__c != oldO.UNITY_Tracking_Number__c || 
                        o.UNITY_Shipping_Provider__c != oldO.UNITY_Shipping_Provider__c){
-                           propagateShippingInfo.add(o);
+                           //UNITYPM Exclude PM Orders
+                           if (!o.UNITYPM_Is_WO_Preventative_Maintenance__c)
+                           		propagateShippingInfo.add(o);
                        }
                     if((((o.UNITY_Final_Price__c != oldO.UNITY_Final_Price__c) || (!o.UNITY_Tax_Processed__c)) && (o.Status == 'Draft' || o.Status == 'Parts Order Required' || o.Status == 'Part Cost Required')) &&
                        (o.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE || o.RecordTypeId == UNITY_Constants.ORDER_USAGE_REQUEST_RECORDTYPE || o.RecordTypeId == UNITY_Constants.PART_SOURCING_PURCHASE_ORDER_RECORDTYPE)){
@@ -146,7 +194,11 @@ public class UNITY_OrderTriggerHandler_Miner extends UNITY_BaseHandler{
                     if(o.RecordTypeId == UNITY_Constants.ORDER_USAGE_REQUEST_RECORDTYPE && o.Status == 'Submitted to Miner'){
                         intercompanyShare.add(o);
                     }
-                    if (o.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE || o.RecordTypeId == UNITY_Constants.PART_SOURCING_PURCHASE_ORDER_RECORDTYPE){
+                    
+                    //added by neli
+                 
+                    if (o.RecordTypeId == UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE || o.RecordTypeId == UNITY_Constants.PART_SOURCING_PURCHASE_ORDER_RECORDTYPE 
+                                                                         || o.UNITYPM_Is_WO_Preventative_Maintenance__c){
 	                    //if Vendor changed or just got populated 
 	                    if (isInvoiceable(o.Status) && ((oldO.UNITY_Vendor__c == null && o.UNITY_Vendor__c != null) || (oldO.UNITY_Vendor__c != o.UNITY_Vendor__c))){
 	                    	shareToVendorOrderList.add(o);
@@ -193,15 +245,57 @@ public class UNITY_OrderTriggerHandler_Miner extends UNITY_BaseHandler{
             if(!intercompanyShare.isEmpty() && UNITY_OrderTriggerHandler_Miner.shareOrderOnce()){
                 shareOrder(intercompanyShare);
             }
+            
             if (!shareToVendorOrderList.isEmpty())
             	UNITY_OrderTriggerHandler_NoSharing.shareOrderToVendor(shareToVendorOrderList);
+         
             if (!unshareToVendorOrderList.isEmpty())
             	UNITY_OrderTriggerHandler_NoSharing.unShareOrderToVendor(unshareToVendorOrderList); 
+            
+            if (!finalPMOrders.isEmpty() && !pmWoIds.isEmpty())
+                updatePMorderAndworkOrder(pmWoIds,finalPMOrders);
         }
     }
+    
+    //added by Neli
+      //added by Neli
+    private static void updatePMorder( List<Order> finalPMOrders){
+        List<Order> oUpdate = new List<Order>();
+          for(Order o :finalPMOrders){
+               o.Status = 'Accepted';
+           }
+    }
+      
+     private static void updatePMorderAndworkOrder(Set<ID> pmWoIDs, List<Order> finalPMOrders){
+        Map<Id,WorkOrder> wosMap = new Map<Id,WorkOrder>([SELECT Id,Status,RecordTypeId,UNITY_Accepted_Vendor__c, UNITY_Current_PO__c, UNITY_Assigned_Vendor__c
+                                               FROM WorkOrder 
+                                                   WHERE Id IN :pmWoIDs]); 
+          List<WorkOrder> woUpdate = new List<WorkOrder>();                                         
+       
+          for(Order o :finalPMOrders){
+            if(wosMap.containsKey(o.FSO__WorkOrder__c)){ 
+                 wosMap.get(o.FSO__WorkOrder__c).Status = 'Assigned';
+                 wosMap.get(o.FSO__WorkOrder__c).UNITY_Vendor_Status__c = 'Accepted';
+                 wosMap.get(o.FSO__WorkOrder__c).UNITY_Accepted_Vendor__c = wosMap.get(o.FSO__WorkOrder__c).UNITY_Assigned_Vendor__c; // o.UNITY_Assigned_Vendor__c; 
+                 wosMap.get(o.FSO__WorkOrder__c).UNITY_Current_PO__c =  o.ID;
+                 wosMap.get(o.FSO__WorkOrder__c).UNITY_Vendor_Accept_Date__c = System.now(); //???
+                 woUpdate.add(wosMap.get(o.FSO__WorkOrder__c));
+            }
+          }
+  
+         try{
+             if (woUpdate.size() > 0)
+               update woUpdate;
+         }
+         catch (Exception ex){
+           trigger.new[0].addError('An error occurred while updating the work order status. Error: ' + ex.getMessage());
+         }
+    }
+    
     /**This method updates the Work Order status based on PO Status
     *@param woids - List<Id>: The ids for the work orders to update the status
     */
+  
     public static void updateWorkOrderStatus(Set<Id> woIds,List<Order>thisOrds){
         //get the values from the custom setting
         List<UNITY_Status_Fields_Update_Map__c> statusMapping = UNITY_Status_Fields_Update_Map__c.getAll().values();
@@ -1011,14 +1105,16 @@ public class UNITY_OrderTriggerHandler_Miner extends UNITY_BaseHandler{
     	boolean result = false;
     	
     	UNITY_General_Settings__c generalSetting = UNITY_General_Settings__c.getValues(UNITY_Constants.PO_INVOICEABLE_STATUSES);
-        system.debug('@@@isInvoiceable generalSetting:'+generalSetting);
+        system.debug('@@@ neli isInvoiceable generalSetting:'+generalSetting);
         if (generalSetting != null){
         	Set<String> delimitedInvoiceableStatuses = new Set<String>();
             delimitedInvoiceableStatuses = new Set<String>(generalSetting.UNITY_Value__c.split(UNITY_Constants.PO_INVOICEABLE_STATUSES_DELIMITER));
-            system.debug('@@@isInvoiceable delimitedInvoiceableStatuses:'+delimitedInvoiceableStatuses);
+            system.debug('@@@ neli isInvoiceable delimitedInvoiceableStatuses:'+delimitedInvoiceableStatuses);
             if (delimitedInvoiceableStatuses.contains(status))
             	result = true;
             
+            
+             system.debug('@@@ neli isInvoiceable result:'+ result);
             return result;
         }
         else{

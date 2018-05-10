@@ -146,13 +146,53 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>Quote_Approved_Date__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>SVMXC__BW_Time_Zone__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Invoice_Date__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Attachment_Compliant__c</field>
             <table>Case</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Cust_Invoices_in_Service_Channel__c</field>
             <table>Case.Invoices__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Most_Recent_Case_Notes__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Miner_Team_Assigned__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Quote_Submitted_Date__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Ross_Repair_Type__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Repair_Location__c</field>
+            <table>Case</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
@@ -171,6 +211,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Ross_Priority__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Site_Location_City__c</field>
             <table>Case</table>
         </columns>
@@ -182,6 +227,11 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Case_Created_Trigger_30_minutes__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Days_to_Invoice_Completed_Cases__c</field>
             <table>Case</table>
         </columns>
         <columns>
@@ -202,6 +252,11 @@
         <columns>
             <checkedByDefault>true</checkedByDefault>
             <field>CaseNumber</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Corporate_Contact__c</field>
             <table>Case</table>
         </columns>
         <columns>
@@ -1157,6 +1212,11 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Customer__c.UNITY_Bill_To_Account__c.MH_SL_CustID__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Account.UNITY_Company__c</field>
             <table>Case</table>
         </columns>
         <masterLabel>Cases</masterLabel>

@@ -15,7 +15,7 @@
         
         List<String> insuranceTypes = New List<String> {'Automobile Liability','General Liability','Installation Floater Liability',
                                                'Rented Equipment Liability', 'Umbrella Liability','Workers Compensation Liability'};
-        List<Integer> numberOfDays = new List<Integer>{-2,6,12,28,55, 90};
+        List<Integer> numberOfDays = new List<Integer>{-2, 6, 12, 28, 55, 90};
               
         List<UNITY_Insurance__c> insurances = new List<UNITY_Insurance__c>();      
         for (integer i =0; i< numberOfDays.size();i++){

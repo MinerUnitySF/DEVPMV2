@@ -1,0 +1,86 @@
+<apex:page >
+    <style type="text/css">
+        table.gridtable {
+            width:100%;
+            //font-family: verdana,arial,sans-serif;
+            font-size:11px;
+            color:#333333;
+            border: 1px solid black;
+            border-width: 1px;
+            border-collapse: collapse;
+        }
+        table.gridtable th {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: #666666;
+            background-color: #dedede;
+        }
+        table.gridtable td {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: #666666;
+            background-color: #ffffff;
+        }
+        </style>
+      <apex:form >
+      <apex:pageBlock >
+        
+        <apex:pageBlockSection columns="1">
+             <apex:pageBlockSectionItem >
+                    <div><p>First, I would like to thank you for all you do and continue to do on behalf of Miner National Service.  Lately, it has become very clear that our current process for collecting and remitting payment is not working and we are causing harm to our relationship with our most valuable commodity, our Affiliates. </p></div>
+                   
+                   <div><p>Effective 2/1/2018, each Affiliate will be assigned to an Affiliate Relations Specialist who will be their designated point of contact when issues arise related to paperwork submission or payment issues.</p></div>
+                    
+                    <div><p>Enforcing our “I’m on it, Now” Core Value, our phones will be routed to the Affiliate Relations Specialist, who will respond and retain ownership of the issues until resolved, driving to a one-cal resolution philosophy.  Below outlines who is your key point of contact based on your company name.   You can reach them by calling <b>(877) 287-0370, Option 2.</b></p></div>
+                     <br/>
+                     <table class="gridtable">
+                      <tr>
+                        <th><b>Phillip McDonald</b></th>
+                        <th><b>Elouise Pena</b></th>
+                        <th><b>Juanita Trevino</b></th>
+                          <th><b>Christina Carter</b></th>
+                      </tr>
+                      
+                      <tr>
+                        <td>Affiliate Relations Specialist</td>
+                         <td>Affiliate Relations Specialist</td>
+                         <td>Affiliate Relations Specialist</td>
+                           <td>Affiliate Relations Specialist</td>
+                      </tr>   
+                        
+                    </table>
+                 <br/>
+                    <div><p>With all the changes within our organization, I wanted to take this opportunity to review the methods of submitting paperwork to Miner. </p></div>
+                <br/>
+              
+                <ui>
+                    <li>If your company is issuing a PO that begins with “MFM”- you will need to ensure that the bar code page is the leading page when faxing or emailing the documents. E-mail address for this method of submitting is <u><span style="color:blue;"><b>ServicePartnerPPW@minercorp.com.</b></span></u></li>
+                    <li>If your company is issuing a PO that begins with “WO” – you can reply to the email, do not change the subject line, attach your documents and send.  Or if you have multiple work orders that you are submitting paperwork or photos for, you can email to <u><span style="color:blue;"><b>ServicePartnerMNS@minercorp.com</b></span></u> mailbox.  This is monitored and processed on a daily basis.</li>
+                    <li>Affiliates are required to include the Work Order Number in the Subject line, this will allow the documents to be expeditiously processed.</li>
+                 </ui>
+                 
+                  <br/>
+                <div><p>And lastly, the Vendor Community Portal, recently launched, allows Affiliates the ability to upload quotes, photos, invoices and sign-offs to their assigned work orders.  If you are currently not on our vendor portal and our interested, please contact your Affiliate Relations Specialist.</p></div>
+                 <br/>
+                  <div><p>Ensuring our success, I wanted to reiterate key things to remember to avoid delays or non-payment of funds.</p></div>
+              
+               <ui>
+                <li>IVR adherence – ensure that your technicians utilize the IVR system and account for the number technicians on-site.  This is mandated by our clients.</li>
+                <li>Affiliates are required to check in and out with Miner.  This provides you with support to ensure clients IVR compliance is adhered too.</li>
+                <li>Not to Exceed “NTE” - Invoices submitted cannot exceed the authorized Purchase Order amount. Miner will only pay the authorized amount issued to the Affiliate.   After the fact request for additional funds will not be accepted or approved.</li>
+                <li>While on-site, should your tech be able to complete repairs but requires additional time or parts, the technician <span style="color:red;"><b>MUST</b></span> call into our office at 877-287-0370.</li>
+                <li>Required paperwork; company invoice, before and after photos, and a Work Acknowledgement Form (Service Sign-Off) that contains time in and out, Manager on Duty Signature and a store stamp if available.</li>
+              </ui>
+                <br/>
+                <div><p>In closing, we at Miner are aware that we have to improve our performance and with these changes we are confident that we will deliver unsurpassed customer service to our loyal Affiliates.  Being that we have mutual financial interests and the goal is to be profitable in our business, it is imperative that our Affiliates adhere to the mandated protocols set forth by the customer.</p></div>
+                  <br/>
+                <div><p>Please join me with this endeavor and let us grow our businesses together!  Miner sincerely appreciates your commitment to our customers and we look forward to a long prosperous business relationship with you!</p></div>
+                
+            </apex:pageBlockSectionItem>
+          </apex:pageBlockSection>
+         
+    </apex:pageBlock>
+ </apex:form>
+</apex:page>

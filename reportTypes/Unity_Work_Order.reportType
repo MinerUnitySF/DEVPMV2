@@ -198,6 +198,16 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Time_to_Debrief__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Next_Action_Date__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>City</field>
             <table>WorkOrder</table>
         </columns>
@@ -208,12 +218,32 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Debrief_Agent__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Date_Time_Debrief_Completed__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>FSO__IsClosed__c</field>
             <table>WorkOrder</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Next_Action__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>Closed_Date__c</field>
+            <table>WorkOrder</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Days_to_Debrief__c</field>
             <table>WorkOrder</table>
         </columns>
         <columns>

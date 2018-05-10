@@ -109,4 +109,188 @@ public class UNITY_CaseTriggerHandler_Miner_UT {
         Test.stopTest();
     }
     
+    private static testMethod void testMapSCCaseValues(){
+        
+        List<Account> accts = new List<Account>();
+        Account cust = TestDataProvider.getAccounts(1,'Customer', 'Customer')[0];
+        cust.Account_Status__c = 'Active';
+        cust.UNITY_Customer_Team__c = 'Team 1';
+        cust.UNITY_MNS_Customer_Team__c = 'Team 1';
+        cust.UNITY_Tier_Level__c = 'Tier 1';
+        accts.add(cust);
+        
+        Account buNSBS = TestDataProvider.getAccounts(1,'Miner','Business Unit')[0];buNSBS.UNITY_Business_Unit__c = 'NSBS';accts.add(buNSBS);
+        Account buMNS = TestDataProvider.getAccounts(1,'Miner','Business Unit')[0];buMNS.UNITY_Business_Unit__c = 'MNS';accts.add(buMNS);
+        insert accts;
+        
+        List<UNITY_SC_to_Case_Field_Mapping__c> listFM = new List<UNITY_SC_to_Case_Field_Mapping__c>();
+        UNITY_SC_to_Case_Field_Mapping__c scCaseFM = new UNITY_SC_to_Case_Field_Mapping__c(
+            //CustomerId_Subscriber__c = '123',
+            Description__c = 'NSBS Pro ID',
+            SCField__c  ='UNITY_Service_Channel_Priority__c',
+            SourceValue__c = 'NEED TO DO (48 HOURS)',
+            TargetField__c = 'Priority',
+            Value__c = '48 Hour Response',
+            Name = 'Test'
+        );
+        listFM.add(scCaseFM);
+
+        UNITY_SC_to_Case_Field_Mapping__c scCaseFM2 = new UNITY_SC_to_Case_Field_Mapping__c(
+            CustomerId_Subscriber__c = '123',
+            Category__c = 'cat1',
+            Description__c = 'NSBS Pro ID2',
+            SCField__c  ='UNITY_Service_Channel_Priority__c',
+            SourceValue__c = 'NEED TO DO (48 HOURS)',
+            TargetField__c = 'Priority',
+            Value__c = '48 Hour Response',
+            Name = 'Test2'
+        );
+        listFM.add(scCaseFM2);
+
+         UNITY_SC_to_Case_Field_Mapping__c scCaseFM3 = new UNITY_SC_to_Case_Field_Mapping__c(
+            CustomerId_Subscriber__c = '123',
+            Description__c = 'NSBS Pro ID2',
+            SCField__c  ='UNITY_Service_Channel_Priority__c',
+            SourceValue__c = 'NEED TO DO (48 HOURS)',
+            TargetField__c = 'Priority',
+            Value__c = '48 Hour Response',
+            Name = 'Test3'
+        );
+        listFM.add(scCaseFM3);
+
+        UNITY_SC_to_Case_Field_Mapping__c scCaseFM4 = new UNITY_SC_to_Case_Field_Mapping__c(
+            Category__c = 'cat1',
+            Description__c = 'NSBS Pro ID2',
+            SCField__c  ='UNITY_Service_Channel_Priority__c',
+            SourceValue__c = 'NEED TO DO (48 HOURS)',
+            TargetField__c = 'Priority',
+            Value__c = '48 Hour Response',
+            Name = 'Test4'
+        );
+        listFM.add(scCaseFM4);
+
+        insert listFM;
+    
+        List<UNITY_Service_Channel_Trade_Mapping__c> tradeMList = new List<UNITY_Service_Channel_Trade_Mapping__c>();
+        UNITY_Service_Channel_Trade_Mapping__c sctm = new UNITY_Service_Channel_Trade_Mapping__c(
+                            UNITY_Miner_Skill_Broad__c = 'General Maintenance',
+                            UNITY_Miner_Skill_Group__c  = 'Handyman',
+                            UNITY_Miner_Skill_Type__c = 'Store Fixtures, Racks, Carts, Ladders, Air Compressors, Etc.',
+                            UNITY_Customer_Subscriber_ID__c = '123',
+                            UNITY_Service_Channel_Trade__c  = 'Glass'
+        );
+        tradeMList.add(sctm);
+        UNITY_Service_Channel_Trade_Mapping__c sctm2 = new UNITY_Service_Channel_Trade_Mapping__c(
+                            UNITY_Miner_Skill_Broad__c = 'General Maintenance',
+                            UNITY_Miner_Skill_Group__c  = 'Handyman',
+                            UNITY_Miner_Skill_Type__c = 'Store Fixtures, Racks, Carts, Ladders, Air Compressors, Etc.',
+                            UNITY_Customer_Subscriber_ID__c = '',
+                            UNITY_Service_Channel_Trade__c  = 'Default'
+        );
+        UNITY_Service_Channel_Trade_Mapping__c sctm3 = new UNITY_Service_Channel_Trade_Mapping__c(
+                            UNITY_Miner_Skill_Broad__c = 'General Maintenance',
+                            UNITY_Miner_Skill_Group__c  = 'Handyman',
+                            UNITY_Miner_Skill_Type__c = 'Store Fixtures, Racks, Carts, Ladders, Air Compressors, Etc.',
+                            UNITY_Customer_Subscriber_ID__c = '',
+                            UNITY_Service_Channel_Trade__c  = 'Dock Equipment'
+        );
+        tradeMList.add(sctm3);
+        UNITY_Service_Channel_Trade_Mapping__c sctm4 = new UNITY_Service_Channel_Trade_Mapping__c(
+                            UNITY_Miner_Skill_Broad__c = 'Glass',
+                            UNITY_Miner_Skill_Group__c  = 'Handyman',
+                            UNITY_Miner_Skill_Type__c = 'Store Fixtures, Racks, Carts, Ladders, Air Compressors, Etc.',
+                            UNITY_Customer_Subscriber_ID__c = '1235',
+                            UNITY_Service_Channel_Trade__c  = 'Glass'
+        );
+        tradeMList.add(sctm4);
+        insert tradeMList;
+
+        List<UNITY_SC_Activated_Subs__c> subList = new List<UNITY_SC_Activated_Subs__c>();
+        UNITY_SC_Activated_Subs__c sub = new UNITY_SC_Activated_Subs__c(
+                Active__c = true,
+                Customer_Name__c = 'App',
+                Name = '123'
+            );
+        subList.add(sub);
+        UNITY_SC_Activated_Subs__c sub2 = new UNITY_SC_Activated_Subs__c(
+                Active__c = true,
+                Customer_Name__c = 'App2',
+                Name = '1235'
+            );
+        subList.add(sub2);  
+        UNITY_SC_Activated_Subs__c sub3 = new UNITY_SC_Activated_Subs__c(
+                Active__c = true,
+                Customer_Name__c = 'App3',
+                Name = '555'
+            );
+        subList.add(sub3);  
+        insert subList;
+
+        List<Case> cases = new List<Case>();
+        
+        Case c = new Case();
+        c.AccountId = cust.Id;
+        c.Status = 'Verified';
+        c.UNITY_Customer__c = cust.Id;
+        c.UNITY_Business_Unit__c = 'NSBS';
+        c.UNITY_Business_Unit_Account__c = buNSBS.Id;
+        c.UNITY_Skill_Broad__c = 'Glass';
+        c.UNITY_Source_System__c = 'Service Channel';
+        c.UNITY_Portal_Source__c = 'Service Channel';
+        c.Origin = 'Web Portal';
+        c.UNITY_Subscriber_ID__c = '123';
+        c.UNITY_Service_Channel_Category__c = 'cat1';
+        c.UNITY_Service_Channel_Trade__c = 'Glass';
+        cases.add(c);
+        
+        Case c2 = new Case();
+        c2.AccountId = cust.Id;
+        c2.Status = 'Verified';
+        c2.UNITY_Customer__c = cust.Id;
+        c2.UNITY_Business_Unit__c = 'NSBS';
+        c2.UNITY_Business_Unit_Account__c = buNSBS.Id;
+        c2.UNITY_Skill_Broad__c = 'Glass';
+        c2.UNITY_Source_System__c = 'Service Channel';
+        c2.UNITY_Portal_Source__c = 'Service Channel';
+        c2.Origin = 'Web Portal';
+        c2.UNITY_Subscriber_ID__c = '1235';
+        c2.UNITY_Service_Channel_Category__c = 'cat1';
+        c2.UNITY_Service_Channel_Trade__c = 'Glass';
+        cases.add(c2);
+
+        Case c3 = new Case();
+        c3.AccountId = cust.Id;
+        c3.Status = 'Verified';
+        c3.UNITY_Customer__c = cust.Id;
+        c3.UNITY_Business_Unit__c = 'NSBS';
+        c3.UNITY_Business_Unit_Account__c = buNSBS.Id;
+        c3.UNITY_Skill_Broad__c = 'Glass';
+        c3.UNITY_Source_System__c = 'Service Channel';
+        c3.UNITY_Portal_Source__c = 'Service Channel';
+        c3.Origin = 'Web Portal';
+        c3.UNITY_Subscriber_ID__c = '555';
+        c3.UNITY_Service_Channel_Category__c = 'cat1';
+        c3.UNITY_Service_Channel_Trade__c = 'Glass';
+        cases.add(c3);
+
+        Test.startTest();
+        insert cases;
+
+        UNITY_TestDataFactory.createWorkOrders(1, c3.Id, cust.Id, null);
+
+        List<String> scTrades = new List<String>{'WINDOW DISPLAY TRACKS'};
+        UNITY_CaseTriggerHandler_Miner.MapSCCaseValues(cases, scTrades);
+
+        User u = TestDataProvider.getUser('Name','LastName','System Administrator');
+        insert  u;
+        c3.OwnerId = u.id;
+        c3.UNITY_Skill_ID__c = '';
+        c3.UNITY_Skill_ID_1__c = '';
+        update c3;
+
+        Test.stopTest();
+        
+        
+    }
+    
 }

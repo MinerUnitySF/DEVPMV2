@@ -137,6 +137,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>Tech_ETA__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>SVMXC__BW_Selected_By__c</field>
             <table>Case</table>
         </columns>
@@ -177,6 +182,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Ross_Repair_Type__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Case_Created_Trigger_30_minutes__c</field>
             <table>Case</table>
         </columns>
@@ -202,6 +212,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Ross_Priority__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>Owner</field>
             <table>Case</table>
         </columns>
@@ -213,6 +228,11 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>Case_Owner_Mobile__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Repair_Location__c</field>
             <table>Case</table>
         </columns>
         <columns>
@@ -1129,6 +1149,12 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <displayNameOverride>Coordinator</displayNameOverride>
+            <field>Corporate_Contact__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Template_Config_Ext_ID__c</field>
             <table>Case</table>
         </columns>
@@ -1519,12 +1545,6 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>Contact</field>
-            <table>Case.WorkOrders</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <displayNameOverride>Coordinator</displayNameOverride>
-            <field>Corporate_Contact__c</field>
             <table>Case.WorkOrders</table>
         </columns>
         <columns>

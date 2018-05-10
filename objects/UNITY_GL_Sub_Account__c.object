@@ -91,6 +91,16 @@
                     <default>false</default>
                     <label>Project</label>
                 </value>
+                <value>
+                    <fullName>PMO</fullName>
+                    <default>false</default>
+                    <label>PMO</label>
+                </value>
+                <value>
+                    <fullName>PMA</fullName>
+                    <default>false</default>
+                    <label>PMA</label>
+                </value>
             </valueSetDefinition>
         </valueSet>
     </fields>

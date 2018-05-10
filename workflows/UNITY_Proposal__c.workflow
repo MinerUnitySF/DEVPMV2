@@ -28,7 +28,7 @@
             <field>UNITY_Agent__c</field>
             <type>userLookup</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Proposal_Status_Notification</template>
     </alerts>
@@ -53,7 +53,7 @@
             <field>UNITY_Agent__c</field>
             <type>userLookup</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Proposal_Status_Notification</template>
     </alerts>
@@ -65,7 +65,7 @@
             <field>UNITY_Agent__c</field>
             <type>userLookup</type>
         </recipients>
-        <senderAddress>customersupport@nsbs.net</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Proposal_Status_Notification</template>
     </alerts>
@@ -81,7 +81,7 @@
             <field>UNITY_Agent__c</field>
             <type>userLookup</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Quote_Initial_Acceptance</template>
     </alerts>
@@ -114,7 +114,7 @@
             <field>UNITY_Agent__c</field>
             <type>userLookup</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>unfiled$public/UNITY_Quote_Initial_Acceptance_v2</template>
     </alerts>
@@ -130,7 +130,7 @@
             <field>UNITY_Agent__c</field>
             <type>userLookup</type>
         </recipients>
-        <senderAddress>customersupport@nsbs.net</senderAddress>
+        <senderAddress>customersupport_uat@nsbs.net</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>unfiled$public/UNITY_Quote_Initial_Acceptance_v2</template>
     </alerts>

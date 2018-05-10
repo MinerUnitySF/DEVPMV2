@@ -41,6 +41,10 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>BarcodeLineItem</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>BatchBudgetUpdate</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -209,6 +213,18 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>DocParserBarcodeData</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>DocumentStagingEmailProcess</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>DocumentTriggerHandler</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>EditWOandCreateInvoice</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -249,27 +265,7 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>LightningForgotPasswordController</apexClass>
-        <enabled>false</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>LightningForgotPasswordControllerTest</apexClass>
-        <enabled>false</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>LightningLoginFormController</apexClass>
-        <enabled>false</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>LightningLoginFormControllerTest</apexClass>
-        <enabled>false</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>LightningSelfRegisterController</apexClass>
-        <enabled>false</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>LightningSelfRegisterControllerTest</apexClass>
+        <apexClass>LightningConnectQuickstart</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -573,6 +569,10 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>TestLightningConnectQuickstart</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>TestNewDocumentCtrl</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -606,6 +606,110 @@
     </classAccesses>
     <classAccesses>
         <apexClass>TriggerTest</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AddRemoveAssetsCntrlExt</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AddRemoveAssetsCntrlExt_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AddRemoveWOAssetsCntrlExt</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AddRemoveWOLIsOnWrokOrder</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AddRemoveWOLIs_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AddWorkPlansControllerExt_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AddWorkPlansControllerExtension</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AssetsWorkPlanPDFCntrlExt</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AssetsWorkPlanPDFCntrlExt_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AssetsWorkPlanPDFCntrlExtension</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AssignVendorBulkControllerExt</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AssignVendorControllerExt_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AssignVendorControllerExtension</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_AssignVnedorBulkControllerExt_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_CaseTriggerHandler_Miner</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_CaseTriggerHandler_Miner_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_CustomWorkPlanAssetsIterable</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_NewOrderItemController</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_NewOrderItemController_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_OrderLineItemsController</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_OrderLineItemsController_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_ServiceContractHandler</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_ServiceContractHandler_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_WorkOrderTriggerHandler_Miner</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_WorkOrderTriggerHandler_Miner_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITYPM_WorkPlanAssetsWrapper</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -710,6 +814,18 @@
     </classAccesses>
     <classAccesses>
         <apexClass>UNITY_AuraCustomSearchController_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_AuraDocUploadRedirectController</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_AuraLoginRequestController</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_AuraLoginRequestController_UT</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -825,6 +941,10 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>UNITY_ContentDocumentLinkTriggerHandler</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>UNITY_CreateCaseFromEmail</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -845,6 +965,10 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>UNITY_CustomerInvoice_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>UNITY_CustomerQuoteCtlr</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -861,6 +985,18 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>UNITY_DocParseBatchScheduler</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_DocParserBatch</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_DocParserUtility</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>UNITY_EmailMessageTriggerHandler</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -870,6 +1006,18 @@
     </classAccesses>
     <classAccesses>
         <apexClass>UNITY_EmailToCaseParser</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_EmailToDocumentStagingParser</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_FixWorkOrderManualSharing</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_FixWorkOrderManualSharing_UT</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -894,6 +1042,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>UNITY_InvoiceLineTriggerHandler_Miner</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_InvoiceLineTriggerHandler_Miner_UT</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1001,7 +1153,15 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>UNITY_OrderLineItemsController_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>UNITY_OrderLinePDFExtension</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_OrderLinePDFExtension_UT</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1038,6 +1198,14 @@
     </classAccesses>
     <classAccesses>
         <apexClass>UNITY_OrdersControllerTest</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_PackingListControllerExt</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_PackingListControllerExt_UT</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1109,6 +1277,10 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>UNITY_ScheduleFixWOManualShareFix</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>UNITY_ScoreHandler</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -1134,6 +1306,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>UNITY_ServiceReportCntrlExtension</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_ServiceReportCntrlExtension_UT</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1182,6 +1358,14 @@
     </classAccesses>
     <classAccesses>
         <apexClass>UNITY_UpdateCaseStatusTest</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_UpdateWOContractedRate</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_UpdateWODateTimeDebriefCompleted</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1234,6 +1418,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>UNITY_VendorExpirationCOINotification</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_VendorExpirationCOINotification_UT</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1301,6 +1489,10 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>UNITY_WorkOrderCntrlExtension_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>UNITY_WorkOrderController</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -1318,6 +1510,14 @@
     </classAccesses>
     <classAccesses>
         <apexClass>UNITY_WorkOrderLineItemTriggerHandler</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_WorkOrderLineItemTriggerHandler_UT</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_WorkOrderPlanPDFCntrlExtension</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1482,10 +1682,6 @@
     </classAccesses>
     <classAccesses>
         <apexClass>lockedClass</apexClass>
-        <enabled>false</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>some</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -2041,6 +2237,71 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Document_Staging_Item__c.Comments__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging_Item__c.DocPaser_Link__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging_Item__c.Document_Type_Code__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging_Item__c.Document_Type__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging_Item__c.Parent_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging_Item__c.Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.Comments__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.DocParser_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.Document_Count__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.Document_Source__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.Email_Subject__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.Incoming_Email_Address__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Lease_Information__c.Active_Lease__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -2132,6 +2393,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>MH_Invoice_Details__c.Add_to_Invoice__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>MH_Invoice_Details__c.Costing_Qty__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -3251,6 +3517,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>UNITY_Attachment__c.External_ID__c</field>
+        <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>UNITY_Attachment__c.UNITY_Standard_Attachment_Id__c</field>
         <readable>false</readable>
     </fieldPermissions>
@@ -3398,6 +3669,11 @@
         <editable>false</editable>
         <field>UNITY_Invoice_Line_Item__c.Product__c</field>
         <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>UNITY_Invoice_Line_Item__c.UNITYPM_Is_Preventative_Maintenance__c</field>
+        <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
@@ -4711,6 +4987,16 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>UNITY_Service_Contract_Line_Item__c.Asset_Type__c</field>
+        <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>UNITY_Service_Contract_Line_Item__c.UNITYPM_Additional_PM_Rate__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>UNITY_Service_Contract_Line_Item__c.UNITY_Cost_Plus__c</field>
         <readable>false</readable>
     </fieldPermissions>
@@ -4872,6 +5158,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>UNITY_Service_Contract__c.Residential__c</field>
+        <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>UNITY_Service_Contract__c.UNITYPM_PMO_NTE__c</field>
         <readable>false</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -5969,6 +6260,14 @@
         <enabled>false</enabled>
     </pageAccesses>
     <pageAccesses>
+        <apexPage>BarcodeTest</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>BarcodeTest2</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
         <apexPage>BulkEditWorkOrderDetails</apexPage>
         <enabled>true</enabled>
     </pageAccesses>
@@ -6115,6 +6414,10 @@
     <pageAccesses>
         <apexPage>LeadAssignedTimeStamp</apexPage>
         <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>LightningConnectQuickstart</apexPage>
+        <enabled>false</enabled>
     </pageAccesses>
     <pageAccesses>
         <apexPage>MCT_TV_KPIDash</apexPage>
@@ -6293,6 +6596,34 @@
         <enabled>false</enabled>
     </pageAccesses>
     <pageAccesses>
+        <apexPage>UNITYPM_AddRemoveAssetsPage</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UNITYPM_AddWorkPlans</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UNITYPM_AssetsWorkPlanPDF</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UNITYPM_AssignVendor</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UNITYPM_Assign_Vendor_Bulk</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UNITYPM_NewOrderItem</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UNITYPM_WorkPlanPDF</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
         <apexPage>UNITYUNITY_Dispute_Invoice_Button</apexPage>
         <enabled>false</enabled>
     </pageAccesses>
@@ -6386,6 +6717,10 @@
     </pageAccesses>
     <pageAccesses>
         <apexPage>UNITY_UploadAttachment</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UNITY_VendorAffiliatesNotification</apexPage>
         <enabled>false</enabled>
     </pageAccesses>
     <pageAccesses>
@@ -6552,6 +6887,16 @@
     <recordTypeVisibilities>
         <default>false</default>
         <recordType>UNITY_Proposal__c.UNITY_Customer_Proposal</recordType>
+        <visible>false</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <default>false</default>
+        <recordType>UNITY_Service_Contract_Line_Item__c.UNITYPM_Asset_Type_Rate</recordType>
+        <visible>false</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <default>false</default>
+        <recordType>UNITY_Service_Contract_Line_Item__c.UNITYPM_PM_Product</recordType>
         <visible>false</visible>
     </recordTypeVisibilities>
     <recordTypeVisibilities>

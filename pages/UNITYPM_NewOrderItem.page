@@ -1,0 +1,1121 @@
+<apex:page standardController="Order" extensions="UNITYPM_NewOrderItemController" docType="html-5.0" name="AddProduct" title="Add Product" deferLastCommandUntilReady="true" standardStylesheets="true" showHeader="false" sidebar="false">
+    <!-- JavaScript and style includes -->
+    <apex:includeScript value="{!URLFOR($Resource.jquery_ui,'js/jquery.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jquery_ui,'js/jquery-ui.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jquery_ui,'moment/moment.min.js')}"/>
+    <apex:includeScript value="/support/console/35.0/integration.js"/>
+    <link rel="stylesheet" href="{!URLFOR($Resource.jquery_ui,'css/jquery-ui.smoothness.css')}"/>
+    <link rel="stylesheet" href="{!URLFOR($Resource.jquery_ui,'css/jquery-ui.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.UNITY_SLDS_100, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.UNITY_LightningDesignSystemV12, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+    
+    <apex:includeScript value="{!URLFOR($Resource.clookup)}"/>
+    
+    <script type="text/javascript">
+        var $j = jQuery.noConflict();
+        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+        $j(function(){
+            if(is_chrome){
+                $j('<style type="text/css">input[type="text"],select{margin-top:0px;}</style>').appendTo('body');
+            }
+        });
+    </script>
+    <!-- Custom Style css -->
+    <style type="text/css">
+        body{
+            min-width:1000px;
+        }
+        h2{
+            font-weight: bold;
+            color: #16325c;
+            font-size: 1.1em;
+            font-family: Arial,Helvetica,sans-serif;
+        }
+        body .bPageBlock .pbBody .labelCol,.bPageBlock .labelCol{
+            color: #54698d;
+            font-weight: normal;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            word-wrap: break-word;
+            max-width: 330px;
+            width: 18%;
+            padding-left: 2px;
+            text-align: right;
+            font-size: 100%;
+            font-weight: bold;
+            margin: 0;
+        }
+        select{
+            max-width: 150px;
+        }
+        body .btn, body input.btn{
+            border-radius: 3px;
+            line-height: 24px;
+            padding: 0 9px;
+            border: 1px solid #e0e5ee;
+            box-shadow: none;
+            cursor: default;
+            font-size: 12px;
+            height: auto;
+            outline: 0;
+            font-weight: normal;
+            font-family: 'SalesforceSans-Regular',Helvetica,Arial,sans-serif;
+            color: #0070d2;
+            text-align: center;
+            white-space: nowrap;
+            background-color: #f4f5f7;
+            background-image: none;
+        }
+        body .btn:hover, body input.btn:hover{
+            background-color: #e7edf4;
+            text-decoration: none;
+        }
+        body .bDetailBlock.bPageBlock .pbBody .dataCol,body .bPageBlock .pbBody .dataCol{
+            color: #16325c;
+            padding: 0px;
+            margin: 0px;
+            font-family: SalesforceSans-Regular,Arial,sans-serif;
+            font-size: 13px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .detailList .lines-table{
+            border-collapse:collapse;
+            margin-bottom:50px;
+            width: 100%;
+        }
+        .detailList .lines-table tr{
+            /*border: 1px solid #ececec;*/
+            border-bottom: 1px solid #ddd;
+            border-top: 1px solid #ddd;
+        }
+        .detailList .lines-table tr th{
+            padding: 3px;
+            margin: 0px;
+            /*border: 1px solid #ddd;*/
+            position: relative;
+            vertical-align: middle;
+            background-color: efefef;
+        }
+        .detailList .lines-table tr td{
+            padding: 0px;
+            margin: 0px;
+            /*border: 1px solid #ddd;*/
+            position: relative;
+            vertical-align: middle;
+            background-color: transparent;
+            padding-bottom: 3px;
+        }
+        .detailList .lines-table tr:nth-child(odd) {
+            background-color: #dcefe8;
+        }
+        .detailList .lines-table tr:nth-child(even) {
+            background-color: #fff;
+        }
+        .detailList .lines-table tr:first-child{
+            background-color: #efefef;
+        }
+        td.select{
+            width:40px;
+        }
+        td.currency{
+            width:80px;
+        }
+        td.lookup-cell{
+            min-width:110px;
+        }
+        .cell-wrapper{
+            display: block;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            margin: 0px;
+            min-height: 26px;
+            max-width: 150px;
+            padding: 0px;
+            position: relative;
+            width: 100%;
+        }
+        .cell-wrapper-assetType{
+            display: block;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            margin: 0px;
+            min-height: 26px;
+            max-width: 150px;
+            padding: 0px;
+            position: relative;
+            width: 100%;
+        }
+        .cell-wrapper-unitCost{
+            display: block;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            margin: 0px;
+            min-height: 26px;
+            max-width: 150px;
+            padding: 0px;
+            position: relative;
+            width: 100%;
+        }
+        .cell-wrapper-unitPrice{
+            display: block;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            margin: 0px;
+            min-height: 26px;
+            max-width: 150px;
+            padding: 0px;
+            position: relative;
+            width: 100%;
+        }
+        input[type="text"],select{
+            /*-webkit-box-shadow:inset 1px 1px 2px 0 rgba(0,0,0,.2);
+            box-shadow:inset 1px 1px 2px 0 rgba(0,0,0,.2);*/
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, .2);
+            border-radius: 3px;
+            padding: 0px 3px;
+            min-height: 22px;
+            box-sizing: border-box;
+            width: 100%;
+            /*height: 100%;*/
+            display: block;
+            /*position: absolute;*/
+            top: 0px;
+            max-width: 150px;
+            min-width: 80px;
+        }
+        input[type="text"]:disabled,select:disabled{
+            /*-webkit-box-shadow:inset 1px 1px 2px 0 rgba(0,0,0,.2);
+            box-shadow:inset 1px 1px 2px 0 rgba(0,0,0,.2);*/
+            background: #efefef;
+            color: #888;
+        }
+        input[type="text"]:hover,select:hover{
+            /*-webkit-box-shadow:inset 1px 1px 2px 0 rgba(0,0,0,.2);
+            box-shadow:inset 1px 1px 2px 0 rgba(0,0,0,.2);*/
+            border: 1px solid rgba(0, 112, 210, .6);
+            outline: 0;
+        }
+        input[type="text"]:focus,select:focus{
+            box-shadow: 0 0 3px #0070d2;
+            border: 1px solid rgba(0, 112, 210, .5);
+            outline: 0;
+            z-index: 99;
+        }
+        input[disabled]:hover,select[disabled]:hover{
+            /*-webkit-box-shadow:inset 1px 1px 2px 0 rgba(0,0,0,.2);
+            box-shadow:inset 1px 1px 2px 0 rgba(0,0,0,.2);*/
+            background: #efefef;
+            border: 1px solid rgba(0, 0, 0, .2);
+        }
+        .unitCostReplacement{
+
+        }
+        .unitPriceReplacement{
+
+        }        
+        a[disabled]{
+            display:none;
+        }
+        input[type="text"].warning-input{
+            border: 1px solid #f9dd34;
+            background: #fbf9ee;
+            color: #363636;
+        }
+        .lookupInput{
+            display: block;
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+        }
+        .lookupInput input[type="text"]{
+            padding-right:23px;
+        }.lookupInput input[type="text"].readonly{
+            padding-left:15px;
+        }
+        .lookupInput input[type="text"].partLocation{
+            padding-right:37px;
+        }
+        .lookupInput a{
+            position: absolute;
+            right: 0px;
+            top: calc(50% - 12px);
+            z-index: 100;
+        }
+        .closeIcon,.closeIconOn{
+            position: absolute;
+            top: 4px;
+            left: 1px;
+        }
+        .buttons-wrapper{
+            display:block;
+            height: 30px;
+        }
+        .info-icon-wrapper{
+            display:block;
+            width:14px;
+            padding:0px;
+            margin:0px;
+            position:absolute;
+            right:22px;
+            top: calc(50% - 9px);
+            height:14px;
+            z-index: 100;
+        }
+        .info-icon{
+            width:14px;
+            height: 14px;
+            position:absolute;
+            right:0px;top:0px;
+            background: url("/img/alohaSkin/help_grey.png");
+            background-size: 14px 14px;
+            background-repeat:no-repeat;
+        }
+        .info-table{
+            border-collapse:collapse;
+        }
+        .info-table th{
+            text-align:right;
+            padding: 3px;
+            font-weight:normal;
+            font-family:"Salesforce Sans", Arial, sans-serif;
+        }
+        .info-table td{
+            vertical-align:middle;
+            padding: 3px;
+            color:#888d96;
+        }
+        .ui-tooltip {
+            border: 1px solid #a8adb6;
+            color: #54698d;
+            font-family:"Salesforce Sans", Arial, sans-serif;
+            font-size: 12px;
+        }
+        .arrow:after {
+            background: #fff;
+            border: 1px solid #a8adb6;
+        }
+        .arrow {
+            width: 70px;
+            height: 16px;
+            overflow: hidden;
+            position: absolute;
+            left: 50%;
+            margin-left: -35px;
+            bottom: -16px;
+        }
+        .arrow.top {
+            top: -16px;
+            bottom: auto;
+        }
+        .arrow.bottom {
+            bottom: -16px;
+            top: auto;
+        }
+        .arrow.left {
+            left: 20%;
+        }
+        .arrow:after {
+            content: "";
+            position: absolute;
+            left: 20px;
+            top: -20px;
+            width: 25px;
+            height: 25px;
+            box-shadow: 6px 5px 9px -9px black;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+        .arrow.top:after {
+            bottom: -20px;
+            top: auto;
+        }
+        .arrow.bottom:after {
+            top: -20px;
+            bottom: auto;
+        }
+        .fields-table{
+            border-collapse: collapse;
+            width:100%;
+            padding:0px;
+            margin:0px;
+        }
+        .detailList .lines-table .fields-table tr{
+            border:none;
+            border-bottom:none;
+            background-color: transparent;
+        }
+        .detailList .lines-table .fields-table tr th{
+            padding: 0px;
+            padding-left: 0px;
+            padding-right: 3px;
+            padding-top: 2px;
+            margin: 0px;
+            border: 0px;
+            background-color:transparent;
+            position: relative;
+            vertical-align: middle;
+            border-left: 1px solid transparent;
+            border-right: 1px solid transparent;
+        }
+        .th-label{
+            padding:0px 3px;
+            background-color: transparent;
+            -webkit-border-radius: 0 5px 0 0;
+            border-radius: 0 5px 0 0;
+            border:1px solid rgba(0, 0, 0, .0);
+            cursor: default;
+            color: #666;
+            font-size: 1em;
+            font-weight: bold;
+            min-width:45px;
+            display:block;
+        }
+        .detailList .lines-table .fields-table tr td{
+            padding: 3px;
+            margin: 0px;
+            border: 1px solid transparent;
+            position: relative;
+            vertical-align: middle;
+            background-color: transparent;
+            padding-top: 0px;
+        }
+        .detailList .lines-table .fields-table .div-table{
+            border-collapse: collapse;
+            width:100%;
+            padding:0px;
+            margin:0px;
+        }
+        .detailList .lines-table .fields-table .div-table th,
+        .detailList .lines-table .fields-table .div-table td{
+            border-collapse: collapse;
+            padding:0px;
+            margin:0px;
+            background-color: transparent;
+            border: none;
+            width: 50%;
+        }
+
+        td.currency input[type="text"]{
+            max-width: 75px;
+        }
+        .fields-table tr td.lookup-cell{
+            min-width:100px;
+        }
+        input.custom-lookup-field[type="text"],.custom-lookup-field{
+            font-weight: bold;
+            background-position: right -5px;
+        }
+        span[id$="product-panel"] a{
+            font-weight: bold;
+            max-width: 100px;
+            width: 100px;
+            display: block;
+            overflow: hidden;
+            max-height: 18px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        span[id$="asset-panel"] a{
+            font-weight: bold;
+            max-width: 100px;
+            width: 100px;
+            display: block;
+            overflow: hidden;
+            max-height: 18px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }        
+        input[type="text"].short{
+            min-width: 50px;
+            max-width: 50px;
+            width: 50px;
+        }
+        input[type="text"].shortQty{
+            min-width: 50px;
+            max-width: 50px;
+            width: 50px;
+        }
+        .totals{
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #666;
+        }
+        .totalCost{
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #666;
+        }        
+        .totalPrice{
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #666;
+        }        
+        .quick-menu-wrapper{
+            display: none;
+            position: absolute;
+            z-index: 999;
+            padding: 5px;
+            margin: 0px;
+            right : 5px;
+            background-color: rgba(0,0,0,.5);
+            -webkit-border-radius: 0 0 5px 5px;
+            border-radius: 0 0 5px 5px;
+        }
+        .quick-menu-item{
+            background-color: #f4f5f7;
+            background-image: none;
+            border: 1px solid #e0e5ee;
+            border-radius: 3px;
+            box-shadow: none;
+            color: #0070d2;
+            cursor: default;
+            display: inline-block;
+            font-size: 10px;
+            font-weight: normal;
+            font-family: 'SalesforceSans-Regular',Helvetica,Arial,sans-serif;
+            height: auto;
+            line-height: 18px;
+            margin-right: 5px;
+            outline: 0;
+            padding: 0 5px;
+            text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .quick-menu-item:hover{
+            background-color: #e7edf4;
+            text-decoration: none;
+        }
+        .quick-menu-item:last-child{
+            margin-right: 0px;
+        }
+    </style>
+    <apex:form >
+        <apex:inputHidden value="{!Order.Status}"></apex:inputHidden>
+        <c:ajaxStatus loadingText="Processing..." overlayColor="#fff"></c:ajaxStatus>
+        <apex:sectionHeader title="Add Product" subTitle="Order {!Order.OrderNumber}"></apex:sectionHeader>
+        
+        <!-- sticky links -->
+        <apex:outputPanel styleClass="quick-menu-wrapper">
+            <apex:commandLink action="{!addItem}"  title="Add Product" reRender="messages,items-wrapper" 
+                              status="loadingStatus" rendered="{!canEdit}"
+                              styleClass="quick-menu-item">Add Product</apex:commandLink>
+            <apex:commandLink action="{!doQuickSave}" title="Quick Save" status="loadingStatus" 
+                              reRender="messages,script,items-wrapper,order-detail" rendered="{!canEdit}" 
+                              styleClass="quick-menu-item">Quick Save</apex:commandLink>
+            <a class="quick-menu-item" onclick="$j('html').animate({scrollTop: '0px'});">top &uarr;</a>
+        </apex:outputPanel>
+
+        <div id="top"></div>
+        <apex:pageBlock title="Order Detail" mode="maindetail">
+            <!-- Page Messages -->
+            <apex:outputPanel id="messages">
+                <apex:pageMessages ></apex:pageMessages>
+            </apex:outputPanel>
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton action="{!doSave}" value="Save" status="loadingStatus" reRender="messages,script,items-wrapper,order-detail" rendered="{!canEdit}" oncomplete="closeMe();"></apex:commandButton>
+                <apex:commandButton action="{!doQuickSave}" value="Quick Save" status="loadingStatus" reRender="messages,script,items-wrapper,order-detail" rendered="{!canEdit}"></apex:commandButton>             
+                <apex:commandButton styleClass="cancel-btn" value="Go Back" rendered="{! NOT(o.UNITYPM_Is_WO_Preventative_Maintenance__c)}"></apex:commandButton>
+            </apex:pageBlockButtons>
+            <apex:outputPanel id="order-detail">
+                <apex:pageBlockSection showHeader="false" collapsible="false" columns="2">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >Order</apex:outputLabel>
+                        <apex:outputLink value="{!o.Id}">{!o.OrderNumber}</apex:outputLink>
+                    </apex:pageBlockSectionItem>
+                    <apex:outputField value="{!o.Status}"></apex:outputField>
+                    <apex:outputField value="{!o.FSO__WorkOrder__c}"></apex:outputField>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >Total Cost</apex:outputLabel>
+                        <span class="totals">${!o.UNITY_Total_Cost__c}</span>
+                    </apex:pageBlockSectionItem>
+                    <apex:outputField value="{!o.AccountId}"></apex:outputField>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >Estimated Tax</apex:outputLabel>
+                        <span class="totals">${!o.UNITY_Estimated_Tax__c}</span>
+                    </apex:pageBlockSectionItem>
+                    <apex:outputField value="{!o.UNITY_Vendor__c}"></apex:outputField>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >Final Price</apex:outputLabel>
+                        <span class="totals">${!o.UNITY_Final_Price__c}</span>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageBlockSectionItem />
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+        </apex:pageBlock>
+
+        <apex:pageBlock mode="maindetail">
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton action="{!addItem}" value="Add Product" rendered="{!canEdit}" reRender="messages,items-wrapper" 
+                                    status="loadingStatus" disabled="false"/>
+                <apex:commandButton styleClass="delSel-btn" value="Remove Selected" rendered="{!canEdit}"  
+                                    status="loadingStatus" disabled="false" />
+            </apex:pageBlockButtons>
+            <apex:PageBlockSection collapsible="false" columns="1" title="PM Products">
+                <apex:outputPanel >
+                 <table>
+                        <tr class="lines-table">
+                            <td>Asset Type</td>
+                            <td>Unit Cost</td>
+                            <td colspan="2">Unit Price</td>
+                        </tr>
+                        <tr>
+                            <td><apex:selectList value="{!assetType}" multiselect="false" size="1" id="assetTypeToReplace">
+                                    <apex:selectOptions value="{!assetTypes}"/>
+                                </apex:selectList>
+                            </td>
+                            <td><apex:inputText value="{!unitCostReplacement}" styleClass="unitCostReplacement"/></td>
+                            <td><apex:inputText value="{!unitPriceReplacement}" styleClass="unitPriceReplacement"/></td>
+                            <td><button type="button" onclick="applyCostAndPriceToLines();">Apply to all PM lines</button></td>
+                        </tr>
+                    </table>
+                </apex:outputPanel>
+                <apex:outputPanel id="items-wrapper">
+                    <apex:outputPanel rendered="{!oLines.size > 0}">
+                        <table  class="lines-table">
+                            <tr>
+                                <th class="select">Select</th>
+                                <th></th>
+                            </tr>
+                            <apex:repeat value="{!oLines}" var="line">
+                                <tr>
+                                    <td>
+                                        <apex:inputCheckbox value="{!line.sel}" rendered="{!AND(canEdit, !line.item.UNITYPM_Is_Preventative_Maintenance__c)}" styleClass="sel-cbx"></apex:inputCheckbox>
+                                    </td>
+                                    <td>
+                                        <table class="fields-table">
+                                            <tr>
+                                                <th><span class="th-label">Product</span></th>
+                                                <th><span class="th-label">Product Code</span></th>
+                                                <th><span class="th-label">Line Type</span></th>
+                                                <th><span class="th-label">Activity Type</span></th>
+                                                <th rowspan="4">
+                                                    <table class="div-table">
+                                                        <tr>
+                                                            <td style="width:100%"><span class="th-label">Qty</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <!-- Quantity -->
+                                                            <td style="width:100%">
+                                                                <input type="hidden" value="{!line.item.UNITYPM_Is_Preventative_Maintenance__c}" id='isPM' class='isPM'/>
+                                                                <input type="hidden" value="{!line.index}" id='lineIndex' class='lineIndex'/>
+                                                                <apex:outputPanel id="qty-panel" styleClass="cell-wrapper">
+                                                                    <apex:inputField value="{!line.item.Quantity}" styleClass="shortQty" html-disabled="disabled" rendered="{!line.item.UNITYPM_Is_Preventative_Maintenance__c}">
+                                                                        <apex:actionSupport action="{!line.onQtyChange}" event="onchange" reRender="totalCost-panel, totalPrice-panel"/>
+                                                                    </apex:inputField>
+                                                                    <apex:inputField value="{!line.item.Quantity}" styleClass="shortQty" rendered="{!NOT(line.item.UNITYPM_Is_Preventative_Maintenance__c)}">
+                                                                        <apex:actionSupport action="{!line.onQtyChange}" event="onchange" reRender="totalCost-panel, totalPrice-panel"/>
+                                                                    </apex:inputField>                                                                                     
+                                                                </apex:outputPanel>
+                                                            </td>
+                                                            <!-- End Quantity -->
+                                                        </tr>
+                                                    </table>
+                                                </th>
+                                                <th rowspan="4">
+                                                    <table class="div-table">
+                                                        <tr>
+                                                            <td>
+                                                                <span class="th-label">Unit Cost</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="th-label">Unit Price</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <!-- Cost -->
+                                                            <td class="currency">
+                                                                <apex:outputPanel id="cost-panel" styleClass="cell-wrapper">
+                                                                    <apex:inputField value="{!line.item.UNITY_Cost__c}" styleClass="cell-wrapper-unitCost" >
+                                                                        <apex:actionSupport action="{!line.onCostQtyChange}" event="onchange" reRender="totalCost-panel"/>
+                                                                    </apex:inputField>
+                                                                </apex:outputPanel>
+                                                            </td>
+                                                            <td class="currency" id="price-panel" styleClass="cell-wrapper">
+                                                                <apex:outputPanel >
+                                                                    <apex:inputField value="{!line.item.UNITY_Price__c}" styleClass="cell-wrapper-unitPrice" >
+                                                                        <apex:actionSupport action="{!line.onPriceChange}" event="onchange" reRender="totalPrice-panel"/>
+                                                                    </apex:inputField>
+                                                                </apex:outputPanel>
+                                                            </td>
+                                                            <!-- End Cost -->
+                                                        </tr>
+                                                    </table>
+                                                </th>
+                                                <th>
+                                                    <table class="div-table">
+                                                        <tr>
+                                                            <td><span class="th-label" style="display:{!IF(line.item.UNITYPM_Is_Preventative_Maintenance__c,'none;','block;')}">Vendor Qty</span></td>
+                                                            <td><span class="th-label">Line Total Cost</span></td>
+                                                        </tr>
+                                                    </table>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <!-- Product Custom Lookup -->
+                                                <td>
+                                                    <apex:outputPanel id="product-panel" styleClass="cell-wrapper">
+                                                        <apex:outputPanel rendered="{!OR(line.item.PriceBookEntryId == NULL,line.item.Id == NULL)}" style="position:absolute;display:block;width:100%;height:100%;top:0px;">
+                                                            <c:CustomLookupField field-name="Product2Id" 
+                                                                                 field_id="part-lookup-{!line.index}" 
+                                                                                 hidden_field_id="part-lookup-{!line.index}-hidden"
+                                                                                 initial_field_value="{!IF(line.pbe != null,line.pbe.Product2.Name,'')}"
+                                                                                 initial_field_data_id="{!IF(line.pbe != null,line.pbe.Product2Id,'')}"
+                                                                                 fields_to_return="Id,Name,ProductCode,Description,UNITY_Product_External_Id__c,UNITY_Product_Type__c,UNITY_Is_Stockable__c"
+                                                                                 fields_labels="{'Name':'Name','ProductCode':'ProductCode','Description':'Description','UNITY_Product_External_Id__c':'External Id','UNITY_Product_Type__c':'Product Type','UNITY_Is_Stockable__c':'Is Stockable'}"
+                                                                                 like_fields="ProductCode,Description,UNITY_Product_External_Id__c,UNITY_Product_Legacy_Id__c"
+                                                                                 where_clause="RecordType.Name = \'Miner\'"
+                                                                                 obj_name="Product2"></c:CustomLookupField>
+                                                            
+                                                            <apex:inputHidden value="{!line.pbe.Product2Id}" required="false" html-data-id="part-lookup-{!line.index}-hidden"></apex:inputHidden>
+                                                            <script type="text/javascript">
+                                                                $j('[data-id="part-lookup-{!line.index}-hidden"]').change(function(){
+                                                                    productChange('{!line.index}',$j(this).val());
+                                                                });
+                                                            </script>
+                                                        </apex:outputPanel>
+                                                        <apex:outputField value="{!line.pbe.Product2Id}" styleClass="product-link" rendered="{!AND(line.item.PriceBookEntryId != NULL,line.item.Id != NULL)}"></apex:outputField>
+                                                    </apex:outputPanel>
+                                                </td>
+                                                <!-- End Product Custom Lookup -->
+                                                <!-- Product Code -->
+                                                <td>
+                                                    <apex:outputPanel id="prodCode-panel" styleClass="cell-wrapper">
+                                                        <apex:outputField value="{!line.pbe.Product2.ProductCode}"></apex:outputField>
+                                                    </apex:outputPanel>
+                                                </td>
+                                                <!-- Line Type -->
+                                                <td>
+                                                    <apex:outputPanel id="lineType-panel" styleClass="cell-wrapper">
+                                                        <apex:outputField value="{!line.item.UNITY_Type__c}" rendered="{!line.item.UNITYPM_Is_Preventative_Maintenance__c}"></apex:outputField>
+                                                        <apex:inputField value="{!line.item.UNITY_Type__c}" rendered="{!NOT(line.item.UNITYPM_Is_Preventative_Maintenance__c)}"></apex:inputField>
+                                                    </apex:outputPanel>
+                                                </td>
+                                                <!-- End Line Type -->
+                                                <!-- Activity Type -->
+                                                <td>
+                                                    <apex:outputPanel id="activityType-panel" styleClass="cell-wrapper">
+                                                        <apex:outputField value="{!line.item.UNITY_Activity_Type__c}" rendered="{!line.item.UNITYPM_Is_Preventative_Maintenance__c}"></apex:outputField>
+                                                        <apex:inputField value="{!line.item.UNITY_Activity_Type__c}" rendered="{!NOT(line.item.UNITYPM_Is_Preventative_Maintenance__c)}"></apex:inputField>
+                                                    </apex:outputPanel>
+                                                </td>
+                                                <!-- End Activity Type -->
+                                                <!-- Vendor Adj Qty and Total Cost -->
+                                                <td>
+                                                    <apex:outputPanel id="totalCost-panel">
+                                                        <table class="div-table">
+                                                            <tr>
+                                                                <td>
+                                                                    <!-- Vendor Adj Qty -->
+                                                                    <apex:inputField value="{!line.item.UNITY_Vendor_Adjusted_Quantity__c}" 
+                                                                                     styleClass="short" 
+                                                                                     rendered="{!NOT(line.item.UNITYPM_Is_Preventative_Maintenance__c)}">
+                                                                        <apex:actionSupport action="{!line.onCostQtyChange}" event="onchange" reRender="totalCost-panel"/>
+                                                                    </apex:inputField>
+                                                                </td>
+                                                                <td class="totals">
+                                                                    <!-- Total Cost -->
+                                                                    <apex:outputField value="{!line.item.UNITY_Total_Cost__c}" styleClass="totalCost" id="totalCost">
+                                                                    </apex:outputField>
+                                                                    <div title="{!line.item.UNITY_Cost_Calculation_Details__c}" 
+                                                                         class="info-icon" 
+                                                                         style="display:block;">
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </apex:outputPanel>
+                                                </td>
+                                                <!-- End Vend Adj Qty and Total Cost -->
+                                            </tr>
+                                            <tr>
+                                                <th><span class="th-label">Is Vendor Supply</span></th>
+                                                <th><span class="th-label"  style="display:{!IF(line.item.UNITYPM_Is_Preventative_Maintenance__c,'none;','block;')}">Non Billable</span></th>
+                                                <th><span class="th-label">Asset</span></th>
+                                                <th><span class="th-label">Asset Type</span></th>
+                                                <th>
+                                                    <table class="div-table">
+                                                        <tr>
+                                                            <td><span class="th-label" style="display:{!IF(line.item.UNITYPM_Is_Preventative_Maintenance__c,'none;','block;')}">Cust Qty</span></td>
+                                                            <td><span class="th-label">Line Total Price</span></td>
+                                                        </tr>
+                                                    </table>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <!-- Is Vendor Supply -->
+                                                <td>
+                                                    <apex:outputPanel id="vendSupply-panel" styleClass="cell-wrapper" >
+                                                        <apex:outputField value="{!line.item.UNITY_Is_Vendor_Supply__c}"></apex:outputField>
+                                                    </apex:outputPanel>
+                                                </td>
+                                                <!-- End Is Vendor Supply -->
+                                                <!-- Non Billable -->
+                                                <td>
+                                                    <apex:outputPanel id="nonBillable-panel" styleClass="cell-wrapper" >
+                                                        <apex:inputField value="{!line.item.UNITY_Not_Billable__c}" rendered="{!NOT(line.item.UNITYPM_Is_Preventative_Maintenance__c)}"></apex:inputField>
+                                                    </apex:outputPanel>
+                                                </td>
+                                                <!-- End Non Billable-->
+                                               <!-- Asset _-->
+                                                <td class="lookup-cell">
+                                                    <apex:outputPanel id="asset-panel" styleClass="cell-wrapper">
+                                                        <apex:outputPanel rendered="{!OR(line.item.UNITY_Asset__c == NULL,line.item.Id == NULL)}" style="position:absolute;display:block;width:100%;height:100%;top:0px;">
+                                                            <c:CustomLookupField field-name="UNITY_Asset__c" 
+                                                                                     field_id="asset-lookup-{!line.index}" 
+                                                                                     hidden_field_id="asset-lookup-{!line.index}-hidden"
+                                                                                     initial_field_value="{!IF(line.assetName != null,line.assetName,'')}"
+                                                                                     initial_field_data_id="{!IF(line.item.UNITY_Asset__c != null,line.item.UNITY_Asset__c,'')}"
+                                                                                     fields_to_return="Id,Name,SerialNumber,Description,Account.Name,Product2.Name,UNITY_Asset_Type__c"
+                                                                                     fields_labels="{'Name':'Name','SerialNumber':'Serial Number','Description':'Description','Account.Name':'Account.Name','Product2.Name':'Product','UNITY_Asset_Type__c':'Asset Type'}"
+                                                                                     where_clause="AccountId = \'{!o.AccountId}\'"
+                                                                                     obj_name="Asset"></c:CustomLookupField>
+                                                            <apex:inputHidden value="{!line.item.UNITY_Asset__c}" required="false" html-data-id="asset-lookup-{!line.index}-hidden"></apex:inputHidden>
+                                                            <script type="text/javascript">
+                                                                $j('[data-id="asset-lookup-{!line.index}-hidden"]').change(function(){ 
+                                                                    assetChange('{!line.index}',$j(this).val()); 
+                                                                });
+                                                            </script> 
+                                                        </apex:outputPanel>                                                                                
+                                                        <apex:outputField value="{!line.item.UNITY_Asset__c}" styleClass="product-link" rendered="{!AND(line.item.UNITY_Asset__c != NULL,line.item.Id != NULL)}"></apex:outputField>    
+                                                    </apex:outputPanel>
+                                                </td>
+                                                <!-- End Asset -->
+                                                <!-- Asset Type-->                                                
+                                                <td>
+                                                    <apex:outputPanel id="asset-type-panel" styleClass="cell-wrapper-assetType" >{!line.assetType}</apex:outputPanel>
+                                                </td>
+                                                <!-- End Asset Type-->                                                
+                                                <!-- Cust Adj Qty and Total Price fields -->
+                                                <td>
+                                                    <apex:outputPanel id="totalPrice-panel">
+                                                        <table class="div-table">
+                                                            <tr>
+                                                                <td>
+                                                                    <apex:inputField value="{!line.item.UNITY_Customer_Adjusted_Quantity__c}" 
+                                                                                     styleClass="short" 
+                                                                                     rendered="{!NOT(line.item.UNITYPM_Is_Preventative_Maintenance__c)}">
+                                                                                    <apex:actionSupport action="{!line.onPriceChange}" event="onchange" reRender="totalPrice-panel"/>
+                                                                    </apex:inputField>
+                                                                </td>
+                                                                <td class="totals">
+                                                                    <apex:outputField value="{!line.item.UNITY_Total_Price__c}" styleClass="totalPrice" id="totalPrice"></apex:outputField>
+                                                                    <div title="{!'Unit Price: '&TEXT(line.item.UNITY_Price__c)&'[BR]'&line.item.UNITY_Price_Calculation_Details__c}" 
+                                                                         class="info-icon" 
+                                                                         style="display:block;">
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </apex:outputPanel>
+                                                </td>
+                                                <!-- End Cust Adj Qty and Total Price fields -->
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!oLines.size == 0}">
+                        <div>
+                            No records to display
+                        </div>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </apex:PageBlockSection>
+            <apex:pageBlockButtons location="bottom"> 
+                <apex:commandButton action="{!doSave}" value="Save" status="loadingStatus" reRender="messages,script,items-wrapper,order-detail" rendered="{!canEdit}" oncomplete="closeMe();"></apex:commandButton>
+                <apex:commandButton action="{!doQuickSave}" value="Quick Save" status="loadingStatus" reRender="messages,script,items-wrapper,order-detail" rendered="{!canEdit}"></apex:commandButton>             
+                <apex:commandButton styleClass="cancel-btn" value="Go Back" rendered="{! NOT(o.UNITYPM_Is_WO_Preventative_Maintenance__c)}"></apex:commandButton>
+            </apex:pageBlockButtons>           
+        </apex:pageBlock>
+        <apex:actionFunction action="{!deleteSel}" name="deleteSelected" reRender="messages,items-wrapper,order-detail" status="loadingStatus" immediate="false"/>
+        <apex:actionFunction action="{!onProductChange}" name="productChange" reRender="messages,items-wrapper,order-detail" status="loadingStatus" immediate="false">
+            <apex:param name="index" value=""></apex:param>
+            <apex:param name="myValue" value=""></apex:param>
+        </apex:actionFunction>
+        <apex:actionFunction action="{!onAssetChange}" name="assetChange" reRender="messages,items-wrapper,order-detail" status="loadingStatus" immediate="false">
+            <apex:param name="index" value=""></apex:param>
+            <apex:param name="myValue" value=""></apex:param>
+        </apex:actionFunction>
+    </apex:form>
+    <apex:outputPanel id="script">
+        <script type="text/javascript">
+            $j(function(){
+                var saveComplete = {!saveComplete};
+                var finalize = {!finalize};
+                if(saveComplete){
+                    if(finalize)
+                        alert('{!saveResult}');
+                    closeAndRefresh(true);
+                }
+            });
+        </script>
+    </apex:outputPanel>
+    <script type="text/javascript">
+        $j(".cancel-btn").click(function(e){
+            e.preventDefault();
+            if({!oLines.size} > 0){
+                closeAndRefresh(true);
+            }else{
+                closeAndRefresh(false);
+            }
+        });
+        $j(".delSel-btn").click(function(e){
+            e.preventDefault();
+            var hasSel = false;
+            $j(".sel-cbx").each(function(i){
+                if($j(this).is(":checked"))
+                    hasSel = true;
+            });
+            if(hasSel){
+                if(confirm('Are you sure?')){
+                    deleteSelected();
+                }
+            }
+        });
+        function closeAndRefresh(refresh){
+            sforce.console.getEnclosingPrimaryTabId(function(result){
+                var ptabid = result.id;
+                if(refresh == true){
+                    sforce.console.refreshPrimaryTabById(ptabid,false,function(result){
+                        sforce.console.getEnclosingTabId(function(result){
+                            var mytabid = result.id;
+                            sforce.console.closeTab(mytabid);
+                            sforce.console.openSubtab(ptabid,'/{!Order.Id}',true,function(result){});
+                        });
+                    });
+                }else{
+                    sforce.console.getEnclosingTabId(function(result){
+                        var mytabid = result.id;
+                        sforce.console.closeTab(mytabid);
+                        sforce.console.openSubtab(ptabid,'/{!Order.Id}',true,function(result){});
+                    });
+                }
+            });
+        }
+        $j(document).tooltip({
+            items: "[data-stockInfo],[title]",
+            position: {
+                at: "center-40 bottom+4",
+                using: function( position, feedback ) {
+                    $j( this ).css( position );
+                    $j( "<div>" )
+                    //.addClass( "arrow" )
+                    .addClass( feedback.vertical )
+                    .addClass( feedback.horizontal )
+                    .appendTo( this );
+                }
+            },
+            show: null,
+            hide: null,
+            content: function(callback){
+                var elem = $j(this);
+                if(elem.is("[data-stockinfo]")){
+                    var args = elem.attr("data-stockinfo").split(",");
+                    //console.log('data-stockinfo[0]' + args[0]);
+                    //console.log('data-stockinfo[1]' + args[1]);
+                    var input = $j(this).parent().parent().find(".lookupInput").find("input").val();
+                    if(input && input != ""){
+                        getStockInfo(args,function(result){
+                            //console.log('result: ' + result);
+                            if(result){
+                                if(result['err']){
+                                    var html = '<table class="info-table"><tr><td><strong>';
+                                    html += result['err'];
+                                    html += '</strong></td></tr></table>';
+                                    callback(html);
+                                }else{
+                                    //console.log('qty: ' + result["qty"]);
+                                    //console.log('lastDate: ' + result["lastDate"]);
+                                    var myDate = moment(result["lastDate"]).format('M/D/YYYY hh:mm A');
+                                    var html = '<table class="info-table"><tr><th>On Hand Qty</th><td>'+result["qty"]+'</td>';
+                                    html += '<tr><th>Last Modified</th><td>'+myDate+'</td></tr></table>';
+                                    console.log('html: '+html);
+                                    callback(html);
+                                }
+                            }else{
+                                //Error handling here
+                                callback(result);
+                            }
+                        });
+                        //return 'qwerty';
+                    }else{
+                        callback(null);
+                    }
+                }else{
+                    var t = elem.attr("title");
+                    //console.log("title: " + t);
+                    if(t != "" && t.indexOf("Lookup") == -1){
+                        var lines = [];
+                        var lineZero = [];
+                        if(t.indexOf('[BR]') != -1){
+                            lines = t.split("[BR]");
+                            lineZero = lines[0];
+                            lines = lines[1].split('\n');
+                        }else{
+                            lines = t.split('\n');
+                        }
+                        if(lines.length == 1){
+                            lines = lines[0].split(':');
+                            var tempLines = [];
+                            for(var i = 1; i < lines.length; i++){
+                                var v = lines[i].trim();
+                                //console.log('after trim() v: ' + v);
+                                if(v.indexOf(' ') != -1)
+                                    v =  v.substring(0,v.indexOf(' '));
+                                //console.log('after substring() v: ' + v);
+                                var l = '';
+                                if(i == 1){
+                                    l = lines[0];
+                                }else{
+                                    var prevL = lines[i-1].trim();
+                                    var l = prevL.substring(prevL.indexOf(' '),prevL.length);
+                                }
+                                //console.log('l: ' + l);
+                                var node = l + ':' + v;
+                                //console.log('node: ' + node);
+                                tempLines.push(node);
+                            }
+                            if(tempLines.length > 0)
+                                lines = tempLines;
+                        }
+                        if(lineZero.length > 0){
+                            lines.unshift(lineZero);
+                        }
+                        var html = '<table class="info-table">';
+                        for(var i = 0; i < lines.length; i++){
+                            var lineSplit = lines[i].split(':');
+                            html += '<tr><td><strong>'+lineSplit[0]+'</strong></td>';
+                            if(lineSplit.length > 1){
+                                html += '<td>'+lineSplit[1]+'</td>';
+                            }
+                            html += '</tr>';
+                        }
+                        html += '</table>'; 
+                        callback(html);
+                    }else{
+                        callback(null);
+                    }
+                }
+            }
+        });
+        
+        $j(document).ready(function(){
+            sforce.console.setTabTitle('Add Product');
+        });
+
+        function getStockInfo(args,callback){
+            if(args && args.length > 0){
+                UNITY_NewOrderItemController.getStockInfo(args,function(result,event){
+                    if(event.status){
+                        callback(result);
+                    }else{
+                        var err = {};
+                        err["err"] = event.message;
+                        console.log('Error: ' + event.message);
+                        callback(err);
+                    }
+                },{escape:false});
+            }
+        }
+
+        var oldTop = -1;
+        var timer;
+        $j(window).scroll(function () {
+            console.log("scrolling...");
+            console.log("oldTop: " + oldTop);
+            console.log("$j('html').scrollTop(): " + $j("html").scrollTop());
+            var elem = $j('html').scrollTop() == 0 ? $j('body') : $j('html');
+            if (oldTop > elem.scrollTop()) {
+                $j('.quick-menu-wrapper').stop().css({ 'top': elem.scrollTop() });
+                oldTop = elem.scrollTop();
+                if (elem.scrollTop() < 2) {
+
+                    clearTimeout(timer);
+                    timer = setTimeout(refresh, 150);
+                }
+            } else {
+                clearTimeout(timer);
+                timer = setTimeout(refresh, 150);
+            }
+        });
+        var refresh = function () {
+            console.log("in refresh()...");
+            moveMenu();
+        };
+
+        function moveMenu() {
+            var elem = $j('html').scrollTop() == 0 ? $j('body') : $j('html');
+            var top = elem.scrollTop();
+            console.log("top: " + top);
+            if (top > 100 && top > oldTop) {
+                $j('.quick-menu-wrapper').stop().css({ 'top': top - 60,'display':'block'}).animate({ 'top': top }, 600, 'easeOutCirc', function () {
+                    
+                });
+                oldTop = top;
+            }else if (top < 100) {
+                oldTop = -1;
+                $j('.quick-menu-wrapper').stop().css({ 'top': 0,'display':'none'});
+            }
+        }
+        function applyCostAndPriceToLines(){
+            var selectedAsseType = $j("select[id$='assetTypeToReplace']").val();
+            var selectedUnitCost = $j(".unitCostReplacement").val();
+            var selectedUnitPrice = $j(".unitPriceReplacement").val();
+            if ( !$j.isNumeric(selectedUnitCost) ){
+                alert('Cost has to be numeric.')
+                return;
+            }
+            if ( !$j.isNumeric(selectedUnitPrice) ){
+                alert('Price has to be numeric.')
+                return;
+            }
+            var modifiedLineIndexes = [];
+            $j('.fields-table').each(
+                function(){
+                    var unitCost = $j(this ).find('.cell-wrapper-unitCost').val();
+                    var unitPrice = $j(this ).find('.cell-wrapper-unitPrice').val();
+                    var lineAssetType = $j(this ).find('.cell-wrapper-assetType').text();
+                    var isPM = $j(this).find('.isPM').val();
+                    var quantity = $j(this ).find('.shortQty').val();
+                    var lineIndex = $j(this).find('.lineIndex').val();
+                    var totalCost = $j(this).find("span[id$='totalCost']").text();
+                    var totalPrice = $j(this).find("span[id$='totalPrice']").text();
+                    if (selectedAsseType == lineAssetType && isPM == "true"){
+                        $j(this ).find('.cell-wrapper-unitCost').val(selectedUnitCost);
+                        $j(this).find("span[id$='totalCost']").text('$' + parseFloat(selectedUnitCost, 10).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,").toString());
+                        $j(this ).find('.cell-wrapper-unitPrice').val(selectedUnitPrice);
+                        $j(this).find("span[id$='totalPrice']").text('$' + parseFloat(selectedUnitPrice, 10).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,").toString());
+                        modifiedLineIndexes.push(lineIndex);
+                    }
+                }
+            );
+            if (modifiedLineIndexes.length > 0){
+                alert('Found '+ modifiedLineIndexes.length + ' with asset type of '+selectedAsseType);
+            }
+            else
+                alert('No lines found with asset type of '+ selectedAsseType);
+
+        }
+    function closeMe(){
+        window.top.close();
+    }    
+    
+    </script>
+    <style type="text/css">
+        input.custom-lookup-field[type="text"],.custom-lookup-field{
+            font-weight: bold;
+            background-position: right -5px;
+        }
+    </style>
+</apex:page>

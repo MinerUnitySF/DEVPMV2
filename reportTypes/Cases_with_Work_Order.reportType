@@ -1026,6 +1026,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>Tech_ETA__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Template_Config_Ext_ID__c</field>
             <table>Case</table>
         </columns>
@@ -1217,6 +1222,11 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>Account.Company__c</field>
+            <table>Case</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Days_to_Invoice_Completed_Cases__c</field>
             <table>Case</table>
         </columns>
         <masterLabel>Cases</masterLabel>
@@ -1515,6 +1525,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Next_Action_Date__c</field>
+            <table>Case.Work_Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>UNITY_De_Escalate_Reason_No_Assignment__c</field>
             <table>Case.Work_Orders__r</table>
         </columns>
@@ -1545,12 +1560,22 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Next_Action__c</field>
+            <table>Case.Work_Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>Discount</field>
             <table>Case.Work_Orders__r</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>UNITY_Dispatch_Attempts__c</field>
+            <table>Case.Work_Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Case__c</field>
             <table>Case.Work_Orders__r</table>
         </columns>
         <columns>
@@ -2567,6 +2592,11 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>PostalCode</field>
+            <table>Case.Work_Orders__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>UNITY_Accepted_Vendor__c.UNITY_Has_Community_Member__c</field>
             <table>Case.Work_Orders__r</table>
         </columns>
         <masterLabel>Work Orders</masterLabel>

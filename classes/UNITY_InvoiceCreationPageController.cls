@@ -42,11 +42,12 @@ public class UNITY_InvoiceCreationPageController{
                           UNITY_Customer_Service_Contract__c,
                           UNITY_Partial_Invoice_Reason__c,
                           UNITY_Partial_Invoiced_User__c,
-                          UNITY_Agent_ID__c 
+                          UNITY_Agent_ID__c,
+                          RecordTypeId 
                    FROM Case 
                    WHERE Id =: controller.getRecord().Id];
         workOrders = [SELECT Id, CaseId, AccountId, WorkOrderNumber,
-                             UNITY_Attachment_Compliant__c,RecordTypeId 
+                             UNITY_Attachment_Compliant__c,RecordTypeId, UNITY_Order_Type__c
                       FROM WorkOrder 
                       WHERE CaseId =: context.Id                       
                       AND UNITY_Attachment_Compliant__c = true];
@@ -60,8 +61,11 @@ public class UNITY_InvoiceCreationPageController{
         Set<Id> workOrderIdSet = new Set<Id>();
         Set<Id> workOrderIdAccountSet = new Set<Id>();
         for(WorkOrder wo : workOrders){
-            workOrderIdSet.add(wo.id);
-            workOrderIdAccountSet.add(wo.AccountId);
+            //UNITYPM if PMO/PMA, Case SHOULD EE of Type Service Request 
+            if (context.RecordTypeId != UNITY_Constants.CASE_PREVENTATIVE_MAINTENANCE_RECORDTYPE || (wo.UNITY_Order_Type__c != 'PMO' && wo.UNITY_Order_Type__c  != 'PMA')){
+              workOrderIdSet.add(wo.id);
+              workOrderIdAccountSet.add(wo.AccountId);          
+            }
         }
         Set<String> delimitedInvoiceableStatuses = new Set<String>();
         UNITY_General_Settings__c generalSetting = generalSettings.get(UNITY_Constants.PO_INVOICEABLE_STATUSES);
@@ -129,7 +133,8 @@ public class UNITY_InvoiceCreationPageController{
             boolean isWOInvoiceable =true;
             if(workOrderOrdersMap.get(wo.Id) != null && 
                ((wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE && wo.UNITY_Attachment_Compliant__c) || 
-                wo.RecordTypeId == UNITY_Constants.WO_NON_WORK_RECORDTYPE)){
+                wo.RecordTypeId == UNITY_Constants.WO_NON_WORK_RECORDTYPE||
+                wo.RecordTypeId == UNITY_Constants.WO_PREVENTATIVE_MAINTENANCE_RECORDTYPE)){
                     for(Order o : workOrderOrdersMap.get(wo.Id)){
                         if(isInvoiceableMap.containsKey(o.Id)){
                             if(!isInvoiceableMap.get(o.Id)){
@@ -153,7 +158,7 @@ public class UNITY_InvoiceCreationPageController{
                          PricebookEntry.Product2.UNITY_Product_Type__c, Quantity, 
                          UNITY_Customer_Adjusted_Quantity__c, UNITY_Is_Vendor_Supply__c, UNITY_Subtype__c, UNITY_Type__c,
                          UNITY_GL_Revenue_Account__c,UNITY_GL_Tax_Account__c,UNITY_GL_Sub_Account__c,UNITY_Activity_Type__c,
-                         UNITY_Asset__c,UNITY_Unknown_Part_Description__c,UNITY_Not_Billable__c
+                         UNITY_Asset__c,UNITY_Unknown_Part_Description__c,UNITY_Not_Billable__c, UNITYPM_Is_Preventative_Maintenance__c
                          FROM OrderItem 
                          WHERE OrderId IN: orderIdSet order by createdDate];
         Map<Id, List<OrderItem>> orderIdToOrderItemMap = new Map<Id, List<OrderItem>>();
@@ -303,7 +308,8 @@ public class UNITY_InvoiceCreationPageController{
                             ili.UNITY_Description__c = oi.UNITY_Unknown_Part_Description__c;
                             ili.UNITY_PO_Has_Discount__c = (((oWrapper.order.UNITY_Discount__c != null) && (oWrapper.order.UNITY_Discount__c > 0)) ||((oWrapper.order.UNITY_Discount_Amount__c != null) && (oWrapper.order.UNITY_Discount_Amount__c > 0)));
                             ili.UNITY_Discount_from_PO__c = ((oWrapper.order.UNITY_Discount__c != null) ? oWrapper.order.UNITY_Discount__c : 0);
-            
+                            ili.UNITYPM_Is_Preventative_Maintenance__c = oi.UNITYPM_Is_Preventative_Maintenance__c;
+
                             if ( oi.PricebookEntry.Product2.UNITY_Product_Type__c == 'Labor' ) {
                                 String minerOTStartHour = sContract.UNITY_Miner_OT_Start_Time_Hour__c;
                                 String minerOTStartMinute = sContract.UNITY_Miner_OT_Start_Time_Minute__c;

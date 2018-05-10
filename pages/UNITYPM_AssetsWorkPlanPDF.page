@@ -1,0 +1,1465 @@
+<apex:page standardController="WorkOrder" renderAs="PDf" contentType="application/pdf" lightningStylesheets="true" 
+                              extensions="UNITYPM_AssetsWorkPlanPDFCntrlExt" showHeader="false" sidebar="false"
+                              standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" docType="html-5.0" >
+    <!-- UNITYPM_AssetsWorkPlanPDFCntrlExtension     -->
+        <html>
+    <head>
+       <style type="text/css"  media="print">
+        @page {
+             margin: 140px 20px 80px 20px;
+            @bottom-right {
+                font-family: Helvetica;
+                font-size: 9pt;
+            }
+            @top-center {
+               content: element(header);
+            }
+            @bottom-left {
+	            content: element(footer);
+	        } 
+	         @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-family: sans-serif;
+                font-size: 80%;
+            }
+          }
+            body {
+    		  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    		  font-size: 9pt;
+    	 }
+    
+		div.footer {
+			display: block;
+			padding: 5px;
+			position: running(footer);
+        }
+         div.header {
+             padding: 8px;             
+             position: running(header);
+             margin-top: 9mm;   
+        }
+         .pagebreak {
+             display: block;
+              page-break-before: always; //after;
+             //page-break-after: auto;
+             width: 100%;
+         }
+         
+         .titleheader {
+             width: 100%;
+             height: 110px;
+             text-align: center;
+             position: relative;
+         }
+         .headerlabel {
+             margin: 0 auto;
+             heigth: 40px;
+             width: 350px;
+             font-size: 30px;
+         }
+         .row {
+             display: inline-block;
+             height: 100%;
+         }
+         .font1 {
+             font-size: 10px;
+         }
+         .font2,
+         .fontImportant2 {
+             font-size: 12px;
+         }
+         .font3,
+         .fontImportant3 {
+             font-size: 15px;
+         }
+         .font4,
+         .fontImportant4 {
+             font-size: 20px;
+             font-weight: bold;
+         }
+         .font5 {
+             font-size: 30px;
+             font-weight: bold;
+         }
+         .fontImportant1,
+         .fontImportant2,
+         .fontImportantHeader,
+         .fontImportant4 {
+             color: #ff0000;
+         }
+         .fontItalic{
+             font-style: italic; 
+              font-size: 15px;
+              background-color: black;
+              color: white;
+              font-weight: bold;
+              text-align: center;
+         }
+         .footerContainer{
+                    display: table-cell;
+                    vertical-align: top;
+                    text-align: center;
+                }
+                
+         
+         table {
+             width: 100%;
+             border-spacing:0;
+             border-collapse: collapse;
+             border: 2px solid black;
+         }
+         
+        
+         .table, table, th, td, tr {
+                    border: 1px solid black;
+                    cellspacing: 0; 
+                    cellpadding: 0;
+                    margin: 0px;
+                    padding: 0px;
+                }
+                
+                td table td{
+                    padding-left:2px;
+                    padding-right:2px;
+                }
+ 
+                td table th{
+                    padding-left:2px;
+                    padding-right:2px;
+                }
+ 
+         
+         th, tr {
+             border-collapse: collapse;
+         }
+         
+       /*  
+        table{
+            border:1px solid #000000;
+            border-collapse:collapse;
+            -fs-table-paginate: paginate;}
+        table td{
+            border:1px solid #000000;
+            word-wrap:break-word;
+            white-space:normal;
+            overflow:hidden;
+            text-align:left;
+            line-height:16px;
+            height:16px;
+        
+        }
+        table tr{
+            page-break-inside:avoid;
+        }
+        table thead tr th{
+            background:#f2f2f2;
+            border:1px solid #000000;
+            text-align:center;
+        }
+        
+        table tr th{
+            background:#f2f2f2;
+            border:1px solid #000000;
+            text-align:center;
+        }
+        */ 
+         
+         
+         
+        .tr2 {
+                    height:30px;
+                }
+        .tdInverse1{
+                    background-color:#000000;
+                    color:#ffffff;
+                    text-align:center;
+                }
+         #leftheader,
+         .leftblock {
+             float: left;
+         }
+         #leftheader {
+             width: 120px;
+             height: 100%;
+         }
+         .leftblock {
+             width: 40%;
+             position: relative;
+             height: 100%;
+         }
+         .centerblock {
+             margin: 0 auto;
+             width: 100%;
+             height: 100%;
+             background: #00ff00;
+         }
+                  .rightblock {
+             width: 40%;
+             height: 100%;
+         }
+         #proposalLabel {
+             color: #ffffff;
+             font-size: 40px;
+             border: 2px solid #ffffff;
+             background: #000000;
+             width: 100%;
+             height: 50px;
+             text-align:center;
+             vertical-align:middle;
+         }
+         #containerblock {
+             height: 150px;
+             tex-align: center;
+             display: block;
+              border: 2px solid #000000;
+         }
+         .noborder,
+         .noborder tr,
+         .noborder th,
+         .noborder td {
+             border: none;
+         }
+         .border1{
+             border: 2px solid #000000;
+         }
+         .border1 th {
+             border: 2px solid #000000;
+             background: #ff0000;
+         }
+         .border2 td{
+             border-top: 2px solid #000000;
+             margin-left: 5px;
+         }
+         .tableblock {
+             height: 140px;
+         }
+         .textcenter {
+             text-align: center;
+         }
+         .borderred {
+             border: 1px solid #ff0000;
+         }
+         .footerContainer{
+             display: table;
+             width: 100%;
+             vertical-align: top;
+             text-align: center;
+         }
+         .parentblock{
+             margin: 10px 0px 10px 0px;
+             position: relative;
+             overflow: hidden;
+         }
+         #termsandconditions p {
+             text-align: justify;
+             text-justify: inter-word;
+             display:table-row;
+             font-size: 8pt;
+             font-family: Arial, Helvetica, sans-serif;
+         }
+         li {
+             font-size:12px;
+         }
+         ol.a {
+             list-style-type: lower-alpha;
+         }
+         .noborder,
+         .noborder tr,
+         .noborder th,
+         .noborder td {
+             border: none;
+         }
+         .border1, .border1 th, .border3{
+             border: 2px solid #000000;
+         }
+         .border1 th, .border3 th {
+             background: #ff0000;
+             text-align: center;
+             height: 30px;
+         }
+
+         .noborder,
+         .noborder tr,
+         .noborder th,
+         .noborder td {
+             border: none;
+         }
+         .border1, .border1 th, .border3{
+             border: 2px solid #000000;
+         }
+         #leftheader,
+         .leftblock {
+             float: left;
+         }
+         #leftheader {
+             width: 200px;
+             height: 100%;
+         }
+         .leftblock {
+             width: 40%;
+             position: relative;
+             height: 100%;
+         }
+         .centerblock {
+             margin: 0 auto;
+             width: 120px;
+             height: 120px;
+             background: #00ff00;
+         }
+         
+         #rightheader,
+         .rightblock {
+             float: right;
+             position: relative;
+             width: 130px;
+             height: 50px;
+         }
+         #rightheader {
+             width: 200px;
+             height: 110px;
+             vertical-align: center;
+             
+         }
+         
+         #rightheader span {
+             display: inline-block;
+             vertical-align: middle;
+         }
+         
+         .rightblock {
+             width: 40%;
+             height: 100%;
+         }
+          .borderred {
+             border: 1px solid #ff0000;
+         }
+        .parentblock{
+             margin: 10px 0px 10px 0px;
+             position: relative;
+             overflow: hidden;
+         }
+         
+         .info {
+                    border: 1px solid;
+                    margin: 10px 0px;
+                    padding:50px 30px 50px 50px;
+                    background-repeat: no-repeat;
+                    background-position: 10px center;
+                    font-family:Arial, Helvetica, sans-serif; 
+                    font-size:18px;
+                    //background-color: #BDE5F8;
+                 }
+           .check-box{
+                    display:inline-block;
+                    width:7px;
+                    height:7px;
+                    border:1px solid #000;
+                    vertical-align:baseline;
+                }
+             .meter-reading-box{
+                    display:inline-block;
+                    width:185px;
+                    height:18px;
+                    border:1px solid #000;
+                    position:relative;
+                }
+             .store-free{
+                    border:2px solid #000;
+                    height:40px;
+                    margin:10px;
+                    position:relative;
+                }
+               .store-free-text{
+                    display:block;
+                    position:absolute;
+                    bottom:3px;
+                    left:3px;
+                }
+                .woli-column-left {
+                    float: left;
+                    width: 70%;
+                }
+                .woli-column-right {
+                    float: left;
+                    width: 30%;
+                }
+                u { background-color: white; }
+                
+                .odd {
+                 border-bottom: 1px solid #000;
+                 background-color: #ECE5B6;
+                 padding: 1px 1px 2px 2px;
+                 font-size: 100%;
+                }
+                
+                .even {
+                   border-bottom: 1px solid #000;
+                   padding: 1px 1px 2px 2px;
+                   font-size: 100%;
+                }
+                #table1 {
+                border-collapse: separate;
+                border-spacing: 5px;
+            }
+            table#wotable td
+            {
+                border: none !important;
+            }
+            .logo{
+                width: 100px; height: 40px; display: block; 
+            }
+                
+    </style> 
+    </head>
+    <body>
+     <apex:form >
+         <div class="footer">
+          <div class="footerContainer" style="page-break-after:always;">
+            <table class ="noborder">
+                <tr>
+                    <td  width ="30%" ><hr/></td>
+                     <td width ="5%"></td>
+                    <td  width ="30%"><hr/></td>
+                     <td width ="5%"></td>
+                    <td  width ="30%"><hr/></td>
+                </tr>
+                <tr>
+                    <td>Service Technician Signature</td>
+                    <td></td>
+                    <td>Customer Signature</td>
+                     <td></td>
+                    <td>Customer Print Name</td>
+                </tr>
+            </table>
+        </div>
+      </div>
+      
+        <tbody>
+        <div class="header"  style="page-break-after:always;">
+              <div id="leftheader">
+                <apex:image styleClass="logo" url="{!workOrder.UNITY_Email_Logo_URL__c}"/>
+                <!--	<apex:image url="{!URLFOR($Resource.MinerCorp_Logo)}" width="65px" height="35px" />  -->
+              </div>
+              <br/><br/><br/>
+             <div>
+               <table class ="noborder" style ="text-align: center;">
+                   <tr class="font3">
+                      <td width="10%">
+                        <u><apex:outputText value="{!storeNo}" /></u>
+                      </td>
+                       <td width="20%">
+                        <u><apex:outputText value="{!siteAddress}"  /></u>
+                      </td>
+                       <td width="8%">
+                        <u><apex:outputText value="{!siteCity}" /></u>
+                      </td>
+                       <td width="5%">
+                        <u><apex:outputText value="{!siteState}"  /></u>
+                      </td>  
+                      <td width="10%">
+                        <u><apex:outputText value="{!siteContactPhone}"  /></u>
+                      </td>
+                      <td width="10%">
+                       <u> <apex:outputText value="{0, date,MMM d,  yyyy}">
+                         <apex:param value="{!woCreatedDate}" /> 
+                        </apex:outputText></u>
+                      </td>
+                   </tr>
+                    
+                   <tr class ="font1">
+                       <td>Store No.</td>
+                       <td>Address</td>
+                       <td>City</td>
+                       <td>State</td>
+                       <td>Site Phone Number</td>
+                       <td>Date</td>
+                   </tr>
+                </table>
+              </div>
+          <!--  <div  style ="text-align: center;">
+                <span><p><b> {!info}</b></p></span>
+            </div> -->
+       </div>
+      
+        <!-- <tbody>-->
+        
+          <!-- added -->
+        <apex:variable var="cnt" value="{!0}" /> 
+         <!--   end added -->
+         
+        <apex:repeat value="{!pageWrapper}" var="page">
+            
+            <!-- added -->
+            <div style="{!if(cnt < 1, 'page-break-before:avoid;','page-break-before:always;')}">
+            <apex:variable var="cnt" value="{!cnt+1}"/>
+            <!--   end added -->
+            
+            <table id="wotable">
+                <tr>
+                    <td style ="text-align: left;"  class="font4">{!page.wpName}</td>
+                     <td style ="text-align: right;"  class="font4">{!workOrderNumber}</td>
+                </tr>
+            </table>
+       
+       
+            <!--<div style="page-break-after:always; text-align: center;"> -->
+                
+            
+            
+            <!--  Row wrapper asset info  page-break-after:auto;  -->
+            <apex:repeat value="{!page.rowWrapper}" var="row">
+                     <table> 
+                      <tr style ="font-style: italic; font-size: 12px; font-weight: bold;">
+                      <apex:repeat value="{!row.values}" var="value">
+                       <apex:outputText value="{!value}" escape="false"/>
+                     </apex:repeat>
+                     </tr> </table>
+                 </apex:repeat>
+                
+            <!-- <apex:outputText value="{!page.groupAssets}"></apex:outputText>  -->
+            
+            <!--   No grouping one asset per page -->   
+            <apex:outputPanel rendered="{!page.groupAssets == false}">
+            <apex:repeat value="{!page.renderTypeWPLIs}"  var="aPageOfLines" id="theList11">              
+               
+            <apex:outputPanel rendered="{!aPageOfLines == 'Pass/Fail'}">
+                <table style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="60%"></td>
+                    <td width="20%">Pass</td>
+                    <td width="20%">Fail</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable12">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                         <apex:outputText value="{!n}"></apex:outputText> 
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td>
+                       <td>Fail</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+               </apex:outputPanel>
+               
+            <apex:outputPanel rendered="{!aPageOfLines == 'Yes/No'}">
+                 <table style ="-fs-table-paginate: paginate;border: 0.5px solid white;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                     <td width="60%"></td>
+                    <td width="20%">Yes</td>
+                    <td width="20%">No</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable13">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                          <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td>
+                       <td>No</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                   </apex:outputPanel>
+                   
+            <apex:outputPanel rendered="{!aPageOfLines == 'Done/NA'}">
+                 <table style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <td width="60%"></td>
+                    <td width="20%">Done</td>
+                    <td width="20%">N/A</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable14">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                          <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td>
+                       <td>N/A</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+            </apex:outputPanel>
+          </apex:repeat>
+        </apex:outputPanel>
+             <!-- text box  grouping -->   
+            <apex:outputPanel rendered="{!page.groupAssets == false}">
+            <apex:repeat value="{!page.renderTypeWPLIs}"  var="aPageOfLines" id="theList111">
+            
+            <apex:outputPanel rendered="{!aPageOfLines == 'NumberOfSections'}">
+                 <table style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!-- <td width="30%">{!aPageOfLines}</td>-->
+                    <td width="20%"></td>
+                    <td width="80%">Number of Sections</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable16">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td height="25"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+            </apex:outputPanel>
+            
+            <apex:outputPanel rendered="{!aPageOfLines == 'TextBox'}">
+                 <table style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!-- <td width="30%">{!aPageOfLines}</td>-->
+                    <td width="20%" style ="color: black;">Text Box</td>
+                    <td width="80%"></td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable17">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td height="50"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+            </apex:outputPanel>
+          </apex:repeat>
+        </apex:outputPanel>
+         
+            <!--    Grouping assets by 5 -->     
+             <apex:outputPanel rendered="{!page.groupAssets == true}">
+               <apex:repeat value="{!page.renderTypeWPLIs}"  var="aPageOfLines" id="theList21"> 
+             
+               <!-- 5 -->
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 5)}">
+                <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Pass</td>
+                    <td width="7%">Fail</td>
+                    <td width="7%">Pass</td>
+                    <td width="7%">Fail</td>
+                    <td width="7%">Pass</td>
+                    <td width="7%">Fail</td>
+                    <td width="7%">Pass</td>
+                    <td width="7%">Fail</td>
+                    <td width="7%">Pass</td>
+                    <td width="7%">Fail</td>
+                  </tr>  
+                 </tr>
+                 
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable22">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                       <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+               </apex:outputPanel>
+               
+               <!-- 4 -->
+                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 4)}">
+                <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                 
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable224">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                       <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td>&nbsp;</td><td>&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+               </apex:outputPanel>
+               
+               <!-- 3 -->
+                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 3)}">
+                <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                 
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable223">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                       <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td>&nbsp;</td><td>&nbsp;</td>
+                       <td>&nbsp;</td><td>&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+               </apex:outputPanel>
+               
+               <!-- 2 -->
+                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 2)}">
+                <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                 
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable222">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                       <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td>&nbsp;</td><td>&nbsp;</td>
+                       <td>&nbsp;</td><td>&nbsp;</td>
+                       <td>&nbsp;</td><td>&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+               </apex:outputPanel>
+               
+               <!-- 1 -->
+                  <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 1)}">
+                <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Pass</td><td width="7%">Fail</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                 
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable221">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                       <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                        <td>&nbsp;</td><td>&nbsp;</td>
+                       <td>&nbsp;</td><td>&nbsp;</td>
+                       <td>&nbsp;</td><td>&nbsp;</td>
+                       <td>&nbsp;</td><td>&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+               </apex:outputPanel>
+               
+               
+                <!-- 5 -->
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 5)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="30%"></td>
+                    <td width="7%">Yes</td>
+                    <td width="7%">No</td>
+                    <td width="7%">Yes</td>
+                    <td width="7%">No</td>
+                    <td width="7%">Yes</td>
+                    <td width="7%">No</td>
+                    <td width="7%">Yes</td>
+                    <td width="7%">No</td>
+                    <td width="7%">Yes</td>
+                    <td width="7%">No</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable23">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                        <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel>
+                
+                <!-- 4 -->
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 4)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="30%"></td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable234">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                        <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel>
+               
+                <!-- 3 -->
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 3)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="30%"></td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 3)}"  var="aline" id="theTable233">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                        <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel>
+               
+                 <!-- 2 -->
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 2)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="30%"></td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable232">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                        <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel>
+               
+                 <!-- 1 -->
+                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 1)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                     <td width="30%"></td>
+                    <td width="7%">Yes</td> <td width="7%">No</td>
+                   <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable231">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                       <td style="text-align: left;">
+                        <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel>
+                
+               
+                <!-- 5 -->    
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 5)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Done</td>
+                    <td width="7%">N/A</td>
+                    <td width="7%">Done</td>
+                    <td width="7%">N/A</td>
+                    <td width="7%">Done</td>
+                    <td width="7%">N/A</td>
+                    <td width="7%">Done</td>
+                    <td width="7%">N/A</td>
+                    <td width="7%">Done</td>
+                    <td width="7%">N/A</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable24">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                          <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel>  
+                
+                <!-- 4 -->    
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 4)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable244">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                          <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+                 
+                <!-- 3-->    
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 3)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable243">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                          <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+                
+                  <!-- 2-->    
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 2)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable242">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                          <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+                 <!-- 1-->    
+               <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 1)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td>-->
+                    <td width="30%"></td>
+                    <td width="7%">Done</td><td width="7%">N/A</td>
+                   <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable241">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;">
+                          <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+           
+             </apex:repeat>
+            </apex:outputPanel>
+             
+             <!-- text box grouping -->
+             <apex:outputPanel rendered="{!page.groupAssets == true}">
+               <apex:repeat value="{!page.renderTypeWPLIs}"  var="aPageOfLines" id="theList221">  
+               
+                 <!-- 5 -->   
+                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 5)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="16%"></td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable26">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="60">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td><td width="7%"  colspan="2"></td><td width="7%" colspan="2"></td><td width="7%" colspan="2"></td><td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+                  <!-- 4 -->   
+                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 4)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="16%"></td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable264">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="60">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+                 <!-- 3 -->   
+                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 3)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="16%"></td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable263">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="60">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+              
+                 <!-- 2 -->   
+                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 2)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="16%"></td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable262">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="60">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+              
+                <!-- 1 -->   
+                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 1)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="16%"></td>
+                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                    <td width="7%"  colspan="2">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable261">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="60">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+               
+               
+                <!-- 5 -->   
+                <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 5)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="15%"></td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable27">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="85">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%" colspan="2"> </td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+                 <!-- 4 -->   
+                <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 4)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="15%"></td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable274">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="85">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%" colspan="2"> </td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+                  <!-- 3 -->   
+                <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 3)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="15%"></td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable273">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="85">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%" colspan="2"> </td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+                  <!-- 2 -->   
+                <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 2)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="15%"></td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable272">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="85">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%" colspan="2"> </td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                  
+                    <!-- 1 -->   
+                <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 1)}">
+                 <table  style ="-fs-table-paginate: paginate;">
+                    <tr>
+                    <tr class ="fontItalic">
+                    <!--<td width="30%">{!aPageOfLines}</td> -->
+                    <td width="15%"></td>
+                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                  </tr>  
+                 </tr>
+                  <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable271">
+                    <apex:repeat value="{!aline}" var="n"> 
+                      <tr class ="font2">
+                        <td style="text-align: left;" height="85">
+                         <apex:outputText value="{!n}"></apex:outputText>
+                       </td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%"  colspan="2"></td>
+                       <td width="7%" colspan="2"> </td>
+                       <td width="7%" colspan="2"></td>
+                       <td width="7%" colspan="2"></td>
+                    </tr>
+                    </apex:repeat>  
+                   </apex:repeat>
+                </table>
+                </apex:outputPanel> 
+                
+             </apex:repeat>
+            </apex:outputPanel> 
+            
+            </div>
+        </apex:repeat> 
+        
+           </tbody>  
+        </apex:form>
+      </body>
+    </html>
+</apex:page>

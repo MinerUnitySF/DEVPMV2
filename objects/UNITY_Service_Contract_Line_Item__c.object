@@ -56,6 +56,31 @@
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
     <fields>
+        <fullName>Asset_Type__c</fullName>
+        <externalId>false</externalId>
+        <label>Asset Type</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+        <valueSet>
+            <restricted>true</restricted>
+            <valueSetName>Asset_Type</valueSetName>
+        </valueSet>
+    </fields>
+    <fields>
+        <fullName>UNITYPM_Additional_PM_Rate__c</fullName>
+        <description>Rate used if there are more than 1 Asset Type in Order Item</description>
+        <externalId>false</externalId>
+        <label>Additional PM Rate</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
         <fullName>UNITY_Cost_Plus__c</fullName>
         <externalId>false</externalId>
         <label>Cost Plus %</label>
@@ -519,10 +544,525 @@
     <pluralLabel>Service Contract Line Items</pluralLabel>
     <recordTypeTrackHistory>false</recordTypeTrackHistory>
     <recordTypes>
+        <fullName>UNITYPM_Asset_Type_Rate</fullName>
+        <active>true</active>
+        <label>Asset Type Rate</label>
+        <picklistValues>
+            <picklist>Asset_Type__c</picklist>
+            <values>
+                <fullName>Air Compressor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Baler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Buffer</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Carpet Extractor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Compactor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor plus guard</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock Equipment</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dockleveler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>EOD</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Electric Pallet Jack</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Floor Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Forklift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Freight Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Garment Conveyors</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hurricane Shutter</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Panic Bar</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Passenger Elevator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Propane Burnisher</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rolling Steel Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door with operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door without operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scissor Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Sectional Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stock Picker</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stripping Machine</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Truck Restraint</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Walkie Stacker</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>UNITY_Currency__c</picklist>
+            <values>
+                <fullName>Canada %24</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Mexico Peso</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>United States %24</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>UNITY_Priority__c</picklist>
+            <values>
+                <fullName>12 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>2 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>24 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>4 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>48 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>72 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>All</fullName>
+                <default>true</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>UNITY_Self_Perform_Trip_Charge_Type__c</picklist>
+            <values>
+                <fullName>Flat Fee</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hourly Rate</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>UNITY_Trip_Charge_Type__c</picklist>
+            <values>
+                <fullName>Flat Fee</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hourly Rate</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+    </recordTypes>
+    <recordTypes>
+        <fullName>UNITYPM_PM_Product</fullName>
+        <active>true</active>
+        <label>PM Product</label>
+        <picklistValues>
+            <picklist>Asset_Type__c</picklist>
+            <values>
+                <fullName>Air Compressor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Baler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Buffer</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Carpet Extractor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Compactor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor plus guard</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock Equipment</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dockleveler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>EOD</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Electric Pallet Jack</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Floor Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Forklift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Freight Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Garment Conveyors</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hurricane Shutter</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Panic Bar</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Passenger Elevator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Propane Burnisher</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rolling Steel Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door with operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door without operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scissor Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Sectional Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stock Picker</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stripping Machine</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Truck Restraint</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Walkie Stacker</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>UNITY_Currency__c</picklist>
+            <values>
+                <fullName>Canada %24</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Mexico Peso</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>United States %24</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>UNITY_Priority__c</picklist>
+            <values>
+                <fullName>12 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>2 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>24 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>4 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>48 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>72 Hour Response</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>All</fullName>
+                <default>true</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>UNITY_Self_Perform_Trip_Charge_Type__c</picklist>
+            <values>
+                <fullName>Flat Fee</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hourly Rate</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>UNITY_Trip_Charge_Type__c</picklist>
+            <values>
+                <fullName>Flat Fee</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hourly Rate</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+    </recordTypes>
+    <recordTypes>
         <fullName>UNITY_Hourly_Rate</fullName>
         <active>true</active>
         <description>NTE, Labor, Travel, OT rates and multipliers per trade.</description>
         <label>Hourly Rate</label>
+        <picklistValues>
+            <picklist>Asset_Type__c</picklist>
+            <values>
+                <fullName>Air Compressor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Baler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Buffer</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Carpet Extractor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Compactor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor plus guard</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock Equipment</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dockleveler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>EOD</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Electric Pallet Jack</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Floor Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Forklift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Freight Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Garment Conveyors</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hurricane Shutter</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Panic Bar</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Passenger Elevator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Propane Burnisher</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rolling Steel Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door with operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door without operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scissor Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Sectional Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stock Picker</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stripping Machine</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Truck Restraint</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Walkie Stacker</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
         <picklistValues>
             <picklist>UNITY_Currency__c</picklist>
             <values>
@@ -596,6 +1136,129 @@
         <fullName>UNITY_Menu_Pricing</fullName>
         <active>true</active>
         <label>Menu Pricing</label>
+        <picklistValues>
+            <picklist>Asset_Type__c</picklist>
+            <values>
+                <fullName>Air Compressor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Baler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Buffer</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Carpet Extractor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Compactor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor plus guard</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock Equipment</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dockleveler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>EOD</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Electric Pallet Jack</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Floor Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Forklift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Freight Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Garment Conveyors</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hurricane Shutter</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Panic Bar</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Passenger Elevator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Propane Burnisher</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rolling Steel Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door with operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door without operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scissor Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Sectional Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stock Picker</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stripping Machine</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Truck Restraint</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Walkie Stacker</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
         <picklistValues>
             <picklist>UNITY_Currency__c</picklist>
             <values>
@@ -671,6 +1334,129 @@
         <description>Specify NTE by Trade and Priority</description>
         <label>NTE</label>
         <picklistValues>
+            <picklist>Asset_Type__c</picklist>
+            <values>
+                <fullName>Air Compressor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Baler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Buffer</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Carpet Extractor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Compactor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor plus guard</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock Equipment</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dockleveler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>EOD</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Electric Pallet Jack</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Floor Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Forklift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Freight Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Garment Conveyors</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hurricane Shutter</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Panic Bar</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Passenger Elevator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Propane Burnisher</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rolling Steel Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door with operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door without operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scissor Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Sectional Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stock Picker</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stripping Machine</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Truck Restraint</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Walkie Stacker</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
             <picklist>UNITY_Currency__c</picklist>
             <values>
                 <fullName>Canada %24</fullName>
@@ -745,6 +1531,129 @@
         <description>Cost of product and any associated labor</description>
         <label>Product Pricing</label>
         <picklistValues>
+            <picklist>Asset_Type__c</picklist>
+            <values>
+                <fullName>Air Compressor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Baler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Buffer</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Carpet Extractor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Compactor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor plus guard</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock Equipment</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dockleveler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>EOD</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Electric Pallet Jack</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Floor Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Forklift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Freight Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Garment Conveyors</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hurricane Shutter</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Panic Bar</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Passenger Elevator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Propane Burnisher</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rolling Steel Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door with operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door without operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scissor Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Sectional Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stock Picker</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stripping Machine</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Truck Restraint</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Walkie Stacker</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
             <picklist>UNITY_Currency__c</picklist>
             <values>
                 <fullName>Canada %24</fullName>
@@ -818,6 +1727,129 @@
         <active>true</active>
         <label>Product Pricing Rule</label>
         <picklistValues>
+            <picklist>Asset_Type__c</picklist>
+            <values>
+                <fullName>Air Compressor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Baler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Buffer</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Carpet Extractor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Compactor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor plus guard</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock Equipment</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dockleveler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>EOD</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Electric Pallet Jack</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Floor Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Forklift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Freight Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Garment Conveyors</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hurricane Shutter</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Panic Bar</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Passenger Elevator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Propane Burnisher</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rolling Steel Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door with operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door without operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scissor Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Sectional Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stock Picker</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stripping Machine</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Truck Restraint</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Walkie Stacker</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
             <picklist>UNITY_Currency__c</picklist>
             <values>
                 <fullName>Canada %24</fullName>
@@ -890,6 +1922,129 @@
         <fullName>UNITY_Service_Charge</fullName>
         <active>true</active>
         <label>Service Charge/Service Fee</label>
+        <picklistValues>
+            <picklist>Asset_Type__c</picklist>
+            <values>
+                <fullName>Air Compressor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Baler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Buffer</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Carpet Extractor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Compactor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conveyor plus guard</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dock Equipment</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Dockleveler</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>EOD</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Electric Pallet Jack</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Floor Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Forklift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Freight Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Garment Conveyors</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Hurricane Shutter</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Panic Bar</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Passenger Elevator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Propane Burnisher</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rolling Steel Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door with operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Rollup Door without operator</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scissor Lift</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Scrubber</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Sectional Door</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stock Picker</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Stripping Machine</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Truck Restraint</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Walkie Stacker</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
         <picklistValues>
             <picklist>UNITY_Currency__c</picklist>
             <values>

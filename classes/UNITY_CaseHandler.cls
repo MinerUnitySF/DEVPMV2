@@ -36,8 +36,16 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
 
     private Set<Id> caseIdsToFireAR = new Set<Id>();
     
-    public void bulkBefore(){
-
+    private static Set<Id> excludeRTSet = new Set<Id>{UNITY_Constants.CASE_PREVENTATIVE_MAINTENANCE_RECORDTYPE,
+								       UNITY_Constants.CASE_PROGRAM_CASE_RECORDTYPE};
+    public static List<SObject> newList_Case1 = UNITY_Utils.excludeRecordType(trigger.new, excludeRTSet);
+    public static Map<Id, SObject> oldMap_Case1 = UNITY_Utils.excludeRecordType(Trigger.oldMap, excludeRTSet);
+    public static Map<Id, SObject> newMap_Case1 = UNITY_Utils.excludeRecordType(Trigger.newMap, excludeRTSet);
+    
+    public void bulkBefore(){}
+    public void bulkAfter(){}
+    public void bulkBefore(List<SObject> newList_Case, List<SObject> oldList_Case, Map<Id,SObject> oldMap_Case, Map<Id,SObject> newMap_Case){
+        System.debug('//Clay - inside the standard bulkBefore :( ');
         Set<String> locSet            = new Set<String>();
         Set<String> subscriberIDSet   = new Set<String>();
         // capture parent case
@@ -50,19 +58,24 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
 
         if (Trigger.isInsert){
             setAccountIfNull();
-            UNITY_AutopopulateChildController.autopopulateFieldsIfApplicableBulkified(trigger.new, 'Case');
+            UNITY_AutopopulateChildController.autopopulateFieldsIfApplicableBulkified(newList_Case, 'Case');
         }
         
         if (Trigger.isUpdate){
-            //if (caseIdAccountMapForUpdateCaseOwner == NULL) 
-            setCaseIdAccountMapForUpdateCaseOwner((Map<Id,Case>)trigger.oldMap,(List<Case>)trigger.new);
+            Map<Id,Case> oldMap = new Map<Id, Case>();
+            for (SObject so: oldMap_Case.values()){
+                Case c = (Case)so;
+                oldMap.put(c.id, c);
+            }
+                
+            setCaseIdAccountMapForUpdateCaseOwner(oldMap,(List<Case>)newList_Case);
             //if (nameQueueIdMap == NULL) 
             setNameQueueIdMap();
         }
         
         Case currentCase;
         // Collecting sets of UNITY_LOC attribute and UNITY_Subscriber_ID value from Case.
-        for(SObject currentObject : Trigger.new) {
+        for(SObject currentObject : newList_Case) {
             currentCase = (Case) currentObject;
                 
             // capture parent case 
@@ -106,8 +119,8 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
             parentCases  =  new Map< id, SObject  >(Database.query(query));
         }
     }
-    
-    public void bulkAfter(){
+
+    public void bulkAfter(List<SObject> newList_Case, List<SObject> oldList_Case, Map<Id,SObject> oldMap_Case, Map<Id,SObject> newMap_Case){
         system.debug('>>>>>> CASE HANDLER  BEFORE Limits.getQueries() '+Limits.getQueries());
         if (Trigger.isUpdate || Trigger.isInsert){
             applyTemplates();
@@ -116,28 +129,30 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
     
     public void beforeInsert(SObject so){
         
+        //UNITYPM check for record type
         Case currentCase = (Case) so;
+        
         if (currentCase.Origin.contains('Email')){
             if(Currentcase.UNITY_Customer__c == null ) Currentcase.UNITY_Customer__c = CurrentCase.AccountId;
-              //  CurrentCase.UNITY_NTE_Threshold__c = currentCase.UNITY_Customer_Service_Contract__r.UNITY_Default_NTE__c;
+																														   
         }
         
-        
-        /*
-        UNITY_Service_Contract__c customerSC = caseCustomerSCMap.get(so.Id);
-        if (customerSC != null){
-            UNITY_Service_Contract__c endCustomerSC;
-            if(customerSC.UNITY_End_Customer__c!=null){
-                endCustomerSC = caseCustomerSCMap.get(customerSC.UNITY_End_Customer__c);
-            }
-            if(endCustomerSC!=null){
-                currentCase.UNITY_Customer_Service_Contract__c = endCustomerSC.Id;
-            }else{
-                currentCase.UNITY_Customer_Service_Contract__c = customerSC.Id;
-            }
-        }
-        */
-        
+		
+		  
+																			
+								
+													
+													   
+																						
+			 
+									
+																				  
+				  
+																			   
+			 
+		 
+		  
+		
         casesToSetSC.add((Case)so);
         System.debug('~~~Clay: The case subject coming across before we insert = ' + currentCase.Subject);
 
@@ -151,39 +166,41 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
                  currentCase.put(field,parentCases.get(currentCase.ParentId).get(field) );
             } 
         }
-            
-        //setBusinessUnitAccount(currentCase);
-        //Krishna
-        //if(currentCase.OwnerId!=UserInfo.getUserId() && currentCase.Origin != 'Phone')
-        //updateCaseOwner(null,currentCase,idAccountMapForUpdateCaseOwner.get(currentCase.UNITY_Business_Unit_Account__c),nameQueueIdMap);
+			
+											  
+				 
+																						
+																																		  
 
 
-        // autopopulate record
-        //UNITY_AutopopulateChildController controller = new UNITY_AutopopulateChildController('Case');
-        //controller.autopopulateFieldsIfApplicable(currentCase);
+							  
+																									   
+																 
     }
     
     public void beforeUpdate(SObject oldSo, SObject so){
         System.Debug('>>> beforeUpdate');
 
+        //UNITYPM check for record type
         Case currentCase = (Case)so;
-        Case oldCase = (Case)oldSo;
+        Case oldCase = (Case) oldSo;
+        
         //System.debug('CLAY: Before update: '+JSON.serializePretty(currentCase));
 
         System.Debug('>>> CurrentBU'+currentCase.UNITY_Business_Unit__c);
         System.Debug('>>> OldCaseBU'+oldCase.UNITY_Business_Unit__c);
 
-        //Krishna
-        /*
-        try{
-            User u=[SELECT Id FROM User WHERE Id=:currentCase.ownerId LIMIT 1];
-            //if(users!=null)System.Debug('**************************:'+users[0].Id);
-        }catch(Exception e){
-            if(currentCase.Origin != 'Phone')
-                updateCaseOwner(oldCase,currentCase,caseIdAccountMapForUpdateCaseOwner.get(currentCase.id),nameQueueIdMap);
+				 
+		  
+			
+																			   
+																					 
+							
+											 
+																														   
 
-        }
-        */
+		 
+		  
 
         // 6/9/2016 Refactor updateCaseOwner Trigger Contdition
         if(((String)currentCase.OwnerId).startsWith('00G') && currentCase.UNITY_Business_Unit__c != NULL && ((oldCase.OwnerId != currentCase.OwnerID) || (oldCase.UNITY_Business_Unit__c != currentCase.UNITY_Business_Unit__c)))
@@ -198,53 +215,55 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
         }
         
 
-        /*
-        // -- need to do it in the update too for email to case flow (busniess unit is set after the case is inserted)
-        
-        UNITY_Service_Contract__c customerSC = caseCustomerSCMap.get(so.Id);
-        if (customerSC != null){
-            UNITY_Service_Contract__c endCustomerSC;
-            if(customerSC.UNITY_End_Customer__c!=null){
-                endCustomerSC = caseCustomerSCMap.get(customerSC.UNITY_End_Customer__c);
-            }
-            if(endCustomerSC!=null){
-                currentCase.UNITY_Customer_Service_Contract__c = endCustomerSC.Id;
-            }else{
-                currentCase.UNITY_Customer_Service_Contract__c = customerSC.Id;
-            }
-        }
+		  
+																													  
+		
+																			
+								
+													
+													   
+																						
+			 
+									
+																				  
+				  
+																			   
+			 
+		 
 
-        //krishna
-        try{
-           if( currentCase.UNITY_Customer__C!=null){
-                List<UNITY_Service_Contract__c> customerSCs=customerSCsByAccount.get(currentCase.UNITY_Customer__C);
-                for(UNITY_Service_Contract__c sc :customerSCs){
-                    if(sc.UNITY_End_Customer__c!=null&& sc.UNITY_End_Customer__c == currentCase.AccountId){
-                         if(sc.UNITY_Business_Unit__c!=null){
-                            Set<String> delimitedBusinessUnit = new Set<String>(sc.UNITY_Business_Unit__c.split(';')); 
-                            if(delimitedBusinessUnit.contains(currentCase.UNITY_Business_Unit__c)){
-                                currentCase.UNITY_Customer_Service_Contract__c = sc.Id;
-                                break;
-                            }
-                          }
-                    }
+				 
+			
+													
+																													
+															   
+																										   
+															 
+																													   
+																								   
+																					   
+									  
+							 
+						   
+					 
 
-                }
-            }
-        }catch(Exception e){
-            System.Debug('Error:'+e);
-        }*/
-        // --
+				 
+			 
+							
+									 
+		   
+			 
         // -- need to do it in the update too for email to case flow (busniess unit is set after the case is inserted)
         setBusinessUnitAccount(currentCase);
-        //setBusinessUnitAccontUnitInWorkOrder(currentCase);
-        // --
+															
+			 
     }
     
     public void beforeDelete(SObject so){}
     
     public void afterInsert(SObject  so){
+        //UNITYPM check for record type
         Case currentCase = (Case)so;
+        
         // collection sc case service request with status changed
         if(currentCase.RecordTypeId == UNITY_Constants.CASE_SERVICE_REQUEST_RECORDTYPE &&
            currentCase.UNITY_Portal_Source__c == UNITY_Constants.CASE_PORTAL_SOURCE_SERVICE_CHANNEL){
@@ -259,19 +278,17 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
                    scCaseIdStatusChangedList.add(currentCase.Id);
                    System.debug('==========CLAY: We just added this case to a list of SCCaseIdStatusChanged because this status is: ' + currentCase.UNITY_Service_Channel_Status__c);
                }
-               //if(currentCase.UNITY_Case_Notes__c != null){
-               //     System.debug('CLAY: We are adding this to the scCaseIdNewCommentList: ' + currentCase.UNITY_Case_Notes__c);
-               //    scCaseIdNewCommentList.add(currentCase.Id);
-               //}
+															 
+																																 
+																
+				  
            }
     }
     
     public void afterUpdate(SObject oldSo, SObject so){
-        Case currentCase = (Case)so;
-        Case oldCase = (Case)oldSo;
-
-        //System.debug(JSON.serializePretty(currentCase));
-        // collection sc case service request with UNITY_Service_Channel_Status__c or UNITY_Case_Notes__c changed         
+        //UNITYPM check for record type
+        Case currentCase = (Case) so;
+        Case oldCase = (Case) oldSo;
         
         if(currentCase.RecordTypeId == UNITY_Constants.CASE_SERVICE_REQUEST_RECORDTYPE && 
            currentCase.UNITY_Portal_Source__c == UNITY_Constants.CASE_PORTAL_SOURCE_SERVICE_CHANNEL &&
@@ -279,8 +296,8 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
                //only gets here if the case was service channel and the status changed
                 System.debug('--CLAY: This case had a status change and should be sent to mule callout');
                //need to allow a couple of changes to status directly in case, without a work order.
-               //this will fire on updates from SC is the problem. We need to exclude if the check-in/out have changed? Yeah. //currentCase.Unity_Service_Channel_Status__c != 'OPEN'
-               //(currentCase.Unity_Service_Channel_Status__c == 'DECLINED' || currentCase.Unity_Service_Channel_Status__c == 'COMPLETED_NO_CHARGE'
+               //this will fire on updates from SC is the problem. We need to exclude if the check-in/out have changed? Yeah. 
+																																				   
                if(oldCase.UNITY_Service_Channel_Status__c  != currentCase.UNITY_Service_Channel_Status__c && currentCase.Unity_Service_Channel_Status__c != 'OPEN') {
                     System.debug('CLAY: Old case status has changed. Adding to the list for the callout');
                    scCaseIdStatusChangedList.add(currentCase.Id);
@@ -316,7 +333,7 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
     
     public void andFinally(){
         
-        for (sObject iter: trigger.new){
+        for (sObject iter: newList_Case1){
             
             Case caseRecord = (Case)iter;
             //system.debug('##### owner '+caseRecord.OwnerId);
@@ -326,16 +343,16 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
         //update workOrderToUpdate;
         
         if (trigger.isInsert && trigger.isBefore){
-            System.debug('#Case list before insert: '+trigger.new.size());
+            System.debug('#Case list before insert: '+newList_Case1.size());
         }
         else if (trigger.isInsert && trigger.isAfter){
-            System.debug('#Case list after insert: '+trigger.new.size());
+            System.debug('#Case list after insert: '+newList_Case1.size());
         }
         else if (trigger.isUpdate && trigger.isBefore){
-            System.debug('#Case list before update: '+trigger.new.size());
+            System.debug('#Case list before update: '+newList_Case1.size());
         }
         else if (trigger.isUpdate && trigger.isAfter){
-            System.debug('#Case list after update: '+trigger.new.size());
+            System.debug('#Case list after update: '+newList_Case1.size());
             if((this.closedCases!=null)&&!this.closedCases.isEmpty())processAssets(this.closedCases);
         }
         
@@ -394,7 +411,7 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
     
     public void applyTemplates(){
         
-        for (sObject iter: trigger.new){
+        for (sObject iter: newList_Case1){
             
             Case caseRecord = (Case)iter;
             
@@ -405,82 +422,11 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
                 caseWithTemplate.add(caseRecord);
             }
         }
-        
-        UNITY_Utils.applyTemplates(recordIdTemplateId, caseWithTemplate, 'UNITY_Template_Configuration__c', 'Case');
+        //UNITYPM Mod: Added if to check if there are records to process
+        if (caseWithTemplate != null && caseWithTemplate.size() > 0)
+        	UNITY_Utils.applyTemplates(recordIdTemplateId, caseWithTemplate, 'UNITY_Template_Configuration__c', 'Case');
     }
-    // Krishna
-   Map <Id,List<UNITY_Service_Contract__c>> customerSCsByAccount = new Map<Id,List<UNITY_Service_Contract__c>>();
 
-   /* 
-   public void setCaseCustomerSCMap(){
-        List<Id> customerAccountIds = new List<Id>();
-        List<Id> endCustomerAccountIds = new List<Id>();
-        // Krishna
-       // Map <Id,List<UNITY_Service_Contract__c>> customerSCsByAccount = new Map<Id,List<UNITY_Service_Contract__c>>();
-        
-        for (SObject iter: trigger.new){
-            Case currentCase = (Case)iter;
-            Case oldCase;
-            if(Trigger.isUpdate) {
-                oldCase = (Case)Trigger.oldMap.get(currentCase.Id);
-            }
-            if(Trigger.isInsert || Trigger.isUpdate )
-            customerAccountIds.add(currentCase.UNITY_Customer__c);
-        }
-        if(customerAccountIds.isEmpty()) return;
-        List<UNITY_Service_Contract__c>  customerSCs = [SELECT Id, UNITY_Account__c, UNITY_Business_Unit__c, UNITY_End_Customer__c 
-                                                        FROM UNITY_Service_Contract__c 
-                                                        WHERE UNITY_Account__c in :customerAccountIds 
-                                                        AND UNITY_Service_Contract__c.RecordTypeId =:UNITY_Constants.SC_SERVICE_REQUEST_RECORDTYPE and UNITY_IS_Active__c = true];           
-                
-        
-        
-        for(UNITY_Service_Contract__c customerSC : customerSCs){
-            List<UNITY_Service_Contract__c> allSCsForCustomer = customerSCsByAccount.get(customerSC.UNITY_Account__c);
-            if(allSCsForCustomer==null){
-                allSCsForCustomer = new List<UNITY_Service_Contract__c>();
-            }
-            if(customerSC.UNITY_End_Customer__c !=null){
-                endCustomerAccountIds.add(customerSC.UNITY_End_Customer__c);               
-            }
-            allSCsForCustomer.add(customerSC);
-            customerSCsByAccount.put(customerSC.UNITY_Account__c, allSCsForCustomer);
-        }   
-        
-        List<UNITY_Service_Contract__c>  endCustomerSCs = [SELECT Id, UNITY_Account__c, UNITY_Business_Unit__c 
-                                                        FROM UNITY_Service_Contract__c 
-                                                        WHERE UNITY_Account__c in :endCustomerAccountIds 
-                                                        AND UNITY_Service_Contract__c.RecordTypeId =:UNITY_Constants.SC_SERVICE_REQUEST_RECORDTYPE and UNITY_IS_Active__c = true];           
-
-        for(UNITY_Service_Contract__c customerSC : endCustomerSCs){
-            List<UNITY_Service_Contract__c> allSCsForCustomer = customerSCsByAccount.get(customerSC.UNITY_Account__c);
-            if(allSCsForCustomer==null){
-                allSCsForCustomer = new List<UNITY_Service_Contract__c>();
-            }
-            allSCsForCustomer.add(customerSC);
-            customerSCsByAccount.put(customerSC.UNITY_Account__c, allSCsForCustomer);
-        }
-
-        for (SObject iter: trigger.new){
-            Case currentCase = (Case)iter;
-            List<UNITY_Service_Contract__c> allSCsForCustomer = customerSCsByAccount.get(currentCase.UNITY_Customer__c);
-            if(allScsForCustomer!=null){
-                for(UNITY_Service_Contract__c customerSC : allScsForCustomer){
-                    if(customerSC.UNITY_Business_Unit__c!=null){
-                        Set<String> delimitedBusinessUnit = new Set<String>(customerSC.UNITY_Business_Unit__c.split(';'));
-                        System.debug('#delimitedBusinessUnit '+delimitedBusinessUnit);
-                        System.debug('#currentCase.UNITY_Business_Unit__c '+currentCase.UNITY_Business_Unit__c);
-                        if(delimitedBusinessUnit.contains(currentCase.UNITY_Business_Unit__c)){
-                            caseCustomerSCMap.put(currentCase.Id, customerSC);
-                            break;
-                        }
-                    }
-                }           
-            }
-        }
-    }
-    */
-    
     /*
      * Name  : setBusinessUnitAccountMap
      * Note  : populate map < BU picklist , BU account > , remember BU accounts are Miner Record Type 
@@ -488,30 +434,35 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
     public static void setBusinessUnitAccountMap(){
         System.debug('>>> setBusinessUnitAccountMap()');
         List<String> relatedBusinessUnit = new List<String>();
-        
-        if (Trigger.isInsert){
-            System.debug('>>> Insert');
-            for (SObject iter: trigger.new){
-                Case newCase = (Case)iter;
-                //System.debug('CLAY: This is our case:');
-                //System.debug(newCase);
-                System.debug('>>> case.UNITY_Business_Unit__c '+newCase.UNITY_Business_Unit__c);
-                if (newCase.UNITY_Business_Unit__c != null){
-                    relatedBusinessUnit.add(((Case)iter).UNITY_Business_Unit__c);
+        //check for new_SR_cases
+        if (newList_Case1.size() > 0){
+            if (Trigger.isInsert){
+                System.debug('>>> Insert');
+                for (SObject iter: newList_Case1){
+                    Case newCase = (Case)iter;
+                    //System.debug('CLAY: This is our case:');
+                    //System.debug(newCase);
+                    System.debug('>>> case.UNITY_Business_Unit__c '+newCase.UNITY_Business_Unit__c);
+                    if (newCase.UNITY_Business_Unit__c != null){
+                        relatedBusinessUnit.add(((Case)iter).UNITY_Business_Unit__c);
+                    }
                 }
+            }else if (Trigger.isUpdate){
+                System.debug('>>> Update '+relatedBusinessUnit);
+
+                for (SObject iter: newList_Case1){
+                    Case newCase = (Case)iter;
+                    if(oldMap_Case1 != null){
+                        Case oldCase = (Case)oldMap_Case1.get(iter.id);
+                        //System.debug('>>> case.UNITY_Business_Unit__c '+newCase.UNITY_Business_Unit__c);
+                        if((newCase.UNITY_Business_Unit__c != null)&&(newCase.UNITY_Business_Unit__c != oldCase.UNITY_Business_Unit__c)){
+                            relatedBusinessUnit.add(((Case)iter).UNITY_Business_Unit__c);
+                        }
+                    }
+                }    
             }
-        }else if (Trigger.isUpdate){
-            System.debug('>>> Update '+relatedBusinessUnit);
-            for (SObject iter: trigger.new){
-                Case newCase = (Case)iter;
-                Case oldCase = (Case)trigger.oldMap.get(iter.id);
-                //System.debug('>>> case.UNITY_Business_Unit__c '+newCase.UNITY_Business_Unit__c);
-                if((newCase.UNITY_Business_Unit__c != null)&&(newCase.UNITY_Business_Unit__c != oldCase.UNITY_Business_Unit__c)){
-                    relatedBusinessUnit.add(((Case)iter).UNITY_Business_Unit__c);
-                }
-            }
-        }
-        
+
+    }
         System.debug('>>> relatedBusinessUnit '+relatedBusinessUnit);
         
         if(!relatedBusinessUnit.isEmpty()) {
@@ -523,17 +474,20 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
         }
         
         if (trigger.isUpdate){
-            List<WorkOrder> workOrderList = [select id, UNITY_Business_Unit_Account__c, CaseId from WorkOrder where CaseId in:trigger.newMap.keyset()];
-            
-            for (WorkOrder iter: workOrderList){
-                Case oldCase = (Case)Trigger.oldMap.get(iter.CaseId);
-                Case newCase = (Case)Trigger.newMap.get(iter.CaseId);
-                // samuel update , add WO from cases If the UNITY_Business_Unit_Account__c has changed on the Case record
-                if(oldCase.UNITY_Business_Unit__c != newCase.UNITY_Business_Unit__c ){
-                    if (caseWorkOrderMap.get(iter.CaseId) == null){
-                        caseWorkOrderMap.put(iter.CaseId, new List<WorkOrder>());
+            if (newMap_Case1 != null){
+                List<WorkOrder> workOrderList = [select id, UNITY_Business_Unit_Account__c, CaseId from WorkOrder where CaseId in :newMap_Case1.keyset()];
+                
+                for (WorkOrder iter: workOrderList){
+                    Case oldCase = (Case)oldMap_Case1.get(iter.CaseId);
+                    Case newCase = (Case)newMap_Case1.get(iter.CaseId);
+                    // samuel update , add WO from cases If the UNITY_Business_Unit_Account__c has changed on the Case record
+                    if(oldCase.UNITY_Business_Unit__c != newCase.UNITY_Business_Unit__c ){
+                        if (caseWorkOrderMap.get(iter.CaseId) == null){
+                            caseWorkOrderMap.put(iter.CaseId, new List<WorkOrder>());
+                        }
+                        caseWorkOrderMap.get(iter.CaseId).add(iter);
                     }
-                    caseWorkOrderMap.get(iter.CaseId).add(iter);
+																
                 }
             }
         }        
@@ -549,7 +503,9 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
         System.debug(currentCase.UNITY_Business_Unit__c);
         boolean should_update_BU_account = false;
         if(Trigger.isInsert) should_update_BU_account = true;
-        if(Trigger.isUpdate && (currentCase.UNITY_Business_Unit__c!=((Case)Trigger.oldMap.get(currentCase.id)).UNITY_Business_Unit__c)) should_update_BU_account = true;
+        //UNITYPM added null checking
+        if(Trigger.isUpdate && oldMap_Case1 != null && oldMap_Case1.size() > 0 && (currentCase.UNITY_Business_Unit__c!=((Case)oldMap_Case1.get(currentCase.id)).UNITY_Business_Unit__c)) 
+            should_update_BU_account = true;
 
         System.debug('Should we update the BU account? : ' + should_update_BU_account);
 
@@ -587,7 +543,7 @@ public with sharing class UNITY_CaseHandler implements UNITY_ITrigger {
         
         List<Case> casesWithoutNTE = new List<Case>();
         
-        for (SObject iter: trigger.new){
+        for (SObject iter: newList_Case1){
             
             Case caseRecord = (Case)iter;
             
@@ -703,7 +659,7 @@ public void updateCaseOwner(Case oldCase,Case newCase,Account bu){
         
         Set<Id> relatedContactIdSet = new Set<Id>();
         
-        for (SObject iter: trigger.new){
+        for (SObject iter: newList_Case1){
             
             Case caseRecord = (Case)iter;
             
@@ -721,7 +677,7 @@ public void updateCaseOwner(Case oldCase,Case newCase,Account bu){
                 contactAccountMap.put(iter.id, iter.AccountId);
             }
             
-             for (SObject iter: trigger.new){
+             for (SObject iter: newList_Case1){
                 
                 Case caseRecord = (Case)iter;
                 

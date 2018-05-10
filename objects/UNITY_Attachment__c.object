@@ -68,6 +68,17 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>External_ID__c</fullName>
+        <externalId>true</externalId>
+        <label>External ID</label>
+        <length>50</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>UNITY_Standard_Attachment_Id__c</fullName>
         <description>It stores standard attachment id</description>
         <externalId>false</externalId>
@@ -88,119 +99,8 @@
         <trackTrending>false</trackTrending>
         <type>Picklist</type>
         <valueSet>
-            <valueSetDefinition>
-                <sorted>true</sorted>
-                <value>
-                    <fullName>Check Request Form</fullName>
-                    <default>false</default>
-                    <label>Check Request Form</label>
-                </value>
-                <value>
-                    <fullName>Completed Survey</fullName>
-                    <default>false</default>
-                    <label>Completed Survey</label>
-                </value>
-                <value>
-                    <fullName>Copy of Supplier Parts</fullName>
-                    <default>false</default>
-                    <label>Copy of Supplier Parts</label>
-                </value>
-                <value>
-                    <fullName>Credit Card Authorization</fullName>
-                    <default>false</default>
-                    <label>Credit Card Authorization</label>
-                </value>
-                <value>
-                    <fullName>Customer Correspondence</fullName>
-                    <default>false</default>
-                    <label>Customer Correspondence</label>
-                </value>
-                <value>
-                    <fullName>Customer-Specific Service Report Sign-Off</fullName>
-                    <default>false</default>
-                    <label>Customer-Specific Service Report Sign-Off</label>
-                </value>
-                <value>
-                    <fullName>Damage &amp; Abuse - Before &amp; After Pictures</fullName>
-                    <default>false</default>
-                    <label>Damage &amp; Abuse - Before &amp; After Pictures</label>
-                </value>
-                <value>
-                    <fullName>Deposit Check</fullName>
-                    <default>false</default>
-                    <label>Deposit Check</label>
-                </value>
-                <value>
-                    <fullName>IVR Check in and Check out (Labor)</fullName>
-                    <default>false</default>
-                    <label>IVR Check in and Check out (Labor)</label>
-                </value>
-                <value>
-                    <fullName>Lien Waiver</fullName>
-                    <default>false</default>
-                    <label>Lien Waiver</label>
-                </value>
-                <value>
-                    <fullName>Miner Sign Off Sheet</fullName>
-                    <default>false</default>
-                    <label>Miner Sign Off Sheet</label>
-                </value>
-                <value>
-                    <fullName>Note To Biller</fullName>
-                    <default>false</default>
-                    <label>Note To Biller</label>
-                </value>
-                <value>
-                    <fullName>PM Checklist completed</fullName>
-                    <default>false</default>
-                    <label>PM Checklist completed</label>
-                </value>
-                <value>
-                    <fullName>PM Failures</fullName>
-                    <default>false</default>
-                    <label>PM Failures</label>
-                </value>
-                <value>
-                    <fullName>Shipping Documents</fullName>
-                    <default>false</default>
-                    <label>Shipping Documents</label>
-                </value>
-                <value>
-                    <fullName>Vendor&apos;s Estimate</fullName>
-                    <default>false</default>
-                    <label>Vendor&apos;s Estimate</label>
-                </value>
-                <value>
-                    <fullName>Vendor&apos;s Invoice</fullName>
-                    <default>false</default>
-                    <label>Vendor&apos;s Invoice</label>
-                </value>
-                <value>
-                    <fullName>Vendor Correspondence</fullName>
-                    <default>false</default>
-                    <label>Vendor Correspondence</label>
-                </value>
-                <value>
-                    <fullName>W-9</fullName>
-                    <default>false</default>
-                    <label>W-9</label>
-                </value>
-                <value>
-                    <fullName>Walmart - Ready to Invoice Still needs Paperwork</fullName>
-                    <default>false</default>
-                    <label>Walmart - Ready to Invoice Still needs Paperwork</label>
-                </value>
-                <value>
-                    <fullName>Warranty Information</fullName>
-                    <default>false</default>
-                    <label>Warranty Information</label>
-                </value>
-                <value>
-                    <fullName>Work Acknowledgment Form (Service Sign-Off)</fullName>
-                    <default>false</default>
-                    <label>Work Acknowledgment Form (Service Sign-Off)</label>
-                </value>
-            </valueSetDefinition>
+            <restricted>true</restricted>
+            <valueSetName>Document_Types</valueSetName>
         </valueSet>
     </fields>
     <fields>

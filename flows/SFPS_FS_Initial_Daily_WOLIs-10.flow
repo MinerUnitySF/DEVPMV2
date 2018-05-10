@@ -127,37 +127,6 @@
                     <stringValue>Service Request</stringValue>
                 </rightValue>
             </conditions>
-            <conditions>
-                <processMetadataValues>
-                    <name>inputDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>leftHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>operatorDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>rightHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <leftValueReference>myVariable_current.UNITY_WO_Record_Type__c</leftValueReference>
-                <operator>NotEqualTo</operator>
-                <rightValue>
-                    <stringValue>Preventative Maintenance</stringValue>
-                </rightValue>
-            </conditions>
             <connector>
                 <targetReference>myRule_1_pmetdec</targetReference>
             </connector>
@@ -270,37 +239,6 @@
                 <operator>EqualTo</operator>
                 <rightValue>
                     <stringValue>Service Request</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <processMetadataValues>
-                    <name>inputDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>leftHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>operatorDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>rightHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <leftValueReference>myVariable_current.UNITY_WO_Record_Type__c</leftValueReference>
-                <operator>NotEqualTo</operator>
-                <rightValue>
-                    <stringValue>Preventative Maintenance</stringValue>
                 </rightValue>
             </conditions>
             <connector>
@@ -420,37 +358,6 @@
                     <stringValue>Service Request</stringValue>
                 </rightValue>
             </conditions>
-            <conditions>
-                <processMetadataValues>
-                    <name>inputDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>leftHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>operatorDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>rightHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <leftValueReference>myVariable_current.UNITY_WO_Record_Type__c</leftValueReference>
-                <operator>NotEqualTo</operator>
-                <rightValue>
-                    <stringValue>Preventative Maintenance</stringValue>
-                </rightValue>
-            </conditions>
             <connector>
                 <targetReference>myRule_5_A1</targetReference>
             </connector>
@@ -566,37 +473,6 @@
                 <operator>EqualTo</operator>
                 <rightValue>
                     <stringValue>Service Request</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <processMetadataValues>
-                    <name>inputDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>leftHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>operatorDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>rightHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <leftValueReference>myVariable_current.UNITY_WO_Record_Type__c</leftValueReference>
-                <operator>NotEqualTo</operator>
-                <rightValue>
-                    <stringValue>Preventative Maintenance</stringValue>
                 </rightValue>
             </conditions>
             <connector>
@@ -725,37 +601,6 @@
                     <stringValue>Service Request</stringValue>
                 </rightValue>
             </conditions>
-            <conditions>
-                <processMetadataValues>
-                    <name>inputDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>leftHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>operatorDataType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <processMetadataValues>
-                    <name>rightHandSideType</name>
-                    <value>
-                        <stringValue>String</stringValue>
-                    </value>
-                </processMetadataValues>
-                <leftValueReference>myVariable_old.UNITY_WO_Record_Type__c</leftValueReference>
-                <operator>NotEqualTo</operator>
-                <rightValue>
-                    <stringValue>Preventative Maintenance</stringValue>
-                </rightValue>
-            </conditions>
             <label>Previously Met - Prev</label>
         </rules>
     </decisions>
@@ -767,7 +612,7 @@
                 <stringValue>&quot;Technician must capture a &quot; + [WorkOrder].UNITY_Business_Unit_Formula__c + &quot; Service Report with authorizing Manger on Duty printed name and signature.&quot;</stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_10_myRule_9_A5_1884726362</name>
+        <name>formula_10_myRule_9_A5_0047119513</name>
         <dataType>String</dataType>
         <expression>&quot;Technician must capture a &quot; + {!myVariable_current.UNITY_Business_Unit_Formula__c} + &quot; Service Report with authorizing Manger on Duty printed name and signature.&quot;</expression>
     </formulas>
@@ -780,7 +625,7 @@
  &quot; Pin: &quot;+ [WorkOrder].UNITY_Vendor_PIN__c </stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_11_myRule_9_A2_0453902294</name>
+        <name>formula_11_myRule_9_A2_0047553808</name>
         <dataType>String</dataType>
         <expression>&quot;Technician is required to check in and out with &quot; +{!myVariable_current.UNITY_Business_Unit_Formula__c} +&quot; IVR - &quot; + {!myVariable_current.UNITY_Miner_IVR_Phone_Number__c} + 
 &quot; &quot;+ {!myVariable_current.WorkOrderNumber} +
@@ -795,7 +640,7 @@
 IF( ISBLANK([WorkOrder].Case.UNITY_Customer_WO__c)  , &quot;N/A&quot;, [WorkOrder].Case.UNITY_Customer_WO__c) </stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_12_myRule_9_A1_2401789659</name>
+        <name>formula_12_myRule_9_A1_8048688817</name>
         <dataType>String</dataType>
         <expression>&quot;Technician is required to check in and out with Customer IVR - &quot; +{!myVariable_current.UNITY_Customer_IVR_Pin__c} +&quot;; Tracking # &quot;+ 
 
@@ -808,7 +653,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
                 <stringValue>&quot;Technician must capture a &quot; + [WorkOrder].UNITY_Business_Unit_Formula__c + &quot; Service Report with authorizing Manger on Duty printed name and signature.&quot;</stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_15_myRule_14_A3_9018543027</name>
+        <name>formula_15_myRule_14_A3_4502373175</name>
         <dataType>String</dataType>
         <expression>&quot;Technician must capture a &quot; + {!myVariable_current.UNITY_Business_Unit_Formula__c} + &quot; Service Report with authorizing Manger on Duty printed name and signature.&quot;</expression>
     </formulas>
@@ -819,7 +664,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
                 <stringValue>&quot;Technician must capture a &quot; + [WorkOrder].UNITY_Business_Unit_Formula__c + &quot; Service Report with authorizing Manager on Duty printed name and signature.&quot;</stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_2_myRule_1_A4_1467923810</name>
+        <name>formula_2_myRule_1_A4_4620575144</name>
         <dataType>String</dataType>
         <expression>&quot;Technician must capture a &quot; + {!myVariable_current.UNITY_Business_Unit_Formula__c} + &quot; Service Report with authorizing Manager on Duty printed name and signature.&quot;</expression>
     </formulas>
@@ -832,7 +677,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
 IF( ISBLANK([WorkOrder].Case.UNITY_Customer_WO__c)  , &quot;N/A&quot;, [WorkOrder].Case.UNITY_Customer_WO__c) </stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_3_myRule_1_A1_1460378767</name>
+        <name>formula_3_myRule_1_A1_3372730189</name>
         <dataType>String</dataType>
         <expression>&quot;Technician is required to check in and out with Customer IVR - &quot; + {!myVariable_current.UNITY_Customer_IVR_Pin__c} +&quot;; Tracking # &quot;+ 
 
@@ -845,7 +690,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
                 <stringValue>&quot;Technician must capture a &quot; + [WorkOrder].UNITY_Business_Unit_Formula__c + &quot; Service Report with authorizing Manger on Duty printed name and signature.&quot;</stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_6_myRule_5_A4_1783842073</name>
+        <name>formula_6_myRule_5_A4_4498841204</name>
         <dataType>String</dataType>
         <expression>&quot;Technician must capture a &quot; + {!myVariable_current.UNITY_Business_Unit_Formula__c} + &quot; Service Report with authorizing Manger on Duty printed name and signature.&quot;</expression>
     </formulas>
@@ -858,14 +703,14 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
  &quot; Pin: &quot;+ [WorkOrder].UNITY_Vendor_PIN__c </stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_7_myRule_5_A1_0877291682</name>
+        <name>formula_7_myRule_5_A1_6583189825</name>
         <dataType>String</dataType>
         <expression>&quot;Technician is required to check in and out with &quot; +{!myVariable_current.UNITY_Business_Unit_Formula__c} +&quot; IVR - &quot; + {!myVariable_current.UNITY_Miner_IVR_Phone_Number__c} + 
 &quot; &quot;+ {!myVariable_current.WorkOrderNumber} +
  &quot; Pin: &quot;+ {!myVariable_current.UNITY_Vendor_PIN__c}</expression>
     </formulas>
-    <interviewLabel>SFPS_FS_Initial_Daily_WOLIs-10_InterviewLabel</interviewLabel>
-    <label>SFPS FS Initial Daily WOLIs UNITYPM</label>
+    <interviewLabel>SFPS_FS_Initial_Daily_WOLIs-9_InterviewLabel</interviewLabel>
+    <label>SFPS FS Initial Daily WOLIs</label>
     <processMetadataValues>
         <name>ObjectType</name>
         <value>
@@ -1123,7 +968,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
             </processMetadataValues>
             <field>Description</field>
             <value>
-                <elementReference>formula_15_myRule_14_A3_9018543027</elementReference>
+                <elementReference>formula_15_myRule_14_A3_4502373175</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -1223,7 +1068,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
             </processMetadataValues>
             <field>Description</field>
             <value>
-                <elementReference>formula_3_myRule_1_A1_1460378767</elementReference>
+                <elementReference>formula_3_myRule_1_A1_3372730189</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -1520,7 +1365,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
             </processMetadataValues>
             <field>Description</field>
             <value>
-                <elementReference>formula_2_myRule_1_A4_1467923810</elementReference>
+                <elementReference>formula_2_myRule_1_A4_4620575144</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -1620,7 +1465,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
             </processMetadataValues>
             <field>Description</field>
             <value>
-                <elementReference>formula_7_myRule_5_A1_0877291682</elementReference>
+                <elementReference>formula_7_myRule_5_A1_6583189825</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -1947,7 +1792,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
             </processMetadataValues>
             <field>Description</field>
             <value>
-                <elementReference>formula_6_myRule_5_A4_1783842073</elementReference>
+                <elementReference>formula_6_myRule_5_A4_4498841204</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -2047,7 +1892,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
             </processMetadataValues>
             <field>Description</field>
             <value>
-                <elementReference>formula_12_myRule_9_A1_2401789659</elementReference>
+                <elementReference>formula_12_myRule_9_A1_8048688817</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -2147,7 +1992,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
             </processMetadataValues>
             <field>Description</field>
             <value>
-                <elementReference>formula_11_myRule_9_A2_0453902294</elementReference>
+                <elementReference>formula_11_myRule_9_A2_0047553808</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -2474,7 +2319,7 @@ IF( ISBLANK({!myVariable_current.Case.UNITY_Customer_WO__c})  , &quot;N/A&quot;,
             </processMetadataValues>
             <field>Description</field>
             <value>
-                <elementReference>formula_10_myRule_9_A5_1884726362</elementReference>
+                <elementReference>formula_10_myRule_9_A5_0047119513</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>

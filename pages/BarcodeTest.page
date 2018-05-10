@@ -1,0 +1,382 @@
+<apex:page applyHtmlTag="false" cache="false" contentType="text/HTML" docType="html-5.0" renderAs="pdf" showHeader="false" sidebar="false" standardController="WorkOrder" extensions="UNITY_WorkOrderCntrlExtension"  
+                        standardStylesheets="false" applyBodyTag="false" >
+    <html>
+    <head>
+      <style type="text/css">
+               @page 
+                {
+                    margin: 150px 20px 70px 20px;
+                    size: 8.5in 11in; /*width height */
+                }
+    
+                @page 
+                {
+                    @top-center 
+                    {
+                        content: element(header);
+                    }
+    
+                    @bottom-center 
+                    {
+                        content: element(footer);
+                    }
+                }
+    
+                div.header 
+                {
+                    padding: 20px 0px 0px 0px;
+                    margin: 0px;
+                    position: running(header);
+                }
+    
+                div.footer 
+                {
+                    padding: 0px 0px 0px 0px;
+                    position: running(footer);
+                    width: 100%;
+                    display: table;
+                }
+                
+                body {
+                    margin: 0px;
+                    padding: 0px;
+                }
+                
+                .pagebreak {
+                    page-break-before:always;
+                }
+                
+                .logo {
+                    float: left;
+                  }
+                
+                .titleheader {
+                    width: 100%;
+                    height: 110px;
+                    text-align: center;
+                    position:relative;
+                }
+                
+                .headerlabel {
+                    margin: 0 auto;
+                    heigth: 40px;
+                    width: 450px;
+                    font-size: 30px; 
+                }
+                
+                .textAlignedCenter {
+                    text-align:center;
+                }
+                
+                .td1{
+                    width:50%;
+                    height:100%;
+                    text-align:center;
+                }
+                
+                .td2 {
+                    width:17%;
+                }
+                
+                .td3 {
+                    width:33%;
+                }
+                
+                .td4 {
+                    width:13%;
+                    font-size:11px;
+                }
+    
+                .td5 {
+                    width:25%;
+                }
+    
+                .td6 {
+                    width:12%;
+                    font-size:11px;
+                }  
+                 .tdInverse1{
+                    background-color:#000000;
+                    color:#ffffff;
+                    text-align:center;
+                }
+                
+                .tr1 {
+                    height:20px;
+                }
+                
+                .tr2 {
+                    height:30px;
+                }
+                
+                .tr4 {
+                    height:100px;
+                }
+                
+                .tr5 {
+                    height:200px;
+                    vertical-align:top;
+                }
+                
+                .tr6 {
+                    height:110px;
+                    vertical-align:top;
+                }
+                                  
+                .row {
+                    display: inline-block;
+                    height: 100%;
+                }
+                
+                .font1 {
+                    font-size:10px;
+                }
+                
+                .font2 {
+                    font-size:12px;
+                }
+                
+                .font3 {
+                    font-size:15px;
+                }
+    
+                .font4 {
+                    font-size:20px;
+                    font-weight:bold;
+                }          
+
+                .fontImportant1, .fontImportant2, .fontImportantHeader{
+                    color:#ff0000;
+                }
+                
+                .fontImportant1, .fontImportantHeader{
+                    font-size:15px;
+                }
+    
+                .fontImportant2{
+                    font-size:12px;
+    
+                }
+               
+                .fontImportantHeader{
+                    text-align:center;
+                }
+                
+                .footerContainer{
+                    display: table-cell;
+                    vertical-align: top;
+                    text-align: center;
+                }
+                #mainTable {
+                    width: 100%;
+                }
+                               
+                .table{
+                    border: 2px solid black;
+                    cellspacing: 0; 
+                    cellpadding: 0;
+                    margin: 0px;
+                    padding: 0px;
+                }/*
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+                td{
+                    padding-left:2px;
+                }
+                */
+                .noborder, .noborder tr, .noborder th, .noborder td { 
+                    border: none; 
+                }
+    
+                div.block {
+                  float: left;
+                  margin: 0px;
+                  padding: 0px;
+                  text-align: left;
+                }
+                .barcode {
+                  float: right;
+                  margin: 0px;
+                  padding: 0px;
+                }
+                .storestamp {
+                    text-align:center;
+                    margin:10px 20px 0px 0px;
+                    border:1px solid black;
+                    height:60px;
+                }
+                
+                .underline1, .underline2 {
+                        border-bottom:1px solid black;
+                }
+                
+                .underline2 {
+                    margin-top:20px;
+                }
+                
+                .overline1, .overline2 {
+                    border-top:1px solid black;
+                }
+                
+                .overline1 {
+                    margin-top:27px;
+                }
+                
+                .overline2 {
+                    margin-top:20px;
+                }
+                .print{
+                    font-size:16px;
+                }
+                
+                .info {
+                    border: 1px solid;
+                    margin: 30px 0px;
+                    padding:50px 30px 50px 50px;
+                    background-repeat: no-repeat;
+                    background-position: 10px center;
+                    font-family:Arial, Helvetica, sans-serif; 
+                    font-size:18px;
+                 }
+                                            
+            </style>
+        </head>
+        <body style="height:100%;">
+       <apex:outputPanel rendered="{!VendorAcceptedStatus}">
+         <apex:form >
+            <div class="header">
+                <apex:image styleClass="logo" url="{!workorder.UNITY_Email_Logo_URL__c}"/>
+                <div class="titleheader">
+                    <div claNss="headerlabel">
+                        Work Order # {!workorder.WorkOrderNumber}
+                    </div>
+                    <div class="barcode">
+                        <GMBLBC:barcode value="WAF {!workorder.Id}" type="code128" displayText="true" width="2"/>
+                        <!--BarcodeZone:ACBarcodeZone Value="WO-00193624" BrcdType="code128" BrcdHeight="40" BarsWidth="2"/-->
+                        <!--c:UNITY_BarcodeGenerator Text="{!workorder.WorkOrderNumber}" Resolution="1" Type="C128B" Width="200"/-->
+                    </div>
+                  <!--  <span><apex:commandLink style="float:right;  padding:0px 2px; font-size:20px; font-weight:bold;" value="Print" onclick="window.print();"/></span>-->
+                </div>
+            </div>
+             <div class="footer">
+                <div class="footerContainer">
+                    <div><apex:outputText value="{!MinerFooterDocument}" escape="false"/></div>
+                </div>
+            </div>
+           <div class="pagebreak">
+                <table class="table">
+                  <colgroup>
+                    <col class="td2"></col>
+                    <col class="td3"></col>
+                    <col class="td2"></col>
+                    <col class="td3"></col>
+                   </colgroup>
+                  <tr class="tr1">
+                    <td class="td1 font4 table" colspan="2">{!workorder.WorkOrderNumber}</td>
+                    <td class="td1 font4 table" colspan="2">DATE ISSUED:{!AssignedDate}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td class="table">VENDOR CODE</td>
+                      <td class="table">{!workorder.UNITY_Accepted_Vendor__r.UNITY_Account_ID__c}</td>
+                      <td class="table">SITE NAME &amp; #</td>
+                      <td class="table">{!workorder.Account.Name}{!IF(ISBLANK(workorder.UNITY_Site_Store_Number__c), '', ', #'+workorder.UNITY_Site_Store_Number__c)}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td class="table">VENDOR NAME</td>
+                      <td class="table">{!workorder.UNITY_Accepted_Vendor__r.Name}</td>
+                      <td class="table">CONTACT</td>
+                      <td class="table">{!WorkOrderContact}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td class="table">ADDRESS</td>
+                      <td class="table">{!workorder.UNITY_Accepted_Vendor__r.BillingStreet}, {!workorder.UNITY_Accepted_Vendor__r.BillingCity}, {!workorder.UNITY_Accepted_Vendor__r.BillingState} {!workorder.UNITY_Accepted_Vendor__r.BillingPostalCode}</td>
+                      <td class="table">ADDRESS</td>
+                      <td class="table">{!WorkOrderShippingStreet}, {!WorkOrderShippingCity}, {!WorkOrderShippingState} {!WorkOrderShippingPostalCode}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td class="table">&nbsp;</td>
+                      <td class="table">&nbsp;</td>
+                      <td class="table">PHONE</td>
+                      <td class="table">{!workorder.UNITY_Site_Contact_Phone__c}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td class="table">NTE</td>
+                      <td class="table">
+                          <apex:outputText value="${0, number, ###,##0.00}">
+                            <apex:param value="{!workorder.UNITY_Initial_Vendor_PO_Cost__c}"/>
+                          </apex:outputText>
+                      </td>
+                      <td class="table">CUSTOMER PO</td>
+                      <td class="table">{!WorkOrderCustomerPO}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td class="table">PRIORITY:</td>
+                      <td class="table">{!workorder.Priority}</td>
+                      <td class="table">RECEIVED DATE:</td>
+                      <td class="table">{!CreatedDate}</td>
+                  </tr>
+                  <tr class="tr2">
+                  
+                     <td class="fontImportantHeader table" colspan="4">REQUIRED DATE &amp; TIME OF SERVICE: {!Window_End}</td>
+                  </tr>
+                  <tr class="tr2">
+                      <td class="tdInverse1 table" colspan="4">PROBLEM REPORTED</td>
+                  </tr>
+                  <tr class="tr4">
+                      <td  class="table" colspan="4">{!workorder.UNITY_Trade__r.Name}, {!workorder.UNITY_Work_Description__c}</td>
+                  </tr>
+                  <tr class="tr2">
+                      <td class="tdInverse1 table" colspan="4">TERMS AND CONDITIONS FOR SUBMITTING FOR PAYMENT</td>
+                  </tr>
+                  <tr class="tr5">
+                      <td  class="table" colspan="4">
+                          <div style="height:200px;position:relative;" >
+                              <div>
+                                  <ul>
+                                      <li>
+                                         <apex:outputText value="{!IF(!ISBLANK(workorder.UNITY_Customer_IVR_Pin__c), 'Customer IVR is required to validate billable hours, call: ' + workorder.UNITY_Customer_IVR_Pin__c + '; Tracking# ' + IF(ISBLANK(workorder.case.UNITY_Customer_WO__c),'N/A',workorder.case.UNITY_Customer_WO__c), '')}" escape="false"/>
+                                      </li>
+                                      <li>
+                                         <apex:outputText value="{!IF(!ISBLANK(workorder.UNITY_Miner_IVR_Phone_Number__c), workorder.Case.UNITY_Business_Unit_Account__r.Name + ' IVR is required to validate billable hours, call: ' + workorder.UNITY_Miner_IVR_Phone_Number__c + ' Pin: ' + workorder.UNITY_Vendor_PIN__c, '')}" escape="false"/>
+                                      </li>
+                                      <li>
+                                          Vendor’s invoice must not exceed the NTE without prior approval. 
+                                      </li>
+                                      <li>
+                                          Exceeding the NTE without approval may result in partial payment.
+                                      </li>
+                                      <li>
+                                           Replacement, Damage and Abuse &amp; Major Repairs - pictures before and after, and surveys must be completed.
+                                      </li>                                      
+                                      <li>
+                                          Vendor must submit a Service Report with legible signature of Manager on Duty &amp; store stamp.
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="fontImportantHeader" style="position:absolute;bottom:0;width:100%;height:50px;">
+                                  ALL PAPER WORK MUST BE EMAILED OR FAXED WITHIN 48 HOURS OF COMPLETION. FAILURE TO COMPLY WILL RESULT IN DELAYED PAY, SHORT PAY OR NON-PAY
+                              </div>
+                              
+                          </div>
+                          
+                      </td>
+                  </tr>
+               </table>
+               <br/><br/>
+                <div class="table fontImportantHeader">
+                    UPON ACCEPTANCE OF THIS PURCHASE ORDER, ALL TERMS AND CONDITIONS OUTLINED IN THE SERVICE PARTNER AGREEMENT &amp; CONTRACTOR AGREEMENT WILL BE ENFORCED
+                </div>
+            </div>  
+         </apex:form>
+         </apex:outputPanel>
+         
+         <apex:outputPanel rendered="{!! VendorAcceptedStatus}" >
+             <div class="info">
+              {!WarningMessage}
+             </div>
+         </apex:outputPanel>
+     </body>
+    </html>
+</apex:page>

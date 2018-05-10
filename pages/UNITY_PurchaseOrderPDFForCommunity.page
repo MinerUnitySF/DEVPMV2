@@ -505,6 +505,8 @@
        </div>
        <div class="borderred"></div>
        <br/><br/>
+       
+        <apex:outputPanel rendered="{!! WorkOrderPreventativeMaintenance}">
            <div> 
                 <table>                            
                     <tr class="tr2">
@@ -512,7 +514,8 @@
                     </tr>
                     <tr>
                       <td>
-                        <c:UNITY_OrderLineItems oId="{!Order.id}"/>
+                        <c:UNITY_OrderLineItems oId="{!Order.id}"/> 
+                        <!-- <c:UNITYPM_OrderLineItems oId="{!Order.id}"/> -->
                         <table width="100%" class="body">
                             <tr>
                                 <td style="text-align:right;padding-right:2px">
@@ -526,6 +529,33 @@
                     </tr>
                 </table>
             </div>
+            </apex:outputPanel>
+            
+        <apex:outputPanel rendered="{! WorkOrderPreventativeMaintenance}">
+           <div> 
+                <table>                            
+                    <tr class="tr2">
+                      <td class="tdInverse1">PURCHASE ORDER LINE ITEMS</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <c:UNITYPM_OrderLineItems oId="{!Order.id}"/> 
+                        <table width="100%" class="body">
+                            <tr>
+                                <td style="text-align:right;padding-right:2px">
+                                    Total: <apex:outputText value="${0, number, ###,##0.00}">
+                                        <apex:param value="{!order.UNITY_Total_Cost__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                      </td>
+                    </tr>
+                </table>
+            </div>
+            </apex:outputPanel>
+        
+       
         </apex:outputPanel>
         </apex:form>
         

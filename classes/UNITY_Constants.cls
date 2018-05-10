@@ -115,11 +115,15 @@ global class UNITY_Constants {
    public static final String SCLI_HOURLY_RATE = 'Hourly Rate';
    public static final String SCLI_PRODUCT_PRICING = 'Product Pricing';
    public static final String SCLI_MENU_PRICING = 'Menu Pricing';
+   public static final String SCLI_ASSET_TYPE_RATE = 'Asset Type Rate'; 
+   public static final String SCLI_PM_PRODUCT = 'PM Product'; 
 
    public static final String SCLI_PRODUCT_PRICING_RULE_RT = 'UNITY_Product_Pricing_Rule';
    public static final String SCLI_HOURLY_RATE_RT = 'UNITY_Hourly_Rate'; 
    public static final String SCLI_NTE_RT = 'UNITY_NTE'; 
    public static final String SCLI_MENU_PRICING_RT = 'UNITY_Menu_Pricing'; 
+   public static final String SCLI_ASSET_TYPE_RATE_RT = 'UNITYPM_Asset_Type_Rate'; 
+   public static final String SCLI_PM_PRODUCT_RT = 'UNITYPM_PM_Product'; 
     
    public static final String SCLI_HOURLY_RATE_RECORDTYPE          = (SCLI_SObjectResult != null 
                                                                     && SCLI_SObjectResult.getRecordTypeInfosByName() != null 
@@ -161,6 +165,14 @@ global class UNITY_Constants {
                                                                     && SCLI_SObjectResult.getRecordTypeInfosByName() != null 
                                                                     && SCLI_SObjectResult.getRecordTypeInfosByName().get(SCLI_SERVICE_CHARGE) != null)?
                                                                     SCLI_SObjectResult.getRecordTypeInfosByName().get(SCLI_SERVICE_CHARGE).getRecordTypeId():null;
+    public static final String SCLI_ASSET_TYPE_RATE_RECORDTYPE = (SCLI_SObjectResult != null 
+                                                                    && SCLI_SObjectResult.getRecordTypeInfosByName() != null 
+                                                                    && SCLI_SObjectResult.getRecordTypeInfosByName().get(SCLI_ASSET_TYPE_RATE) != null)?
+                                                                    SCLI_SObjectResult.getRecordTypeInfosByName().get(SCLI_ASSET_TYPE_RATE).getRecordTypeId():null;
+    public static final String SCLI_PM_PRODUCT_RECORDTYPE = (SCLI_SObjectResult != null 
+                                                                    && SCLI_SObjectResult.getRecordTypeInfosByName() != null 
+                                                                    && SCLI_SObjectResult.getRecordTypeInfosByName().get(SCLI_PM_PRODUCT) != null)?
+                                                                    SCLI_SObjectResult.getRecordTypeInfosByName().get(SCLI_PM_PRODUCT).getRecordTypeId():null;
     
     // Account 
     public static final String ACCOUNT_CUSTOMER = 'Customer';
@@ -214,7 +226,11 @@ global class UNITY_Constants {
                                                                 && WO_SObjectResult.getRecordTypeInfosByName().get(WO_SITE_SURVEY_NAME) != null)?
                                                                 WO_SObjectResult.getRecordTypeInfosByName().get(WO_SITE_SURVEY_NAME).getRecordTypeId():null;
 
-    
+    public static final String WO_PREVENTATIVE_MAINTENANCE_RECORDTYPE = (WO_SObjectResult != null 
+                                                                && WO_SObjectResult.getRecordTypeInfosByName() != null 
+                                                                && WO_SObjectResult.getRecordTypeInfosByName().get(WO_PREVENTATIVE_MAINTENANCE_NAME) != null)?
+                                                                WO_SObjectResult.getRecordTypeInfosByName().get(WO_PREVENTATIVE_MAINTENANCE_NAME).getRecordTypeId():null;
+
     public static final String WO_VENDOR_STATUS_ASSIGNED = 'Assigned';
     public static final String WO_VENDOR_STATUS_ACCEPTED = 'Accepted';
     public static final String WO_VENDOR_STATUS_REJECTED = 'Rejected';
@@ -338,8 +354,9 @@ global class UNITY_Constants {
     public static final String CASE_PROJECT_MANAGEMENT = 'Project Management';  
     public static final String CASE_PROJECT_PHASE = 'Project Phase';
     public static final String CASE_SERVICE_REQUEST = 'Service Request';
-   
+    public static final String CASE_PREVENTATIVE_MAINTENANCE = 'Preventative Maintenance';
     public static final String CASE_PORTAL_SOURCE_SERVICE_CHANNEL = 'Service Channel';
+    public static final String CASE_PROGRAM_CASE = 'Program Case';
     
     public static final String CASE_PROJECT_MANAGEMENT_RECORDTYPE = (Case_SObjectResult != null 
                                                                         && Case_SObjectResult.getRecordTypeInfosByName() != null 
@@ -353,7 +370,15 @@ global class UNITY_Constants {
                                                                         && Case_SObjectResult.getRecordTypeInfosByName() != null 
                                                                         && Case_SObjectResult.getRecordTypeInfosByName().get(CASE_SERVICE_REQUEST) != null)?
                                                                         Case_SObjectResult.getRecordTypeInfosByName().get(CASE_SERVICE_REQUEST).getRecordTypeId():null;
+    public static final String CASE_PREVENTATIVE_MAINTENANCE_RECORDTYPE = (Case_SObjectResult != null 
+                                                                        && Case_SObjectResult.getRecordTypeInfosByName() != null 
+                                                                        && Case_SObjectResult.getRecordTypeInfosByName().get(CASE_PREVENTATIVE_MAINTENANCE) != null)?
+                                                                        Case_SObjectResult.getRecordTypeInfosByName().get(CASE_PREVENTATIVE_MAINTENANCE).getRecordTypeId():null;
     
+    public static final String CASE_PROGRAM_CASE_RECORDTYPE = (Case_SObjectResult != null 
+                                                                        && Case_SObjectResult.getRecordTypeInfosByName() != null 
+                                                                        && Case_SObjectResult.getRecordTypeInfosByName().get(CASE_PROGRAM_CASE) != null)?
+                                                                        Case_SObjectResult.getRecordTypeInfosByName().get(CASE_PROGRAM_CASE).getRecordTypeId():null;
     
     // task 
     public static final String TASK_UNITY_TASK = 'UNITY Task'; 
@@ -443,8 +468,16 @@ global class UNITY_Constants {
     // Vendor Preference
     public static final String VENDOR_PREFERENCE_PREFERRED   = 'Preferred';   
     public static final String VENDOR_PREFERENCE_DO_NOT_USE  = 'Do Not Use';
-    
-    
+
+    // Barcode Parsing Status
+    public static final String DOCUMENT_STAGING_STATUS_UPLOADED   = 'Uploaded';
+    public static final String DOCUMENT_STAGING_STATUS_PARSED   = 'Parsed';
+    public static final String DOCUMENT_STAGING_STATUS_ATTACHED   = 'Attached';
+    public static final String DOCUMENT_STAGING_STATUS_FAILED  = 'Failed';
+    public static final String DOCUMENT_STAGING_STATUS_COMPLETE  = 'Complete';
+    public static final String DOCUMENT_STAGING_STATUS_NEW  = 'New';
+
+
     // The Agent can edit this Date Time fields by customer or local Time Zone 
     public static final Map<SObjectType,list<String>> SOBJECT_DATETIME_FIELDS = new  Map<SObjectType,list<String>>{ WorkOrder.getSObjectType() => new list<String>{'UNITY_Work_Window_Begin__c','StartDate','FSO__Start_Travel_Date__c','FSO__Check_In_Date__c','FSO__Completed_Date__c'},
                                                               Case.getSObjectType()      => new list<String>{'UNITY_Work_Window_Begin__c', 'UNITY_Service_Completed_Date_Time__c' }};

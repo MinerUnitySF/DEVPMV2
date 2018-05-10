@@ -18,6 +18,83 @@ public class UNITY_Utils {
 
     }
 
+    public static SObject includedInRecordType(SObject record, Set<Id> recordTypeList){
+		if (record == null)
+            return record;
+
+        String recordTypeID = (String)record.get('RecordTypeId');
+        if (recordTypeList.contains(recordTypeID))
+			return record;
+        else
+        	return null;
+    }
+    public static SObject excludedInRecordType(SObject record, Set<Id> recordTypeList){
+        if (record == null)
+            return record;
+        
+        String recordTypeID = (String)record.get('RecordTypeId');
+        if (!recordTypeList.contains(recordTypeID))
+			return record;
+        else
+            return null;
+	}
+    
+    public static List<SObject> includeRecordType(List<SObject> records, Set<Id> recordTypeList){
+        List<SObject> resultInclude = new List<SObject>();
+        
+		if (records == null || records.size() == 0)
+            return records;
+                    
+        for (SObject so: records){
+            String recordTypeID = (String)so.get('RecordTypeId');
+
+           if (recordTypeList.contains(recordTypeID))
+				resultInclude.add(so);
+        }
+        return resultInclude;
+    }
+    public static List<SObject> excludeRecordType(List<SObject> records, Set<Id> recordTypeList){
+        List<SObject> resultExclude = new List<SObject>();
+        
+        if (records == null || records.size() == 0)
+            return records;
+        
+        for (SObject so: records){
+            String recordTypeID = (String)so.get('RecordTypeId');
+           if (!recordTypeList.contains(recordTypeID))
+				resultExclude.add(so);
+        }
+        return resultExclude;
+    }
+    
+    public static Map<Id, SObject> includeRecordType(Map<Id, SObject> recordMap, Set<Id> recordTypeList){
+        Map<Id, SObject> resultInclude = new Map<Id, SObject>();
+        
+        if (recordMap == null || recordMap.size() == 0)
+            return recordMap;
+        
+        for (SObject so: recordMap.values()){
+            String recordTypeID = (String)so.get('RecordTypeId');
+
+           if (recordTypeList.contains(recordTypeID))
+				resultInclude.put(so.Id, so);
+        }
+        return resultInclude;
+    }
+    public static Map<Id, SObject> excludeRecordType(Map<Id, SObject> recordMap, Set<Id> recordTypeList){
+        Map<Id, SObject> resultExclude = new Map<Id, SObject>();
+        
+        if (recordMap == null || recordMap.size() == 0)
+            return recordMap;
+        
+        for (SObject so: recordMap.values()){
+            String recordTypeID = (String)so.get('RecordTypeId');
+           if (!recordTypeList.contains(recordTypeID))
+				resultExclude.put(so.Id, so);
+        }
+        return resultExclude;
+    }
+    
 
     /*
      *   @programer   : Samuel Astol

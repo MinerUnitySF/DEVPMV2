@@ -36,79 +36,67 @@
  */
 public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
     
-    public override void bulkBefore(){
+    public override void bulkBefore(List<SObject> newList_WorkOrder, List<SObject> oldList_WorkOrder, Map<Id,SObject> oldMap_WorkOrder, Map<Id,SObject> newMap_WorkOrder){
         //if(runTriggerOnce_Before()){
             //System.debug('###### UNITY_WorkOrderTriggerHandler_Miner in bulkBefore: ');
             if(trigger.isInsert){
-                UNITY_TimeInput_Ctlr.verifyDateTimeChanged(trigger.new,null,'WorkOrder',true);
+                UNITY_TimeInput_Ctlr.verifyDateTimeChanged(newList_WorkOrder,null,'WorkOrder',true);
             }
             if(trigger.isUpdate){
-                UNITY_TimeInput_Ctlr.verifyDateTimeChanged(trigger.new,Trigger.oldMap,'WorkOrder',true);
+                UNITY_TimeInput_Ctlr.verifyDateTimeChanged(newList_WorkOrder,oldMap_WorkOrder,'WorkOrder',true);
                 //Need to validation before completing the Work Order.
                 List<WorkOrder> compWOs = new List<WorkOrder>();
                 List<WOrkOrder> ownerChangedWO = new List<WorkOrder>(); 
                 List<WorkOrder> syncEndDate = new List<WorkOrder>();
-                for(SObject obj :Trigger.new){
+                Map<Id,WorkOrder> woCaseChangeMap = new Map<Id,WorkOrder>();                
+                for(SObject obj :newList_WorkOrder){
                     WorkOrder wo = (WorkOrder)obj;
-                    WorkOrder oldWO = (WorkOrder)Trigger.oldMap.get(wo.Id);
+                    WorkOrder oldWO = (WorkOrder)oldMap_WorkOrder.get(wo.Id);
                     System.debug('//CLAY: OldWO:' + oldWO.Status + ' ' + oldWO.SFPS_FS_AllTasks_Completed__c + ' ' + oldWO.UNITY_Next_Step__c);
                     System.debug('//CLAY: New WO:'+ wo.Status + ' ' + wo.SFPS_FS_AllTasks_Completed__c + ' ' + wo.UNITY_Next_Step__c) ;
-                    
-                            
-                            
-                          
-                           
-                           
-                            
-                            
                     //if(wo.Status == 'Completed' && wo.Status != oldWO.Status && wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE)
                     //if(wo.Status == 'Completed' && wo.SFPS_FS_OverallStatus__c != oldWO.SFPS_FS_OverallStatus__c && wo.SFPS_FS_OverallStatus__c == 'Completed' && wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE)
                     //CLAY: trying to head off the entire process builder that completes all tasks. Instead of checking for status completed/overall status, lets try using the debrief fields
-                    if(wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE 
-                                                     && (wo.Status == 'IVR Check Out - Agent Review Needed' || wo.Status == 'Reopened') 
-                                                           && (oldWO.SFPS_FS_AllTasks_Completed__c != 'All Tasks Completed/Verified'
-                                                            && wo.SFPS_FS_AllTasks_Completed__c == 'All Tasks Completed/Verified' 
-                                                            && oldWO.UNITY_Next_Step__c != 'Completion Confirmed' 
-                                                            && wo.UNITY_Next_Step__c == 'Completion Confirmed')){
-                         // === added by neli
+                    if(wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE && (wo.Status == 'IVR Check Out - Agent Review Needed' || wo.Status == 'Reopened') && (oldWO.SFPS_FS_AllTasks_Completed__c != 'All Tasks Completed/Verified'
+                                                                                                && wo.SFPS_FS_AllTasks_Completed__c == 'All Tasks Completed/Verified' 
+                                                                                                && oldWO.UNITY_Next_Step__c != 'Completion Confirmed' 
+                                                                                                && wo.UNITY_Next_Step__c == 'Completion Confirmed')){
+                             compWOs.add(wo);
+                              
                             DateTime completedDate = null;
                             DateTime currentDateTime = System.now();
                             String userName = UserInfo.getName();
                             TimeZone tz =  UserInfo.getTimeZone();
                             String tsDisplay = tz.getDisplayName();
-                            
-                            if( String.isNotBlank(wo.UNITY_Account_Time_Zone__c)){
-                              
-                                String tempCompletedDate = UNITY_TimeInput_Ctlr.convertDateTime(currentDateTime,tz.toString());
-                                completedDate = DateTime.parse(tempCompletedDate);
-                                     
-                               if( wo.SFPS_FS_LastCheckOut__c != null){ 
-                                  Decimal minNum =  ((completedDate.getTime())/1000/60) - ((wo.SFPS_FS_LastCheckOut__c.getTime())/1000/60);  
-                                 // Decimal minNum =  ((currentDateTime.getTime())/1000/60) - ((wo.SFPS_FS_LastCheckOut__c.getTime())/1000/60);  
-                                 wo.UNITY_Date_Status_IVR_Check_Out__c = completedDate;
-                                  wo.UNITY_Total_Min_Btw_Last_IVR_and_Debrief__c = minNum;
-                               }
-                            }
-                            
-                            if (wo.SFPS_FS_AllTasks_Completed__c == 'All Tasks Completed/Verified'){
-                                wo.UNITY_User_Set_AllTasks_Completed__c = userName;
-                            }
-                         //==================
                           
-                          compWOs.add(wo);
-                       }
-                        
-
+                            String tempCompletedDate = UNITY_TimeInput_Ctlr.convertDateTime(currentDateTime, tz.toString());
+                            completedDate = DateTime.parse(tempCompletedDate);
+                                 
+                           if( wo.SFPS_FS_LastCheckOut__c != null){ 
+                              Decimal minNum =  ((completedDate.getTime())/1000/60) - ((wo.SFPS_FS_LastCheckOut__c.getTime())/1000/60);              
+                              wo.UNITY_Time_to_Debrief__c = minNum;
+                              wo.UNITY_Date_Time_Debrief_Completed__c = completedDate;
+                           }
+                           
+                            
+                            if (wo.SFPS_FS_AllTasks_Completed__c == 'All Tasks Completed/Verified' && wo.UNITY_Debrief_Agent__c == null){
+                                wo.UNITY_Debrief_Agent__c = userName;
+                            }
+                         }                        
+                     
                     if(wo.OwnerId != oldWO.OwnerId && !wo.MSPFS_Intercompany_Transfer__c){
                         ownerChangedWO.add(wo);
                     }
-
+                    
+                     //if(wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE && wo.SFPS_FS_AllTasks_Completed__c == 'Job Complete; Reopen for Usage Request') {
+                     //    wo.Status = 'Reopened';
+                     //}
+                         
                     //Populate the EndDate
                     if((wo.StartDate != null && wo.StartDate != oldWO.StartDate) || 
                        (String.isNotBlank(wo.UNITY_Tech_ETA_Date_Cust__c) && wo.UNITY_Tech_ETA_Date_Cust__c != oldWO.UNITY_Tech_ETA_Date_Cust__c) || 
-                         (wo.StartDate != null && wo.EndDate == null) || 
-                                (String.isNotBlank(wo.UNITY_Tech_ETA_Date_Cust__c) && wo.EndDate == null)){
-                                    
+                       (wo.StartDate != null && wo.EndDate == null) || 
+                       (String.isNotBlank(wo.UNITY_Tech_ETA_Date_Cust__c) && wo.EndDate == null)){
                             if(String.isNotBlank(wo.UNITY_Business_Unit__c) && String.isNotBlank(wo.UNITY_Account_Time_Zone__c)){
                                 if(!wo.MSPFS_Intercompany_Transfer__c && !wo.UNITY_Business_Unit__c.contains('MSP')){
                                     DateTime startDate = null;
@@ -128,6 +116,11 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
                                     wo.StartDate = null;
                                     wo.EndDate = null;
                     }
+
+                    if (wo.CaseId != oldWO.CaseId && (wo.UNITY_Order_Type__c == 'PMO' || wo.UNITY_Order_Type__c == 'PMA')){
+                      woCaseChangeMap.put(wo.Id, wo);
+                    }
+
                 }
                 if(!compWOs.isEmpty())
                     validateCompletedWO(compWOs);
@@ -135,13 +128,15 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
                 if(!ownerChangedWO.isEmpty()){
                     revertOwnerChange(ownerChangedWO);
                 }
+                if (woCaseChangeMap.size() > 0)
+                    evaluateAndSetExpectingCaseFlag(woCaseChangeMap); 
             }//End if trigger.isUpdate
             //populate ultimate parent text field that is used for community sharing
-            if (Trigger.newMap != null){
+            if (newMap_WorkOrder != null){
                 Map<Id,WorkOrder> customerMap = new  Map<Id,WorkOrder>([SELECT Id, UNITY_Customer__r.UNITY_Company__c 
-                                                        FROM WorkOrder WHERE Id in :Trigger.newMap.keySet()]);
+                                                        FROM WorkOrder WHERE Id in :newMap_WorkOrder.keySet()]);
                 
-                for(SObject obj :Trigger.new){
+                for(SObject obj :newList_WorkOrder){
                     WorkOrder wo = (WorkOrder)obj;
                     WorkOrder woCustomer = customerMap.get(wo.Id);
                     if (wo.UNITY_Customer__c != null && woCustomer.UNITY_Customer__c != null)
@@ -151,7 +146,7 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
         //}
     }
     
-    public override void bulkAfter(){
+    public override void bulkAfter(List<SObject> newList_WorkOrder, List<SObject> oldList_WorkOrder, Map<Id,SObject> oldMap_WorkOrder, Map<Id,SObject> newMap_WorkOrder){
         //if(runTriggerOnce_After()){
             //Set of case id to check for Attachment Compliant
             Set<Id> aComp = new Set<Id>();
@@ -163,9 +158,9 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
                 //to assign the related Case to the BU Customer Team after Vendor Accepts initial WO 
                 //List<WorkOrder> acceptedWOs = new List<WorkOrder>();
                 Set<Id> cids = new Set<Id>();
-                for(SObject so :Trigger.new){
+                for(SObject so :newList_WorkOrder){
                     WorkOrder wo = (WorkOrder)so;
-                    WorkOrder oldWO = (WorkOrder)Trigger.oldMap.get(wo.Id);
+                    WorkOrder oldWO = (WorkOrder)oldMap_WorkOrder.get(wo.Id);
                     System.debug('##### Vendor Status: ' + wo.UNITY_Vendor_Status__c);
                     System.debug('##### Status: ' + wo.Status);
                     System.debug('##### old Vendor Status: ' + oldWO.UNITY_Vendor_Status__c);
@@ -180,7 +175,7 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
                       ){
                           aComp.add(wo.CaseId);
                     }
-                    if (wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE || wo.RecordTypeId == UNITY_Constants.WO_NON_WORK_RECORDTYPE){
+                    if (wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE || wo.RecordTypeId == UNITY_Constants.WO_NON_WORK_RECORDTYPE || wo.RecordTypeId == UNITY_Constants.WO_PREVENTATIVE_MAINTENANCE_RECORDTYPE){
                     	if (oldWO.UNITY_Assigned_Vendor__c != wo.UNITY_Assigned_Vendor__c){	
                             system.debug('@@@WorkOrderTrigger share assignedVendorChanged');
 		                	if (wo.UNITY_Assigned_Vendor__c != null)
@@ -206,14 +201,12 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
                     if(!System.isFuture())
                         reassignCaseToCustTeam(cids);
                 }
-
-                //Izay: Call the set defaults on service record
-                //MSPFS_WorkOrderHandler.setDefaultOnServiceRecord(Trigger.new, Trigger.oldMap);
+                
             }else if(Trigger.isInsert){
-                for(SObject so :Trigger.new){
+                for(SObject so :newList_WorkOrder){
                     WorkOrder wo = (WorkOrder)so;
                     aComp.add(wo.CaseId);
-                    if ((wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE || wo.RecordTypeId == UNITY_Constants.WO_NON_WORK_RECORDTYPE) && wo.UNITY_Assigned_Vendor__c != null)
+                    if ((wo.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE || wo.RecordTypeId == UNITY_Constants.WO_NON_WORK_RECORDTYPE || wo.RecordTypeId == UNITY_Constants.WO_PREVENTATIVE_MAINTENANCE_RECORDTYPE) && wo.UNITY_Assigned_Vendor__c != null)
                     	shareToVendorList.add(wo);
                 }
             }
@@ -251,9 +244,9 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
                 wosMap.put(wo.Id, wo);
                 woVendorMap.put(wo.Id,wo.UNITY_Assigned_Vendor__c);
             }
-            System.debug('#####Neli >>>: woVendorMap = ' + JSON.serializePretty(woVendorMap));
+            System.debug('#####Izay: woVendorMap = ' + JSON.serializePretty(woVendorMap));
             //Need to get all POs under this Work Order to include those part sourcing under related Non-Work WOs
-            //###Neli >>>: Updated query to exclude POs in "Part Source Identified" status
+            //###Izay: Updated query to exclude POs in "Part Source Identified" status
             List<Order> orders = [SELECT Id, OrderNumber, UNITY_Vendor__c, Status, RecordTypeId, FSO__WorkOrder__r.Status, 
                                     FSO__WorkOrder__c, FSO__WorkOrder__r.UNITY_Related_Work_Order__c, FSO__WorkOrder__r.RecordTypeId, FSO__WorkOrder__r.SFPS_FS_OverallStatus__c
                                   FROM Order WHERE
@@ -283,7 +276,7 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
                     ordWOMap.get(o.FSO__WorkOrder__c).add(o);
                 }
             }
-            System.debug('#####Neli >>>: ordWOMap = ' + JSON.serializePretty(ordWOMap));
+            System.debug('#####Izay: ordWOMap = ' + JSON.serializePretty(ordWOMap));
             //Now find if all the POs in the WO are in the correct status (any invoiceable status)
             Map<string,UNITY_General_Settings__c> generalSettings = UNITY_General_Settings__c.getAll();
             Set<String> delimitedInvoiceableStatuses = new Set<String>();
@@ -295,7 +288,7 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
             if (POInvoiceableStatuses!=null){
                 delimitedInvoiceableStatuses = new Set<String>(POInvoiceableStatuses.split(UNITY_Constants.PO_INVOICEABLE_STATUSES_DELIMITER));
             }
-            System.debug('#####Neli >>>: delimitedInvoiceableStatuses = ' + JSON.serializePretty(delimitedInvoiceableStatuses));
+            System.debug('#####Izay: delimitedInvoiceableStatuses = ' + JSON.serializePretty(delimitedInvoiceableStatuses));
             
             for(Id id :ordWOMap.keySet()){
                 Boolean pass = true;
@@ -311,21 +304,21 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
                             showMsg1 = true;
                             msg += 'Order ' + o.OrderNumber;
                             oNum =  o.OrderNumber;
-                            System.debug('//Neli >>>: We have found a PO that will prevent completion. Rolling back.');
+                            System.debug('//CLAY: We have found a PO that will prevent completion. Rolling back.');
                         }
                     }else if(o.RecordTypeId == partSourceRTId && !delimitedInvoiceableStatuses.contains(o.Status)){
                         pass = false;
                         showMsg1 = true;
                         msg += 'Order ' + o.OrderNumber;
                         oNum =  o.OrderNumber;
-                        System.debug('//Neli >>>: We have found a part sourcing PO that will prevent completion. Rolling back.');
+                        System.debug('//CLAY: We have found a part sourcing PO that will prevent completion. Rolling back.');
                     }else if( o.RecordTypeId == urRectype ){
                         pass = false;
                         showMsg2 = true;
                         //Clay: TODO - Could we insert HTML here for the javascript to render as a link for the user? Would need to target primary/sub tab
                         msg2 += 'Order ' + o.OrderNumber;
                         oNum =  o.OrderNumber;
-                        System.debug('//Neli >>>: We have found a usage request that will prevent completion. Rolling back.');
+                        System.debug('//CLAY: We have found a usage request that will prevent completion. Rolling back.');
                     }
                 }
                 if(!pass){
@@ -507,51 +500,7 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
         }
     }
     
-    public static void shareToVendor(List<WorkOrder> workOrders){
-
-		Map<Id, Id> groupAndWOrderMap = getGroupIdAndWOrderIdMap(workOrders);
-		
-		if (groupAndWOrderMap == null)
-			return;
-			
-        system.debug('@@@shareToVendor groupAndWOrderMap:'+groupAndWOrderMap);
-        
-        if (groupAndWOrderMap.size() > 0){
-            List<WorkOrderShare> shareToInsert = new List<WorkOrderShare>();
-            for (Id groupID : groupAndWOrderMap.keySet()){
-                
-                WorkOrderShare woShare = new WorkOrderShare();
-                woShare.ParentId = groupAndWOrderMap.get(groupID);
-		        woShare.AccessLevel = 'Read';
-		        woShare.RowCause = Schema.OrderShare.RowCause.Manual;
-		        woShare.UserOrGroupId = groupID;
-		        shareToInsert.add(woShare);
-            }
-            system.debug('@@@shareToVendor shareToInsert:'+shareToInsert);
-            insert shareToInsert;
-        }
-    }
-        
-    public static void unShareToVendor(List<WorkOrder> workOrders){
-    	
-    	system.debug('@@@unShareToVendor workOrders:'+workOrders);
-    	
-		Map<Id, Id> groupAndWOrderMap = getGroupIdAndWOrderIdMap(workOrders);
-
-		if (groupAndWOrderMap == null)
-			return;
-		system.debug('@@@unShareToVendor groupAndWOrderMap:'+groupAndWOrderMap);
-		List<WorkOrderShare> WOShareList = [SELECT ParentId, UserOrGroupId FROM WorkOrderShare 
-											WHERE UserOrGroupId in :groupAndWOrderMap.keySet() 
-											AND RowCause = 'Manual' AND AccessLevel = 'Read'
-											AND ParentId in :groupAndWOrderMap.values()];
-											
-        system.debug('@@@unShareToVendor WOShareList:'+WOShareList);
-        
-        if (WOShareList.size() > 0){
-            delete WOShareList;
-        }
-    }
+  
     
     //Returns a map of WO ID and the Group ID of the Vendor Account's Role (Community Role)
     public static Map<Id, Id> getGroupIdAndWOrderIdMap (List<WorkOrder> workOrders){
@@ -599,6 +548,27 @@ public class UNITY_WorkOrderTriggerHandler_Miner extends UNITY_BaseHandler{
     	return result;
     }    
 
+    //Reset UNITYPM_Expecting_Case_from_Integration__c flag
+    private static void evaluateAndSetExpectingCaseFlag(Map<id, WorkOrder> woList){
+        system.debug('@@@evaluateAndSetExpectingCaseFlag woList'+woList);
+
+        Map<id, Id> woCaseMap = new Map<id, id>();
+        for (WorkOrder wo : woList.values()){
+            woCaseMap.put(wo.Id, wo.CaseId);
+        }
+
+        Map<id, Case> caseList = new Map<Id, Case>([SELECT Id, RecordTypeId FROM Case where Id in :woCaseMap.values()]);
+
+        for(Id woId : woCaseMap.keySet()){
+            WorkOrder wo = woList.get(woId);
+            Case c = caseList.get(woCaseMap.get(woId));
+
+            if (c.RecordTypeId == UNITY_Constants.CASE_SERVICE_REQUEST_RECORDTYPE){
+              system.debug('@@@evaluateAndSetExpectingCaseFlag Service Request? Yes');
+              wo.UNITYPM_Expecting_Case_from_Integration__c = false;
+            }
+        }
+    }
     //Clay
     //This method will make the last two WOLIs of work orders not completed
     //WHY: This was needed to finish the validation

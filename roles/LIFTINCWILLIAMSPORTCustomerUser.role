@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Role xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseAccessLevel>None</caseAccessLevel>
+    <contactAccessLevel>None</contactAccessLevel>
+    <description>LIFT, INC. - WILLIAMSPORT Customer User</description>
+    <mayForecastManagerShare>false</mayForecastManagerShare>
+    <name>LIFT, INC. - WILLIAMSPORT Customer User</name>
+    <opportunityAccessLevel>None</opportunityAccessLevel>
+    <parentRole>Miner_Corporate</parentRole>
+</Role>

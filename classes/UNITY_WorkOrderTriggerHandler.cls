@@ -54,8 +54,6 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
     private Map<id,Map<id,UNITY_Vendor_Assignment__c>> wo_vendorAssignments = new Map<id,Map<id,UNITY_Vendor_Assignment__c>>();
 
-    //private Map<String, UNITY_Vendor_Assignment__c>  woVendor_assignment = new Map<String, UNITY_Vendor_Assignment__c>();
-
     private static Id standardPriceBookId = UNITY_Constants.getStandardPriceBookId();
 
     private  Set<Id> completedWorkOrders = new Set<Id>();
@@ -66,28 +64,45 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
     
     private Set<Id> closedWorkOrders = new Set<Id>();
     
-    public override void bulkBefore(){
+    Set<Id> excludeRTSet = new Set<Id>{UNITY_Constants.WO_PREVENTATIVE_MAINTENANCE_RECORDTYPE}; 
+        							
+    List<SObject> new_SR_WorkOrders = UNITY_Utils.excludeRecordType(trigger.new, excludeRTSet);
+    List<SObject> old_SR_WorkOrders = UNITY_Utils.excludeRecordType(trigger.old, excludeRTSet);
+    Map<Id, SObject> newMap_SR_WorkOrders = UNITY_Utils.excludeRecordType(Trigger.newMap, excludeRTSet);    
+    Map<Id, SObject> oldMap_SR_WorkOrders = UNITY_Utils.excludeRecordType(Trigger.oldMap, excludeRTSet);    
+    
+    
+    public override void bulkBefore(List<SObject> newList_WorkOrder, List<SObject> oldList_WorkOrder, Map<Id,SObject> oldMap_WorkOrder, Map<Id,SObject> newMap_WorkOrder){
 
         if (Trigger.isInsert){
 
             populateRelatedCasesMap();
 
-            UNITY_AutopopulateChildController.autopopulateFieldsIfApplicableBulkified(trigger.new, 'WorkOrder');
+            UNITY_AutopopulateChildController.autopopulateFieldsIfApplicableBulkified(newList_WorkOrder, 'WorkOrder');
 
             List<Id> relatedSC = new List<Id>();
+            Map<Id,WorkOrder> pmoAndPMAWOMap = new Map<Id,WorkOrder>();
 
-            for (SObject so : Trigger.new){
+            for (SObject so : newList_WorkOrder){
 
                 WorkOrder workOrderRecord = (WorkOrder) so;
 
                 if (workOrderRecord.UNITY_Customer_Service_Contract__c != null){
                     relatedSC.add(workOrderRecord.UNITY_Customer_Service_Contract__c);
                 }
+                if (workOrderRecord.RecordTypeId == UNITY_Constants.WO_SERVICE_REQUEST_RECORDTYPE  && 
+                    (workOrderRecord.UNITYPM_Type__c == 'PMO' || workOrderRecord.UNITYPM_Type__c == 'PMA')){
+                        pmoAndPMAWOMap.put(workOrderRecord.Id, workOrderRecord);
+                        system.debug('@@@pmoAndPMAWOMap:'+pmoAndPMAWOMap);
+                }
+
             }
 
             if(relatedSC.size()>0){
                 //customerServiceContracts = new Map<Id, UNITY_Service_Contract__c>([select id, UNITY_Margin__c, UNITY_Default_Labor_Rate__c, (select id, UNITY_Trade__c, UNITY_Labor_Cost__c from UNITY_Service_Contract_Line_Items__r where recordTypeid =: UNITY_Constants.SCLI_HOURLY_RATE_RECORDTYPE) from UNITY_Service_Contract__c where id in: serviceContractIdsByCase.values()]);
-                customerServiceContracts = new Map<Id, UNITY_Service_Contract__c>([select id, UNITY_Margin__c, UNITY_Default_Labor_Rate__c, (select id, UNITY_Trade__c, UNITY_Labor_Cost__c from UNITY_Service_Contract_Line_Items__r where recordTypeid =: UNITY_Constants.SCLI_HOURLY_RATE_RECORDTYPE) from UNITY_Service_Contract__c where id in: relatedSC]);
+                customerServiceContracts = new Map<Id, UNITY_Service_Contract__c>([select id, UNITY_Margin__c, UNITY_Default_Labor_Rate__c, 
+                            (select id, UNITY_Trade__c, UNITY_Labor_Cost__c from UNITY_Service_Contract_Line_Items__r where recordTypeid =: UNITY_Constants.SCLI_HOURLY_RATE_RECORDTYPE)
+                                  from UNITY_Service_Contract__c where id in: relatedSC]);
             }
             system.debug('@@ : customerServiceContracts : '+customerServiceContracts);
 
@@ -99,9 +114,25 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
                     serviceContractLineByTradeMap.get(serviceContract.Id).put(scli.UNITY_Trade__c, scli);
                 }
             }
+            if (pmoAndPMAWOMap.size() > 0)
+                populateFieldsFromOriginatingWO(pmoAndPMAWOMap);
+
 
         } else {
-            MSPFS_WorkOrderHandler.revertStatusAfterUpdate( ( Map<Id, WorkOrder> )Trigger.oldMap, ( Map<Id, WorkOrder> )Trigger.newMap );
+            //UNITYPM check for null
+            if (oldMap_WorkOrder != null && newMap_WorkOrder != null && oldMap_WorkOrder.size() > 0 && newMap_WorkOrder.size() > 0){
+                Map<Id, WorkOrder> oldMap = new Map<Id, WorkOrder>();
+                Map<Id, WorkOrder> newMap = new Map<Id, WorkOrder>();
+                for (sObject sObj: oldMap_WorkOrder.values()){
+                    WorkOrder wo = (WorkOrder)sObj;
+                    oldMap.put(wo.id, wo);
+                }
+                for (sObject sObj: newMap_WorkOrder.values()){
+                    WorkOrder wo = (WorkOrder)sObj;
+                    newMap.put(wo.id, wo);
+                }
+            	MSPFS_WorkOrderHandler.revertStatusAfterUpdate(oldMap, newMap );
+            }
         }
 
         Set<id> aux_casesId = new Set<id>();
@@ -110,7 +141,7 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
         Set<id> aux_updatedVendorStatus = new Set<id>();
 
-        for (SObject so : Trigger.new){
+        for (SObject so : newList_WorkOrder){
 
             WorkOrder onWorkOrder = (WorkOrder) so;
 
@@ -120,7 +151,7 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
             if(Trigger.isUpdate){
 
-                WorkOrder oldWorkOrder = (WorkOrder) Trigger.oldMap.get(onWorkOrder.id);
+                WorkOrder oldWorkOrder = (WorkOrder) oldMap_WorkOrder.get(onWorkOrder.id);
 
                 if((onWorkOrder.UNITY_Vendor_Status__c != oldWorkOrder.UNITY_Vendor_Status__c)){
 
@@ -183,8 +214,8 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
             // closedWorkOrders
 
             Map<Id,WorkOrder> completedWorkOrderMap = new Map<Id,WorkOrder>();
-            for(WorkOrder newWorkOrder :(List<WorkOrder>) Trigger.new) {
-                WorkOrder oldWorkOrder = (WorkOrder)Trigger.oldMap.get(newWorkOrder.Id);
+            for(WorkOrder newWorkOrder :(List<WorkOrder>) newList_WorkOrder) {
+                WorkOrder oldWorkOrder = (WorkOrder)oldMap_WorkOrder.get(newWorkOrder.Id);
                 if ((newWorkOrder.SFPS_FS_OverallStatus__c != oldWorkOrder.SFPS_FS_OverallStatus__c) && newWorkOrder.SFPS_FS_OverallStatus__c == 'Completed'){
                     completedWorkOrderMap.put(newWorkOrder.Id,newWorkOrder);
                 }
@@ -208,65 +239,55 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
     }
 
-    public override void bulkAfter(){
+    public override void bulkAfter(List<SObject> newList_WorkOrder, List<SObject> oldList_WorkOrder, Map<Id,SObject> oldMap_WorkOrder, Map<Id,SObject> newMap_WorkOrder){
         
         Set<id> aux_filterVA = new Set<id>();
         
         if (trigger.isUpdate){
-            if (!UNITY_Constants.isExecutingContext('UNITY_WorkOrderTriggerHandler.propagateBusinessUnitAccount')){
-                //propagateBusinessUnitAccount();
-            }
-            
-            for(SObject so :Trigger.new){
+            for(SObject so :newList_WorkOrder){
                 WorkOrder newWO = (WorkOrder)so;
-                WorkOrder oldWO = (WorkOrder)Trigger.oldMap.get(newWO.id);
+                WorkOrder oldWO = (WorkOrder)oldMap_WorkOrder.get(newWO.id);
                 
                 if((newWO.UNITY_Vendor_Status__c != oldWO.UNITY_Vendor_Status__c)&&(oldWO.UNITY_Assigned_Vendor__c != null))
                     aux_filterVA.add(newWO.id);
             }
             
-            //getPOOrders();
             getVendorAssignments(aux_filterVA);
-            //updateWOCountsOnAssetAfterUpdate(trigger.new, trigger.oldMap);
-            //countWorkOrdersOnAsset(trigger.new, trigger.oldMap);
-            //populateAccountLastVisitedDateAndSiteSurveyCountAfterUpdate(trigger.new, trigger.oldMap);
             if(!System.isFuture() && !System.isBatch()){
-                populateAccountLastVisitedDateAndSiteSurveyCount(trigger.newMap.keySet(), JSON.serialize(trigger.oldMap));
-                UNITY_UpdateCaseStatus.onAfterUpdate(trigger.newMap.keySet(),JSON.serialize(trigger.oldMap));
+                populateAccountLastVisitedDateAndSiteSurveyCount(newMap_WorkOrder.keySet(), JSON.serialize(oldMap_WorkOrder));
+                UNITY_UpdateCaseStatus.onAfterUpdate(newMap_WorkOrder.keySet(),JSON.serialize(oldMap_WorkOrder));
             }
             //Izay: MSPFS Processes
             system.debug('########### we got here dan');
-            MSPFS_WorkOrderHandler.validateWorkOrderWhenETAPopulated( ( Map<Id, WorkOrder> )Trigger.oldMap, ( Map<Id, WorkOrder> )Trigger.newMap );
-            MSPFS_WorkOrderHandler.populateTechnicianOnChildPOs( ( Map<Id, WorkOrder> )Trigger.oldMap, ( Map<Id, WorkOrder> )Trigger.newMap );
+            //UNITYPM check for null
+            if (oldMap_WorkOrder != null && newMap_WorkOrder != null && oldMap_WorkOrder.size() > 0 && newMap_WorkOrder.size() > 0){
+                Map<Id, WorkOrder> oldMap = new Map<Id, WorkOrder>();
+                Map<Id, WorkOrder> newMap = new Map<Id, WorkOrder>();
+                for (sObject sObj: oldMap_WorkOrder.values()){
+                    WorkOrder wo = (WorkOrder)sObj;
+                    oldMap.put(wo.id, wo);
+                }
+                for (sObject sObj: newMap_WorkOrder.values()){
+                    WorkOrder wo = (WorkOrder)sObj;
+                    newMap.put(wo.id, wo);
+                }
+            	MSPFS_WorkOrderHandler.validateWorkOrderWhenETAPopulated(oldMap, newMap);
+            	MSPFS_WorkOrderHandler.populateTechnicianOnChildPOs(oldMap, newMap);
+            }
         }
         if(trigger.isDelete){
-            //updateWOCountsOnAssetAfterDelete(trigger.old);
-            //countWorkOrdersOnAsset(trigger.old, null);
-            //populateAccountLastVisitedDateAndSiteSurveyCountAfterDelete(trigger.old);
             if(!System.isFuture() && !System.isBatch())
-                populateAccountLastVisitedDateAndSiteSurveyCount(trigger.oldMap.keySet(), null);
+                populateAccountLastVisitedDateAndSiteSurveyCount(oldMap_WorkOrder.keySet(), null);
         }
         
         if(trigger.isInsert || trigger.isUndelete){
-            //updateWOCountsOnAssetAfterInsert(trigger.new);
-            //countWorkOrdersOnAsset(trigger.new, null);
-            //populateAccountLastVisitedDateAndSiteSurveyCountAfterInsert(trigger.new);
             if(!System.isFuture() && !System.isBatch()){
-                populateAccountLastVisitedDateAndSiteSurveyCount(trigger.newMap.keySet(), null);
-                UNITY_UpdateCaseStatus.onAfterInsert(trigger.newMap.keySet());
+                populateAccountLastVisitedDateAndSiteSurveyCount(newMap_WorkOrder.keySet(), null);
+                UNITY_UpdateCaseStatus.onAfterInsert(newMap_WorkOrder.keySet());
             }
-        }
-        
-        if(trigger.isInsert || trigger.isUpdate) {
-            //updateManualSharing();    
         }
     }
 
-   /*
-    * Name : getVendorAssignments
-    * Note :
-    *
-    */
     private void getVendorAssignments(Set<id> filterVA){
 
         if(!filterVA.isEmpty()){
@@ -288,75 +309,9 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         }
     }
 
-    /*
-    private void getPOOrders(){
-
-        Map<id,Order> orders = new Map<id,Order>([SELECT  id,
-                                                          FSO__WorkOrder__c,
-                                                          UNITY_Vendor__c
-                                                  FROM Order
-                                                  WHERE (FSO__WorkOrder__c in :Trigger.newMap.keySet()) AND
-                                                        (RecordTypeId = :UNITY_Constants.ORDER_PURCHASE_ORDER_RECORDTYPE) AND
-                                                        (Status = :UNITY_Constants.ORDER_STATUS_FINAL)]);
-
-        for(id orderId :orders.keySet()){
-            if(!wo_POOrders.containsKey(orders.get(orderId).FSO__WorkOrder__c))
-                wo_POOrders.put(orders.get(orderId).FSO__WorkOrder__c, new Map<id,List<Order>>());
-
-            if(wo_POOrders.get(orders.get(orderId).FSO__WorkOrder__c).get(orders.get(orderId).UNITY_Vendor__c) == null)
-                wo_POOrders.get(orders.get(orderId).FSO__WorkOrder__c).put(orders.get(orderId).UNITY_Vendor__c , new List<Order>());
-
-            wo_POOrders.get(orders.get(orderId).FSO__WorkOrder__c).get(orders.get(orderId).UNITY_Vendor__c).add(orders.get(orderId));
-        }
-    }*/
-    /*
-    private void countWorkOrdersOnAsset(List<SObject> woList, Map<Id,SObject> woMap){
-        Set<Id> assetIdSet = new Set<Id>();
-        if(woMap != null){
-            for(SObject o : woList){
-                WorkOrder wo = (WorkOrder)o;
-                WorkOrder oldwo = (WorkOrder)(woMap.get(o.id));
-                if(wo.AssetId != oldwo.AssetId || (wo.AssetId != null && wo.Status != oldwo.Status && (wo.Status == 'Closed' || oldwo.Status == 'Closed'))){
-                    assetIdSet.add(wo.AssetId);
-                    assetIdSet.add(oldwo.AssetId);
-                }
-            }
-        } else {
-            for(SObject o : woList){
-                WorkOrder wo = (WorkOrder)o;
-                assetIdSet.add(wo.AssetId);
-            }
-        }
-        if(assetIdSet.size() == 0) return;
-        Map<Id,Asset> assetMap = new Map<Id, Asset>([SELECT Id, SSVY_Total_of_Work_Orders__c, SSVY_Open_Work_Orders__c FROM Asset WHERE Id IN: assetIdSet]);
-        List<WorkOrder> workOrders = [SELECT Id, AssetId, Status FROM WorkOrder WHERE AssetId IN: assetIdSet];
-        Map<Id, List<WorkOrder>> assetIdToWorkOrderList = new Map<Id, List<WorkOrder>>();
-        for(WorkOrder wo : workOrders){
-            if(!assetIdToWorkOrderList.containsKey(wo.AssetId)){
-                assetIdToWorkOrderList.put(wo.AssetId, new List<WorkOrder>());
-            }
-            assetIdToWorkOrderList.get(wo.AssetId).add(wo);
-        }
-        for(Asset asset : assetMap.values()){
-            assetMap.get(asset.Id).SSVY_Total_of_Work_Orders__c = 0;
-            assetMap.get(asset.Id).SSVY_Open_Work_Orders__c = 0;
-            if(assetIdToWorkOrderList.containsKey(asset.Id)){
-                for(WorkOrder wo : assetIdToWorkOrderList.get(asset.Id)){
-                    if(wo.Status != 'Closed'){
-                        assetMap.get(wo.AssetId).SSVY_Total_of_Work_Orders__c++;
-                        assetMap.get(wo.AssetId).SSVY_Open_Work_Orders__c++;
-                    } else {
-                        assetMap.get(wo.AssetId).SSVY_Total_of_Work_Orders__c++;
-                    }
-                }
-            }
-        }
-        update AssetMap.values();
-    } */
 	@future
     public static void populateAccountLastVisitedDateAndSiteSurveyCount( Set<Id> woIdSet, String woMapString){
         UNITY_Constants.isExecutingContext('populateAccountLastVisitedDateAndSiteSurveyCount');
-        //List<SObject> woList = (List<SObject>)JSON.deserialize(woListString, List<SObject>.class);
         List<SObject> woList = [SELECT Id, FSO__Completed_Date__c, AccountId, RecordTypeId FROM WorkOrder WHERE Id IN: woIdSet];
         Map<Id,SObject> woMap;
         if(String.isNotBlank(woMapString))
@@ -420,294 +375,6 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         update AccountMap.values();
     }
 
-    /*
-    private void updateWOCountsOnAssetAfterUpdate(List<SObject> workOrders, Map<Id,SObject> mapOld){
-        Set<Id> assetIdSet = new Set<Id>();
-        List<WorkOrder> workOrdersToProcess = new List<WorkOrder>();
-        for(SObject o : workOrders){
-            WorkOrder wo = (WorkOrder)o;
-            WorkOrder oldwo = (WorkOrder)(mapOld.get(o.id));
-            if(wo.AssetId != oldwo.AssetId || (wo.AssetId != null && wo.Status != oldwo.Status && (wo.Status == 'Closed' || oldwo.Status == 'Closed'))){
-                assetIdSet.add(wo.AssetId);
-                assetIdSet.add(oldwo.AssetId);
-                workOrdersToProcess.add(wo);
-            }
-        }
-        if(workOrdersToProcess.size() == 0) return;
-        Map<Id,Asset> assetMap = new Map<Id, Asset>([SELECT Id, SSVY_Total_of_Work_Orders__c, SSVY_Open_Work_Orders__c FROM Asset WHERE Id IN: assetIdSet]);
-        for(WorkOrder wo : workOrdersToProcess){
-            WorkOrder oldwo = (WorkOrder)(mapOld.get(wo.id));
-            if(wo.AssetId != oldwo.AssetId){
-                if(wo.AssetId != null) assetMap.get(wo.AssetId).SSVY_Total_of_Work_Orders__c++;
-                if(oldwo.AssetId != null) assetMap.get(oldwo.AssetId).SSVY_Total_of_Work_Orders__c--;
-                if (wo.Status != 'Closed' && oldwo.Status == 'Closed'){
-                    if(wo.AssetId != null) assetMap.get(wo.AssetId).SSVY_Open_Work_Orders__c++;
-                } else if (wo.Status == 'Closed' && oldwo.Status != 'Closed'){
-                    if(oldwo.AssetId != null) assetMap.get(oldwo.AssetId).SSVY_Open_Work_Orders__c--;
-                } else if (wo.Status != 'Closed' && oldwo.Status != 'Closed'){
-                    if(wo.AssetId != null) assetMap.get(wo.AssetId).SSVY_Open_Work_Orders__c++;
-                    if(oldwo.AssetId != null) assetMap.get(oldwo.AssetId).SSVY_Open_Work_Orders__c--;
-                }
-            } else {
-                if (wo.Status != 'Closed' && oldwo.Status == 'Closed'){
-                    assetMap.get(wo.AssetId).SSVY_Open_Work_Orders__c++;
-                } else if (wo.Status == 'Closed' && oldwo.Status != 'Closed'){
-                    assetMap.get(wo.AssetId).SSVY_Open_Work_Orders__c--;
-                }
-            }
-        }
-        update assetMap.values();
-    }
-
-    private void updateWOCountsOnAssetAfterInsert(List<SObject> workOrders){
-        Set<Id> assetIdSet = new Set<Id>();
-        List<WorkOrder> workOrdersToProcess = new List<WorkOrder>();
-        for(SObject o : workOrders){
-            WorkOrder wo = (WorkOrder)o;
-            if(wo.AssetId != null){
-                workOrdersToProcess.add(wo);
-                assetIdSet.add(wo.AssetId);
-            }
-        }
-        if(workOrdersToProcess.size() == 0) return;
-        Map<Id,Asset> assetMap = new Map<Id, Asset>([SELECT Id, SSVY_Total_of_Work_Orders__c, SSVY_Open_Work_Orders__c FROM Asset WHERE Id IN: assetIdSet]);
-        for(WorkOrder wo : workOrdersToProcess){
-            assetMap.get(wo.AssetId).SSVY_Total_of_Work_Orders__c++;
-            if(wo.Status != 'Closed'){
-                assetMap.get(wo.AssetId).SSVY_Open_Work_Orders__c++;
-            }
-        }
-        update assetMap.values();
-    }
-
-    private void updateWOCountsOnAssetAfterDelete(List<SObject> workOrders){
-        Set<Id> assetIdSet = new Set<Id>();
-        List<WorkOrder> workOrdersToProcess = new List<WorkOrder>();
-        for(SObject o : workOrders){
-            WorkOrder wo = (WorkOrder)o;
-            if(wo.AssetId != null){
-                workOrdersToProcess.add(wo);
-                assetIdSet.add(wo.AssetId);
-            }
-        }
-        if(workOrdersToProcess.size() == 0) return;
-        Map<Id,Asset> assetMap = new Map<Id, Asset>([SELECT Id, SSVY_Total_of_Work_Orders__c, SSVY_Open_Work_Orders__c FROM Asset WHERE Id IN: assetIdSet]);
-        for(WorkOrder wo : workOrdersToProcess){
-            assetMap.get(wo.AssetId).SSVY_Total_of_Work_Orders__c--;
-            if(wo.Status != 'Closed'){
-                assetMap.get(wo.AssetId).SSVY_Open_Work_Orders__c--;
-            }
-        }
-        update assetMap.values();
-    }
-
-    private void populateAccountLastVisitedDateAndSiteSurveyCountAfterUpdate(List<SObject> workOrders, Map<Id,SObject> mapOld){
-        Set<Id> accountIdSet = new Set<Id>(); //To minimalize number of SOQL queries, query for accounts is done as single query
-        Map<Id, Integer> accountIdToChangeSiteSurveyMap = new Map<Id, Integer>();
-        RecordType siteSurveyRT = [SELECT Id FROM RecordType WHERE SObjectType = 'WorkOrder' AND DeveloperName = 'Site_Survey'];
-        for(SObject o : workOrders){
-            WorkOrder wo = (WorkOrder)o;
-            WorkOrder oldwo = (WorkOrder)(mapOld.get(o.id));
-            if(wo.AccountId != oldwo.AccountId || wo.FSO__Completed_Date__c != oldwo.FSO__Completed_Date__c){
-                accountIdSet.add(wo.AccountId);
-                accountIdSet.add(oldwo.AccountId);
-            }
-            system.debug(LoggingLevel.INFO, '****** accountIdSet: ' + accountIdSet);
-            if(wo.AccountId != oldwo.AccountId && wo.RecordTypeId == siteSurveyRT.Id && wo.RecordTypeId == oldwo.RecordTypeId){
-                if(!accountIdToChangeSiteSurveyMap.containsKey(wo.AccountId)) accountIdToChangeSiteSurveyMap.put(wo.AccountId, 0);
-                if(!accountIdToChangeSiteSurveyMap.containsKey(oldwo.AccountId)) accountIdToChangeSiteSurveyMap.put(oldwo.AccountId, 0);
-                accountIdToChangeSiteSurveyMap.put(wo.AccountId, accountIdToChangeSiteSurveyMap.get(wo.AccountId) + 1);
-                accountIdToChangeSiteSurveyMap.put(oldwo.AccountId, accountIdToChangeSiteSurveyMap.get(oldwo.AccountId) - 1);
-            }
-            if(wo.AccountId == oldwo.AccountId && wo.RecordTypeId != oldwo.RecordTypeId && (wo.RecordTypeId == siteSurveyRT.Id || oldwo.RecordTypeId == siteSurveyRT.Id)){
-                if(wo.RecordTypeId == siteSurveyRT.Id){
-                    if(!accountIdToChangeSiteSurveyMap.containsKey(wo.AccountId)) accountIdToChangeSiteSurveyMap.put(wo.AccountId, 0);
-                    if(!accountIdToChangeSiteSurveyMap.containsKey(oldwo.AccountId)) accountIdToChangeSiteSurveyMap.put(oldwo.AccountId, 0);
-                    accountIdToChangeSiteSurveyMap.put(wo.AccountId, accountIdToChangeSiteSurveyMap.get(wo.AccountId) + 1);
-                }
-                if(oldwo.RecordTypeId == siteSurveyRT.Id){
-                    if(!accountIdToChangeSiteSurveyMap.containsKey(wo.AccountId)) accountIdToChangeSiteSurveyMap.put(wo.AccountId, 0);
-                    if(!accountIdToChangeSiteSurveyMap.containsKey(oldwo.AccountId)) accountIdToChangeSiteSurveyMap.put(oldwo.AccountId, 0);
-                    accountIdToChangeSiteSurveyMap.put(wo.AccountId, accountIdToChangeSiteSurveyMap.get(wo.AccountId) - 1);
-                }
-            }
-            if(wo.AccountId != oldwo.AccountId && wo.RecordTypeId != oldwo.RecordTypeId && (wo.RecordTypeId == siteSurveyRT.Id || oldwo.RecordTypeId == siteSurveyRT.Id)){
-                if(wo.RecordTypeId == siteSurveyRT.Id){
-                    if(!accountIdToChangeSiteSurveyMap.containsKey(wo.AccountId)) accountIdToChangeSiteSurveyMap.put(wo.AccountId, 0);
-                    accountIdToChangeSiteSurveyMap.put(wo.AccountId, accountIdToChangeSiteSurveyMap.get(wo.AccountId) + 1);
-                }
-                if(oldwo.RecordTypeId == siteSurveyRT.Id){
-                    if(!accountIdToChangeSiteSurveyMap.containsKey(oldwo.AccountId)) accountIdToChangeSiteSurveyMap.put(oldwo.AccountId, 0);
-                    accountIdToChangeSiteSurveyMap.put(oldwo.AccountId, accountIdToChangeSiteSurveyMap.get(oldwo.AccountId) -1);
-                }
-            }
-        }
-        if(accountIdToChangeSiteSurveyMap.size() == 0 && accountIdSet.size() == 0) return;
-        Map<Id, Account> accountMap = new Map<Id, Account>([SELECT Id, SSVY_Total_Site_Surveys_Completed__c, SSVY_Last_Visited_Date__c FROM Account WHERE Id IN: accountIdSet OR Id IN: accountIdToChangeSiteSurveyMap.keySet()]);
-        List<WorkOrder> woList = [SELECT Id, FSO__Completed_Date__c, AccountId FROM WorkOrder WHERE AccountId IN: accountIdSet];
-        Map<Id, List<WorkOrder>> accountIdToWorkOrdersMap = new Map<Id, List<WorkOrder>>();
-        for(WorkOrder wo : woList){
-            if(!accountIdToWorkOrdersMap.containsKey(wo.AccountId)){
-                accountIdToWorkOrdersMap.put(wo.AccountId, new List<WorkOrder>());
-            }
-            accountIdToWorkOrdersMap.get(wo.AccountId).add(wo);
-        }
-        Map<Id, Account> accountsToUpdate = new Map <Id, Account>();
-        for(Id accId : accountMap.keySet()){
-            if(accountIdSet.contains(accId)){
-                if(accountIdToWorkOrdersMap.get(accId) == null){
-                    accountMap.get(accId).SSVY_Last_Visited_Date__c = null;
-                    accountsToUpdate.put(accId, accountMap.get(accId));
-                } else {
-                    DateTime mostRecentDate;
-                    for(WorkOrder wo : accountIdToWorkOrdersMap.get(accId)){
-                        if(mostRecentDate == null || mostRecentDate < wo.FSO__Completed_Date__c){
-                            mostRecentDate = wo.FSO__Completed_Date__c;
-                        }
-                    }
-                    system.debug(LoggingLevel.INFO, '****** mostRecentDate: ' + mostRecentDate);
-                    if(mostRecentDate != null){
-                        accountMap.get(accId).SSVY_Last_Visited_Date__c = mostRecentDate.dateGMT();
-                    } else {
-                        accountMap.get(accId).SSVY_Last_Visited_Date__c = null;
-                    }
-                    accountsToUpdate.put(accId, accountMap.get(accId));
-                }
-            }
-            if(accountIdToChangeSiteSurveyMap.containsKey(accId)){
-                if(accountsToUpdate.containsKey(accId)){
-                    accountsToUpdate.get(accId).SSVY_Total_Site_Surveys_Completed__c = accountsToUpdate.get(accId).SSVY_Total_Site_Surveys_Completed__c + accountIdToChangeSiteSurveyMap.get(accId);
-                } else {
-                    accountMap.get(accId).SSVY_Total_Site_Surveys_Completed__c = accountMap.get(accId).SSVY_Total_Site_Surveys_Completed__c + accountIdToChangeSiteSurveyMap.get(accId);
-                    accountsToUpdate.put(accId, accountMap.get(accId));
-                }
-            }
-
-        }
-        system.debug(LoggingLevel.INFO, '****** accountsToUpdate: ' + accountsToUpdate);
-        update accountsToUpdate.values();
-    }
-
-    private void populateAccountLastVisitedDateAndSiteSurveyCountAfterDelete(List<SObject> workOrders){
-        Set<Id> accountIdSet1 = new Set<Id>(); //To minimalize number of SOQL queries query for accounts is done in one query
-        Set<Id> accountIdSet2 = new Set<Id>();
-        RecordType siteSurveyRT = [SELECT Id FROM RecordType WHERE SObjectType = 'WorkOrder' AND DeveloperName = 'Site_Survey'];
-        Map<Id, Integer> accountIdToChangeSiteSurveyMap = new Map<Id, Integer>();
-        for(SObject o : workOrders){
-            WorkOrder wo = (WorkOrder)o;
-            if(wo.FSO__Completed_Date__c != null){
-                accountIdSet1.add(wo.AccountId);
-            }
-            if(wo.RecordTypeId == siteSurveyRT.Id){
-                accountIdSet2.add(wo.AccountId);
-                if(!accountIdToChangeSiteSurveyMap.containsKey(wo.AccountId)){
-                    accountIdToChangeSiteSurveyMap.put(wo.AccountId, 0);
-                }
-                accountIdToChangeSiteSurveyMap.put(wo.AccountId, accountIdToChangeSiteSurveyMap.get(wo.AccountId) + 1);
-            }
-        }
-        if(accountIdSet1.size() == 0 && accountIdSet2.size() == 0) return;
-        Map<Id, Account> accountMap = new Map<Id, Account>([SELECT Id, SSVY_Total_Site_Surveys_Completed__c, SSVY_Last_Visited_Date__c FROM Account WHERE Id IN: accountIdSet1 OR Id IN: accountIdSet2]);
-        List<WorkOrder> woList = [SELECT Id, FSO__Completed_Date__c, AccountId FROM WorkOrder WHERE AccountId IN: accountIdSet1];
-        Map<Id, List<WorkOrder>> accountIdToWorkOrdersMap = new Map<Id, List<WorkOrder>>();
-        for(WorkOrder wo : woList){
-            if(!accountIdToWorkOrdersMap.containsKey(wo.AccountId)){
-                accountIdToWorkOrdersMap.put(wo.AccountId, new List<WorkOrder>());
-            }
-            accountIdToWorkOrdersMap.get(wo.AccountId).add(wo);
-        }
-        Map<Id, Account> accountsToUpdate = new Map <Id, Account>();
-        for(Id accId : accountMap.keySet()){
-            if(accountIdSet1.contains(accId)){
-                if(accountIdToWorkOrdersMap.get(accId) == null){
-                    accountMap.get(accId).SSVY_Last_Visited_Date__c = null;
-                    accountsToUpdate.put(accId, accountMap.get(accId));
-                } else {
-                    DateTime mostRecentDate;
-                    for(WorkOrder wo : accountIdToWorkOrdersMap.get(accId)){
-                        if(mostRecentDate == null || mostRecentDate < wo.FSO__Completed_Date__c){
-                            mostRecentDate = wo.FSO__Completed_Date__c;
-                        }
-                    }
-                    if(mostRecentDate != null){
-                        accountMap.get(accId).SSVY_Last_Visited_Date__c = mostRecentDate.dateGMT();
-                    } else {
-                        accountMap.get(accId).SSVY_Last_Visited_Date__c = null;
-                    }
-                    accountsToUpdate.put(accId, accountMap.get(accId));
-                }
-            }
-            if(accountIdSet2.contains(accId)){
-                if(accountsToUpdate.containsKey(accId)){
-                    accountsToUpdate.get(accId).SSVY_Total_Site_Surveys_Completed__c = accountsToUpdate.get(accId).SSVY_Total_Site_Surveys_Completed__c - accountIdToChangeSiteSurveyMap.get(accId);
-                } else {
-                    accountMap.get(accId).SSVY_Total_Site_Surveys_Completed__c = accountMap.get(accId).SSVY_Total_Site_Surveys_Completed__c - accountIdToChangeSiteSurveyMap.get(accId);
-                    accountsToUpdate.put(accId, accountMap.get(accId));
-                }
-            }
-        }
-        update accountsToUpdate.values();
-    }
-
-    private void populateAccountLastVisitedDateAndSiteSurveyCountAfterInsert(List<SObject> workOrders){
-        Set<Id> accountIdSet1 = new Set<Id>(); //To minimalize number of SOQL queries query for accounts is done in one query
-        Set<Id> accountIdSet2 = new Set<Id>();
-        RecordType siteSurveyRT = [SELECT Id FROM RecordType WHERE SObjectType = 'WorkOrder' AND DeveloperName = 'Site_Survey'];
-        Map<Id, Integer> accountIdToChangeSiteSurveyMap = new Map<Id, Integer>();
-        for(SObject o : workOrders){
-            WorkOrder wo = (WorkOrder)o;
-            if(wo.FSO__Completed_Date__c != null){
-                accountIdSet1.add(wo.AccountId);
-            }
-            if(wo.RecordTypeId == siteSurveyRT.Id){
-                accountIdSet2.add(wo.AccountId);
-                if(!accountIdToChangeSiteSurveyMap.containsKey(wo.AccountId)){
-                    accountIdToChangeSiteSurveyMap.put(wo.AccountId, 0);
-                }
-                accountIdToChangeSiteSurveyMap.put(wo.AccountId, accountIdToChangeSiteSurveyMap.get(wo.AccountId) + 1);
-            }
-        }
-        if(accountIdSet1.size() == 0 && accountIdSet2.size() == 0) return;
-        Map<Id, Account> accountMap = new Map<Id, Account>([SELECT Id, SSVY_Total_Site_Surveys_Completed__c, SSVY_Last_Visited_Date__c FROM Account WHERE Id IN: accountIdSet1 OR Id IN: accountIdSet2]);
-        List<WorkOrder> woList = [SELECT Id, FSO__Completed_Date__c, AccountId FROM WorkOrder WHERE AccountId IN: accountIdSet1];
-        Map<Id, List<WorkOrder>> accountIdToWorkOrdersMap = new Map<Id, List<WorkOrder>>();
-        for(WorkOrder wo : woList){
-            if(!accountIdToWorkOrdersMap.containsKey(wo.AccountId)){
-                accountIdToWorkOrdersMap.put(wo.AccountId, new List<WorkOrder>());
-            }
-            accountIdToWorkOrdersMap.get(wo.AccountId).add(wo);
-        }
-        Map<Id, Account> accountsToUpdate = new Map<Id, Account>();
-        for(Id accId : accountMap.keySet()){
-            if(accountIdSet1.contains(accId)){
-                DateTime mostRecentDate;
-                for(WorkOrder wo : accountIdToWorkOrdersMap.get(accId)){
-                    if(mostRecentDate == null || mostRecentDate < wo.FSO__Completed_Date__c){
-                        mostRecentDate = wo.FSO__Completed_Date__c;
-                    }
-                }
-                if(mostRecentDate != null){
-                    accountMap.get(accId).SSVY_Last_Visited_Date__c = mostRecentDate.dateGMT();
-                } else {
-                    accountMap.get(accId).SSVY_Last_Visited_Date__c = null;
-                }
-                accountsToUpdate.put(accId, accountMap.get(accId));
-            }
-            if(accountIdSet2.contains(accId)){
-                if(accountsToUpdate.containsKey(accId)){
-                    accountsToUpdate.get(accId).SSVY_Total_Site_Surveys_Completed__c = accountsToUpdate.get(accId).SSVY_Total_Site_Surveys_Completed__c + accountIdToChangeSiteSurveyMap.get(accId);
-                } else {
-                    accountMap.get(accId).SSVY_Total_Site_Surveys_Completed__c = accountMap.get(accId).SSVY_Total_Site_Surveys_Completed__c + accountIdToChangeSiteSurveyMap.get(accId);
-                    accountsToUpdate.put(accId, accountMap.get(accId));
-                }
-            }
-        }
-        update accountsToUpdate.values();
-    }*/
-
-    //private Map<Id, UNITY_Service_Contract__c> customerServiceContracts = new Map<Id, UNITY_Service_Contract__c>();
-    //private Map<Id, Id> serviceContractIdsByCase = new Map<Id, Id>();
-
     private void populateMarginFromServiceContract(WorkOrder newWO){
         UNITY_Service_Contract__c serviceContract = customerServiceContracts.get(newWO.UNITY_Customer_Service_Contract__c);
         system.debug('@@ : serviceContract : '+serviceContract);
@@ -731,15 +398,6 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
     public override void beforeInsert(SObject so){
 
         WorkOrder newWorkOrder = (WorkOrder) so;
-
-
-        //populateServiceContract(newWorkOrder); //find the service contract (active, record type = case record type), populate WO service contract field.
-        //populateNTE(newWorkOrder); //check if case NTE is blank or 0, if so get NTE from SC you found earlier. if NTE on case is not null or 0, copy case NTE to WO.
-        //pullNTEFromCase(newWorkOrder); // Added by Vaishnavi for T-00405
-
-        // autopopulate record
-        //UNITY_AutopopulateChildController controller = new UNITY_AutopopulateChildController('WorkOrder');
-        //controller.autopopulateFieldsIfApplicable(newWorkOrder);
 
         // generate a random four digit ping
         newWorkOrder.UNITY_Customer_PIN__c = UNITY_Utils.generateRandomPin();
@@ -766,7 +424,17 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
         if (newWorkOrder.UNITY_Assigned_Vendor__c != oldWorkOrder.UNITY_Assigned_Vendor__c && newWorkOrder.UNITY_Assigned_Vendor__c == null){
             newWorkOrder.UNITY_Vendor_Contract__c = null;
+            newWorkOrder.UNITY_Contracted_Rate__c = null;
         }
+        
+        if ((newWorkOrder.UNITY_Accepted_Vendor__c != oldWorkOrder.UNITY_Accepted_Vendor__c 
+            && newWorkOrder.UNITY_Accepted_Vendor__c != null 
+            && newWorkOrder.UNITY_Vendor_Status__c == UNITY_Constants.WO_VENDOR_STATUS_ACCEPTED)
+            || (newWorkOrder.UNITY_Trade__c != oldWorkOrder.UNITY_Trade__c && newWorkOrder.UNITY_Accepted_Vendor__c != null)){
+                system.debug('@@@contractedRate passed condition');
+                assignContractedRate(newWorkOrder);                            
+        }
+        
         populateCPFromServiceContract(newWorkOrder);
         this.checkOwnerChange(newWorkOrder,oldWorkOrder);
     }
@@ -812,9 +480,6 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         }
 
         this.truckOnsiteProcess();
-
-        //populate vendor service contract
-        //populateVendorServiceContract();
 
         //methods only considered for update only, so for the rest of the operation not considered
         this.createNewDraftPO();
@@ -1019,8 +684,6 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
                                     woToAssignTechnician.add(newWO);
                                 }
 
-                                //woVendorToAssignment.get(newWO.id +'-'+onVendorW.id).Status__c        = newWO.UNITY_Vendor_Status__c;
-                                //woVendorToAssignment.get(newWO.id +'-'+onVendorW.id).Last_Assigned__c = newWO.UNITY_Vendor_Last_Assigned__c;
                                 onVendorW.assignment.Status__c        = newWO.UNITY_Vendor_Status__c;
                                 onVendorW.assignment.Last_Assigned__c = newWO.UNITY_Vendor_Last_Assigned__c;
 
@@ -1066,26 +729,6 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         }
     }
 
-    /*
-    * @name       : captureMiddlemanCustomer
-    * @arguments  : WorkOrder new SObject
-    * @note       : Populate UNITY_Customer__c fields on Work Order from the Case related.
-    *               Mapping : WorkOrder.UNITY_Customer__c = Case.UNITY_Customer__c
-    *                         WorkOrder.AccountId = Case.AccountId
-    */
-    /*
-    public void captureMiddlemanCustomer(WorkOrder newWorkOrder){
-
-        id caseId = newWorkOrder.CaseId;
-
-        if((caseId != null) && (parentCases.get(caseId) != null)){
-            newWorkOrder.put( 'UNITY_Customer__c' , parentCases.get(caseId).get('UNITY_Customer__c') );
-            newWorkOrder.put( 'AccountId'   , parentCases.get(caseId).get('AccountId'));
-
-        }
-
-    }*/
-
     public void updatePO(){
 
         if(poToUpdate.size()>0){
@@ -1098,7 +741,7 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         list<Order> toUpdate = new list<Order>();
         if((orders.size()>0) && !UNITY_Constants.isExecutingContext('UNITY_WorkOrderTriggerHandler.insertCurrentPO')){
             for(Order onOrder :orders){
-                WorkOrder onWO = (WorkOrder)Trigger.newMap.get(onOrder.FSO__WorkOrder__c);
+                WorkOrder onWO = (WorkOrder)newMap_SR_WorkOrders.get(onOrder.FSO__WorkOrder__c);
                 if(!onWO.UNITY_PO_Review_Pending__c){
                     Order finalOrder = new Order();
                     finalOrder.id = onOrder.id;
@@ -1109,28 +752,6 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
             update toUpdate;
         }
     }
-
-    /*
-    * @name       : pullNTEFromCase
-    * @arguments  : WorkOrder new SObject
-    * Programmer  : Vaishnavi
-    *
-    */
-    /*
-    public void pullNTEFromCase(WorkOrder newWorkOrder){
-
-        id caseId = newWorkOrder.CaseId;
-
-        if((caseId != null) && (parentCases.get(caseId) != null)){
-
-            if(newWorkOrder.UNITY_Not_To_Exceed_NTE__c == 0.0) // If NTE in Work Order is 0.0, pull NTE Value from Case
-            {
-                newWorkOrder.put( 'UNITY_Not_To_Exceed_NTE__c' , parentCases.get(caseId).get('UNITY_NTE_Threshold__c'));
-            //System.debug('Print Wo' + newWorkOrder);
-            }
-        }
-
-    }*/
 
     /*
     * @name        : populateNTE
@@ -1158,33 +779,6 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         }
         System.debug('SCNTE' +SCNTE);
         System.debug('WOTRADE' +WOTRADE);
-
-        /*
-        if((caseId != null) && (caseNTE!=0.0 || caseNTE!=0)){
-            newWorkOrder.put( 'UNITY_Not_To_Exceed_NTE__c' , parentCases.get(caseId).get('UNITY_NTE_Threshold__c'));
-            System.debug('CASENTECopied');
-        }
-        else
-        {
-          List<UNITY_Service_Contract_Line_Item__c> scli =[SELECT Id,Name,UNITY_Trade__c,Unity_NTE__c,UNITY_Service_Contract__c FROM UNITY_Service_Contract_Line_Item__c WHERE UNITY_Service_Contract__c =:scId AND RecordType.Name = 'Hourly Rate'];
-          for(UNITY_Service_Contract_Line_Item__c scliObj : scli){
-          scliNTE = scliObj.Unity_NTE__c;
-          scliTrade = String.valueOf(scliObj.UNITY_Trade__c);
-          System.debug('SCLI' +scliNTE+ 'Trade' + scliTrade);
-
-          }
-          if(scli.size()>0 && ((scliTrade).equals(WOTrade)))
-          {
-              newWorkOrder.UNITY_Not_To_Exceed_NTE__c = scliNTE;
-              System.debug('Trade Equal');
-          }else
-          {
-              newWorkOrder.UNITY_Not_To_Exceed_NTE__c = SCNTE;
-              System.debug('Trade Not Equal');
-          }
-
-
-        }*/
     }
     /*
     * @name        : populateServiceContract
@@ -1222,7 +816,7 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
     public void applyTemplates(){
 
-        for (sObject iter: trigger.new){
+        for (sObject iter: new_SR_WorkOrders){
 
             WorkOrder workOrder = (WorkOrder)iter;
 
@@ -1247,9 +841,9 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
         if (Trigger.isUpdate){
 
-            for (SObject iter: trigger.new){
+            for (SObject iter: new_SR_WorkOrders){
 
-                if ( ((WorkOrder)iter).UNITY_Business_Unit_Account__c != ((WorkOrder)trigger.oldMap.get(iter.id)).UNITY_Business_Unit_Account__c){
+                if ( ((WorkOrder)iter).UNITY_Business_Unit_Account__c != ((WorkOrder)oldMap_SR_WorkOrders.get(iter.id)).UNITY_Business_Unit_Account__c){
                     workOrderBUChanged.add(iter.Id);
                 }
             }
@@ -1258,14 +852,14 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         List<Order> relatedOrders = [select id ,FSO__WorkOrder__c from Order where FSO__WorkOrder__c in: workOrderBUChanged];
 
         for (Order iter: relatedOrders){
-            iter.UNITY_Business_Unit_Account__c = ((WorkOrder)(trigger.newMap.get(iter.FSO__WorkOrder__c))).UNITY_Business_Unit_Account__c;
+            iter.UNITY_Business_Unit_Account__c = ((WorkOrder)(newMap_SR_WorkOrders.get(iter.FSO__WorkOrder__c))).UNITY_Business_Unit_Account__c;
             ordersToUpdate.add(iter);
         }
 
         List<UNITY_Proposal__c> proposalList = [select id, UNITY_Work_Order__c from UNITY_Proposal__c where UNITY_Work_Order__c in:workOrderBUChanged];
 
         for (UNITY_Proposal__c iter: proposalList){
-            iter.UNITY_Business_Unit_Account__c = ((WorkOrder)(trigger.newMap.get(iter.UNITY_Work_Order__c))).UNITY_Business_Unit_Account__c;
+            iter.UNITY_Business_Unit_Account__c = ((WorkOrder)(newMap_SR_WorkOrders.get(iter.UNITY_Work_Order__c))).UNITY_Business_Unit_Account__c;
             proposalsToUpdate.add(iter);
         }
 
@@ -1274,11 +868,11 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         update proposalsToUpdate;
     }
 
-    public void populateRelatedCasesMap(){
+     public void populateRelatedCasesMap(){
 
         Set<Id> caseIdSet = new Set<Id>();
 
-        for (SObject wo: trigger.new){
+        for (SObject wo: new_SR_WorkOrders){
             caseIdSet.add(((WorkOrder)wo).CaseId);
         }
 
@@ -1299,7 +893,7 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
             Order newOrder = null;
             for(UNITY_wrapperVendorByTrade vendor :createNewDraftPO.values()){
 
-                WorkOrder wo = (WorkOrder)Trigger.newMap.get(vendor.assignment.Work_Order__c);
+                WorkOrder wo = (WorkOrder)newMap_SR_WorkOrders.get(vendor.assignment.Work_Order__c);
                 order_fields = new Map<String,Object>();
                 order_fields.put('FSO__WorkOrder__c'    , vendor.assignment.Work_Order__c);
                 order_fields.put('UNITY_Vendor__c'      , vendor.id);
@@ -1327,7 +921,7 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
                 for(UNITY_wrapperVendorByTrade vendor :createNewDraftPO.values()){
                     if(aux_orderUpdetedFields.get(vendor.assignment.Initial_PO__c)!=null){
-                        WorkOrder wo = (WorkOrder)Trigger.newMap.get(vendor.assignment.Work_Order__c);
+                        WorkOrder wo = (WorkOrder)newMap_SR_WorkOrders.get(vendor.assignment.Work_Order__c);
                         wo.UNITY_Initial_Vendor_PO_Cost__c = aux_orderUpdetedFields.get(vendor.assignment.Initial_PO__c).UNITY_Total_Cost__c;
                     }
                 }
@@ -1352,7 +946,7 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
             for (Id iter: workOrderWithVendorAssigned){
 
-                WorkOrder wo = (WorkOrder)trigger.newMap.get(iter);
+                WorkOrder wo = (WorkOrder)newMap_SR_WorkOrders.get(iter);
 
                 assignedVendorList.add(wo.UNITY_Assigned_Vendor__c);
             }
@@ -1377,7 +971,7 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
 
           for (Id iter: workOrderWithVendorAssigned){
 
-              WorkOrder wo = (WorkOrder)trigger.newMap.get(iter);
+              WorkOrder wo = (WorkOrder)newMap_SR_WorkOrders.get(iter);
 
               List<UNITY_Service_Contract__c> relatedVendorContract = vendorContractMap.get(wo.UNITY_Assigned_Vendor__c);
 
@@ -1441,12 +1035,12 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
             for(Id driverId :workOrderChangedOwners.keySet()){
                 if((driverLocationsMap.get(driverId)==null))
                     for(Id woId :workOrderChangedOwners.get(driverId))
-                        Trigger.newMap.get(woId).put('UNITY_Truck_On_Site__c',null);
+                        newMap_SR_WorkOrders.get(woId).put('UNITY_Truck_On_Site__c',null);
                     
                 
                 else if((driverLocationsMap.get(driverId)!=null)&& !driverLocationsMap.get(driverId).isEmpty())
                     for(Id woId :workOrderChangedOwners.get(driverId))
-                        Trigger.newMap.get(woId).put('UNITY_Truck_On_Site__c',driverLocationsMap.get(driverId).get(0).Id);
+                        newMap_SR_WorkOrders.get(woId).put('UNITY_Truck_On_Site__c',driverLocationsMap.get(driverId).get(0).Id);
                     
                 
             }
@@ -1463,12 +1057,12 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         Map<Id,List<Id>> accountIdUserIdMap = new Map<Id,List<Id>>();
         Set<Id> accountIds = new Set<Id>();
         Set<Id> oldAccountIds = new Set<Id>();
-        system.debug(' ---> Trigger.old :'+Trigger.old);
-        system.debug(' ---> Trigger.new :'+Trigger.new);
-        for(WorkOrder workorder : (List<WorkOrder>)Trigger.new) {
+        system.debug(' ---> Trigger.old :'+old_SR_WorkOrders);
+        system.debug(' ---> Trigger.new :'+new_SR_WorkOrders);
+        for(WorkOrder workorder : (List<WorkOrder>)new_SR_WorkOrders) {
             WorkOrder oldworkorder;
-            if(Trigger.oldMap != null) {
-                oldworkorder = (WorkOrder)Trigger.oldMap.get(workorder.Id);
+            if(oldMap_SR_WorkOrders != null) {
+                oldworkorder = (WorkOrder)oldMap_SR_WorkOrders.get(workorder.Id);
             }
             if(oldworkorder == null || workorder.AccountId != oldworkorder.AccountId) {
                 accountIds.add(workorder.AccountId);
@@ -1491,10 +1085,10 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
             }
     
             system.debug('>>> accountIdUserIdMap'+accountIdUserIdMap);
-            for(WorkOrder workOrderNew : (List<WorkOrder>)Trigger.new) {
+            for(WorkOrder workOrderNew : (List<WorkOrder>)new_SR_WorkOrders) {
                 WorkOrder workOrderOld;
-                if(Trigger.oldMap != null) {
-                    workOrderOld =(WorkOrder)Trigger.oldMap.get(workOrderNew.Id);
+                if(oldMap_SR_WorkOrders != null) {
+                    workOrderOld =(WorkOrder)oldMap_SR_WorkOrders.get(workOrderNew.Id);
                 }
                 if(accountIds.contains(workOrderNew.AccountId) && 
                    accountIdUserIdMap.get(workOrderNew.AccountId) != null) {
@@ -1536,7 +1130,405 @@ public with sharing class UNITY_WorkOrderTriggerHandler extends UNITY_BaseHandle
         UNITY_Utils.countWorkOrdersOnAsset(woIds, WorkOrder.getSObjectType());
     }
 
+    //Populate the field - Contracted rate
+	private static void assignContractedRate(WorkOrder wo){
+        system.debug('@@@assignContractedRate');
+        if (wo.UNITY_Vendor_Contract__c != null && wo.UNITY_Trade__c != null){
+            UNITY_Service_Contract__c vendorContract = [SELECT Id, UNITY_Default_Labor_Rate__c, 
+                                                        (SELECT UNITY_Labor_Cost__c, UNITY_Trade__c FROM UNITY_Service_Contract_Line_Items__r 
+                                                         WHERE RecordTypeId = :UNITY_Constants.SCLI_HOURLY_RATE_RECORDTYPE
+                                                         AND UNITY_Trade__c = :wo.UNITY_Trade__c
+                                                         ORDER BY LastModifiedDate desc
+                                                        )
+                                                        FROM UNITY_Service_Contract__c WHERE Id = :wo.UNITY_Vendor_Contract__c];
+            system.debug('@@@assignContractedRate vendorContract:'+vendorContract);
+            wo.UNITY_Contracted_Rate__c = vendorContract.UNITY_Default_Labor_Rate__c;
+            system.debug('@@@assignContractedRate vendorContract.UNITY_Default_Labor_Rate__c:'+vendorContract.UNITY_Default_Labor_Rate__c);
+            if (vendorContract != null && vendorContract.UNITY_Service_Contract_Line_Items__r.size() > 0){
+                wo.UNITY_Contracted_Rate__c = vendorContract.UNITY_Service_Contract_Line_Items__r[0].UNITY_Labor_Cost__c;
+	            system.debug('@@@assignContractedRate hourlyrate:'+wo.UNITY_Contracted_Rate__c);
+            }
+    	}
+    }
 
     class WorkOrderException extends Exception{}
+
+    private void populateFieldsFromOriginatingWO(Map<Id,WorkOrder> pmoWOList){
+        Map<Id,Id> woAndOriginatingWOMap = new Map<Id,Id>();
+        for (WorkOrder wo: pmoWOList.values()){
+            woAndOriginatingWOMap.put(wo.Id, wo.UNITYPM_Originating_Work_Order__c);
+        }
+
+        Map<Id, WorkOrder> originatingWOMap = new Map<Id, WorkOrder>([SELECT Id, UNITY_Business_Unit__c, UNITY_Skill_Group__c,
+                                                UNITY_Skill_Type__c, UNITY_Skill_Broad__c, CaseId, UNITY_Program_Case__c, AccountId, 
+                                                UNITY_Customer_Service_Contract__c, UNITY_Accepted_Vendor__c, ContactId, UNITY_Vendor_Status__c,
+                                                UNITY_Site_Contact_Phone__c, UNITY_Work_Window_Begin__c
+                                                FROM WorkOrder WHERE ID in :woAndOriginatingWOMap.values()]);
+        
+        system.debug('@@@populateFieldsFromOriginatingWO originatingWOMap:'+originatingWOMap);
+
+        
+        //Get Vendor SCs
+        Set<Id> vendorIdSet = new Set<Id>();
+        for (WorkOrder wo : originatingWOMap.values()){
+            vendorIdSet.add(wo.UNITY_Accepted_Vendor__c);
+        }
+        system.debug('@@@populateFieldsFromOriginatingWO vendorIdSet:'+vendorIdSet);
+
+        Map<Id,UNITY_Service_Contract__c> vendorServiceContractMap = new Map<Id,UNITY_Service_Contract__c>([SELECT Id, UNITYPM_PMO_NTE__c, UNITY_Account__c, RecordTypeId 
+                                                                FROM UNITY_Service_Contract__c
+                                                                WHERE RecordTypeId = :UNITY_Constants.SC_SERVICE_REQUEST_RECORDTYPE
+                                                                AND UNITY_IS_Active__c = true
+                                                                AND UNITY_Account__c in :vendorIdSet]);
+
+        system.debug('@@@populateFieldsFromOriginatingWO vendorServiceContractMap:'+vendorServiceContractMap);
+        Map<Id, Id> vendorServReqSCMap = new Map<Id, Id>();
+        for (UNITY_Service_Contract__c sc : vendorServiceContractMap.values()){
+            vendorServReqSCMap.put(sc.UNITY_Account__c, sc.Id);
+        }
+
+        List<WorkOrder> woNeedsNewCaseList = new List<WorkOrder>();
+        List<WorkOrder> woNeedsNewCasePMOList = new List<WorkOrder>();
+        List<WorkOrder> woNeedsSCList = new List<WorkOrder>();
+        for(Id woID: woAndOriginatingWOMap.keySet()){
+            WorkOrder wo = pmoWOList.get(woId);
+            WorkOrder originatingWO = originatingWOMap.get(woAndOriginatingWOMap.get(woId));
+
+            if (originatingWO == null)
+                continue;
+
+            //Check if there is an accepted vendor
+            if (originatingWO.UNITY_Accepted_Vendor__c == null || originatingWO.UNITY_Vendor_Status__c != 'Accepted'){
+                if (wo.UNITYPM_Type__c == 'PMO' )
+                    wo.addError('Preventative Maintenance work order must have an accepted vendor before a PMO work order can be created.');
+                else 
+                    wo.addError('Preventative Maintenance work order must have an accepted vendor before a PMA work order can be created.');
+                return;
+            }
+
+            system.debug('@@@populateFieldsFromOriginatingWO originatingWO.UNITY_Business_Unit__c:'+originatingWO.UNITY_Business_Unit__c);
+
+            wo.UNITY_Site_Contact_Phone__c = originatingWO.UNITY_Site_Contact_Phone__c;
+            wo.UNITY_Work_Description__c = wo.Description;
+            wo.UNITY_Business_Unit__c = originatingWO.UNITY_Business_Unit__c;
+            wo.UNITY_Skill_Broad__c = originatingWO.UNITY_Skill_Broad__c;                
+            wo.UNITY_Skill_Group__c = originatingWO.UNITY_Skill_Group__c;
+            wo.UNITY_Skill_Type__c = originatingWO.UNITY_Skill_Type__c;
+            wo.UNITY_Vendor_Status__c = originatingWO.UNITY_Vendor_Status__c;
+            wo.UNITY_Vendor_Contract__c = vendorServReqSCMap.containsKey(originatingWO.UNITY_Accepted_Vendor__c) ? vendorServReqSCMap.get(originatingWO.UNITY_Accepted_Vendor__c) : null;
+            //if (wo.UNITYPM_Type__c == 'PMO')
+            //    wo.StartDate = originatingWO.UNITY_Work_Window_Begin__c.addMinutes(1);
+
+            //If user is not expecting a Service Channel case, use the Originating WO's Case
+            if (wo.UNITYPM_Expecting_Case_from_Integration__c){
+                wo.UNITY_Program_Case__c = originatingWO.UNITY_Program_Case__c;
+                wo.CaseId = originatingWO.CaseId;
+                wo.AccountId = originatingWO.AccountId;
+            }
+            else{
+                woNeedsNewCaseList.add(wo);
+                if (wo.UNITYPM_Type__c == 'PMO')
+                    woNeedsNewCasePMOList.add(originatingWO);
+            }
+        }
+        system.debug('@@@populateFieldsFromOriginatingWO woNeedsNewCaseList:'+woNeedsNewCaseList);
+
+        system.debug('@@@populateFieldsFromOriginatingWO pmoWOList:'+pmoWOList);
+
+        //Populate Customer SC
+        populateSRServiceContract(pmoWOList.values());
+
+        //For PMO, get NTE.  Use originating WO's SC
+        Set<Id> scIdSet = new Set<Id>();
+        for (WorkOrder wo: woNeedsNewCasePMOList){
+            scIdSet.add(wo.UNITY_Customer_Service_Contract__c);
+        }
+
+        system.debug('@@@populateFieldsFromOriginatingWO scIdSet:'+scIdSet);
+
+        Map<Id,UNITY_Service_Contract__c> serviceContactMap = new Map<Id,UNITY_Service_Contract__c>([SELECT Id, UNITYPM_PMO_NTE__c, UNITY_Account__c, RecordTypeId 
+                                                                FROM UNITY_Service_Contract__c
+                                                                WHERE RecordTypeId = :UNITY_Constants.SC_PREVENTATIVE_MAINTENANCE_RECORDTYPE
+                                                                AND UNITY_IS_Active__c = true
+                                                                AND Id in :scIdSet]);
+
+        system.debug('@@@populateFieldsFromOriginatingWO serviceContactMap:'+serviceContactMap);
+    
+
+        //Create cases
+        if (woNeedsNewCaseList.size() > 0){    
+            //Create the Cases
+            List<Case> casesToInsert = new List<Case>();
+            for (WorkOrder wo: woNeedsNewCaseList){
+                WorkOrder originatingWO = originatingWOMap.get(woAndOriginatingWOMap.get(wo.Id));
+
+                if (originatingWO == null)
+                    continue;
+
+                Case c = new Case(
+                    RecordTypeId = UNITY_Constants.CASE_SERVICE_REQUEST_RECORDTYPE,
+                    Type = wo.UNITYPM_Type__c,
+                    ParentId = originatingWO.UNITY_Program_Case__c,
+                    Subject = wo.Subject,
+                    Description = wo.Description,
+                    Status = 'Verified',
+                    UNITY_Skill_Broad__c = wo.UNITY_Skill_Broad__c,
+                    UNITY_Skill_Group__c = wo.UNITY_Skill_Group__c,
+                    UNITY_Skill_Type__c = wo.UNITY_Skill_Type__c,
+                    UNITY_Trade__c = wo.UNITY_Trade__c,
+                    UNITY_Customer__c = wo.UNITY_Customer__c,
+                    AccountId = originatingWO.AccountId,
+                    ContactId = wo.ContactId
+                    );
+
+                if (wo.UNITYPM_Type__c == 'PMO'){
+                    UNITY_Service_Contract__c sc = serviceContactMap.get(originatingWO.UNITY_Customer_Service_Contract__c);
+                    if (sc != null)
+                        c.UNITY_NTE_Threshold__c = sc.UNITYPM_PMO_NTE__c;
+                }
+                casesToInsert.add(c);
+            }
+
+
+
+            system.debug('@@@populateFieldsFromOriginatingWO casesToInsert:'+casesToInsert);
+
+            //Associate the new Cases to the Work Orders
+            if (casesToInsert.size() > 0){
+                Database.SaveResult[] result = Database.insert(casesToInsert, false);
+                system.debug('@@@populateFieldsFromOriginatingWO result:'+result );
+
+                for (Integer i =0;  i < woNeedsNewCaseList.size(); i++) {
+                    WorkOrder wo = woNeedsNewCaseList[i];
+                    Case c = casesToInsert[i];
+                    wo.CaseId = c.Id;
+                }
+            }
+
+        }
+
+    }
+
+    //Populate SR that is not from Case
+    public static void populateSRServiceContract(List<WorkOrder> woList){
+        
+        system.debug('@@@populateSRServiceContract woList:'+woList);
+        Set<Id> relatedCustomerIdSet = new Set<Id>();
+        Set<Id> relatedAccountIdSet = new Set<Id>();
+        Set<Id> relatedbusUnitAccountIdSet = new Set<Id>();
+        
+        //collect customer account
+        for(WorkOrder wo: woList){
+            relatedCustomerIdSet.add(wo.UNITY_Customer__c);
+            relatedAccountIdSet.add(wo.AccountId);
+            relatedbusUnitAccountIdSet.add(wo.UNITY_Business_Unit_Account__c);
+        }
+        
+        
+        // get related customer accounts
+        List<Account> relatedCustomerList = [SELECT Id, ParentId, UNITY_Bill_To_Account__c, Residential__c,
+                                            
+                                            (SELECT Id, UNITY_Account__c, UNITY_Business_Unit__c, UNITY_End_Customer__c, Default_Customer_Service_Contract__c, Residential__c
+                                            FROM Service_Contracts__r 
+                                            WHERE RecordTypeId =:UNITY_Constants.SC_SERVICE_REQUEST_RECORDTYPE and UNITY_IS_Active__c = true)
+                                            
+                                            FROM Account WHERE id IN : relatedCustomerIdSet OR id IN : relatedbusUnitAccountIdSet];
+        
+        System.debug('Izay: relatedCustomerList: ' + JSON.serializePretty(relatedCustomerList));
+        
+        // get related accounts                                    
+        Map<Id, Account> relatedAccountMap = new Map<Id, Account>( [SELECT Id, ParentId, UNITY_Bill_To_Account__c,Residential__c FROM Account WHERE id IN : relatedAccountIdSet] );
+
+        Map<Id, List<UNITY_Service_Contract__c>> accountServiceContractMap = new Map<Id, List<UNITY_Service_Contract__c>>();
+        Map<Id, List<UNITY_Service_Contract__c>> customerServiceContractMap = new Map<Id, List<UNITY_Service_Contract__c>>();
+        
+        Map<Id, Id> parentAccount = new Map<Id, Id>();
+        Map<Id, Id> billToAccount = new Map<Id, Id>();
+        
+        //set the customer's service contract map
+        for (Account iter: relatedCustomerList){
+            
+            if (iter.Service_Contracts__r != null){
+                accountServiceContractMap.put(iter.Id, iter.Service_Contracts__r);
+                customerServiceContractMap.put(iter.Id, iter.Service_Contracts__r);
+            }
+        }
+        
+        //set the account parent and billTo maps
+        for (Account iter: relatedAccountMap.values() ){
+            
+            if (iter.ParentId != null){
+                parentAccount.put(iter.Id, iter.ParentId);
+            }
+            
+            if (iter.UNITY_Bill_To_Account__c != null){
+                billToAccount.put(iter.Id, iter.UNITY_Bill_To_Account__c);
+            }
+        }
+        
+        //search for a contract in customer account
+        for (WorkOrder wo: woList){
+            
+            List<UNITY_Service_Contract__c> customerServiceContracts = accountServiceContractMap.get(wo.UNITY_Customer__c);
+            
+            //3rd Party Scenario
+            if (wo.UNITY_Customer__c != wo.AccountId){
+                setCustomerServiceContract3rdParty(wo, accountServiceContractMap.get(wo.UNITY_Customer__c), wo.AccountId);
+            }
+            else if (setCustomerServiceContract(wo, customerServiceContracts)){
+                
+                //the customer contract was populated so we stop the searching in parent and billToAccount
+                parentAccount.remove(wo.AccountId);
+                billToAccount.remove(wo.AccountId);
+            }    
+        }
+        
+        //search for a contract in customer parent account or customer bill to account
+
+        List<UNITY_Service_Contract__c> serviceContractList = [select id, UNITY_Account__c, UNITY_End_Customer__c, UNITY_Business_Unit__c from UNITY_Service_Contract__c
+                                                                    where RecordTypeId =:UNITY_Constants.SC_SERVICE_REQUEST_RECORDTYPE 
+                                                                    and UNITY_IS_Active__c = true and (UNITY_Account__c in: billToAccount.values() 
+                                                                                                        or UNITY_Account__c in: parentAccount.values())];
+            
+        for (UNITY_Service_Contract__c iter: serviceContractList){
+        
+            List<UNITY_Service_Contract__c> relatedServiceContract = accountServiceContractMap.get(iter.UNITY_Account__c);
+            
+            if (relatedServiceContract == null){
+                relatedServiceContract = new List<UNITY_Service_Contract__c>();
+            }
+            
+            relatedServiceContract.add(iter);
+            
+            accountServiceContractMap.put(iter.UNITY_Account__c, relatedServiceContract);
+        }
+            
+        for (WorkOrder wo: woList){
+            
+            if (wo.UNITY_Customer_Service_Contract__c == null){
+                
+                Boolean serviceContractPopulated = false;
+                
+                Id parentAccountId = parentAccount.get(wo.AccountId);
+                Id billToAccountId = billToAccount.get(wo.AccountId);
+                
+                //3rd Party Scenario
+                if (wo.UNITY_Customer__c != wo.AccountId){
+                    //End Customer = parentAccount
+                    serviceContractPopulated = setCustomerServiceContract3rdParty(wo, customerServiceContractMap.get(wo.UNITY_Customer__c), parentAccountId);
+                    if (!serviceContractPopulated){
+                        //End Customer = billToAccountId
+                        serviceContractPopulated = setCustomerServiceContract3rdParty(wo, customerServiceContractMap.get(wo.UNITY_Customer__c), billToAccountId);
+                    }
+                    if (!serviceContractPopulated){
+                        //End Customer = null
+                        setCustomerServiceContract3rdParty(wo, customerServiceContractMap.get(wo.UNITY_Customer__c), null);
+                    }
+                }
+                else{
+                    //search in parent customer account
+                    if (parentAccountId != null){
+                        List<UNITY_Service_Contract__c> scList = accountServiceContractMap.get(parentAccountId);
+                        system.debug('@@@populateSRServiceContract parentAccountId scList:' + scList);
+                        serviceContractPopulated = setCustomerServiceContract(wo, scList);
+                    }
+                    
+                    //search in billToAccount
+                    if (billToAccountId != null && !serviceContractPopulated){
+                        List<UNITY_Service_Contract__c> scList = accountServiceContractMap.get(billToAccountId);
+                        system.debug('@@@populateSRServiceContract billToAccountId scList:' + scList);
+                        serviceContractPopulated = setCustomerServiceContract(wo, scList);
+                    }
+                }
+                System.debug('Izay: serviceContractPopulated = '+serviceContractPopulated);
+                System.debug('Izay: wo.UNITY_Business_Unit_Account__c = ' + wo.UNITY_Business_Unit_Account__c);
+                System.debug('Izay: accountServiceContractMap.containsKey( wo.UNITY_Business_Unit_Account__c) = ' + accountServiceContractMap.containsKey( wo.UNITY_Business_Unit_Account__c));
+                if ( !serviceContractPopulated && wo.UNITY_Business_Unit_Account__c != null && accountServiceContractMap.containsKey( wo.UNITY_Business_Unit_Account__c) ) {
+                    System.debug('Izay: no sc, bu not null, and sc in map');
+                    if ( wo.AccountId != null && relatedAccountMap.containsKey(wo.AccountId) && relatedAccountMap.get(wo.AccountId).Residential__c  ) {
+                        System.debug('Izay: acctid != null, map contains acctid, and residential');
+                        serviceContractPopulated = setCustomerServiceToBusinessUnitDefault(wo, accountServiceContractMap.get( wo.UNITY_Business_Unit_Account__c ), true );
+                    }
+                    if ( !serviceContractPopulated ) 
+                        serviceContractPopulated = setCustomerServiceToBusinessUnitDefault( wo, accountServiceContractMap.get( wo.UNITY_Business_Unit_Account__c ), false );
+                    //If there is still no SC
+                    if ( !serviceContractPopulated ){
+                        wo.addError('Customer should have an active Service Request service contract.');
+                    }
+                }
+            }
+        }
+    }
+    
+    private static Boolean setCustomerServiceContract3rdParty(WorkOrder woRecord, List<UNITY_Service_Contract__c> serviceContractList, Id endCustomer){
+        
+        if (serviceContractList != null){
+            
+            for(UNITY_Service_Contract__c serviceContract : serviceContractList){
+                
+                if(serviceContract.UNITY_Business_Unit__c!=null){
+                    
+                    Set<String> delimitedBusinessUnit = new Set<String>(serviceContract.UNITY_Business_Unit__c.split(';'));
+                    
+                    System.debug('#serviceContract.UNITY_End_Customer__c '+serviceContract.UNITY_End_Customer__c);
+                    System.debug('#endCustomer '+endCustomer);
+                    
+                    if(delimitedBusinessUnit.contains(woRecord.UNITY_Business_Unit__c) && serviceContract.UNITY_End_Customer__c == endCustomer){
+                        
+                        woRecord.UNITY_Customer_Service_Contract__c = serviceContract.Id;
+                        system.debug('@@@setCustomerServiceContract3rdParty woRecord.UNITY_Customer_Service_Contract__c:'+woRecord.UNITY_Customer_Service_Contract__c );
+                        return true;
+                        
+                        break;
+                    }        
+                }
+            }
+            
+            return false;                         
+        }
+        return false; 
+    }
+    
+    private static Boolean setCustomerServiceContract(WorkOrder woRecord, List<UNITY_Service_Contract__c> serviceContractList){
+        
+        system.debug('@@@setCustomerServiceContract entry'+serviceContractList);
+        if(serviceContractList != null){
+                
+            for(UNITY_Service_Contract__c serviceContract : serviceContractList){
+                system.debug('@@@setCustomerServiceContract serviceContract.UNITY_Business_Unit__c'+serviceContract.UNITY_Business_Unit__c);
+                if(serviceContract.UNITY_Business_Unit__c!=null){
+                    
+                    Set<String> delimitedBusinessUnit = new Set<String>(serviceContract.UNITY_Business_Unit__c.split(';'));
+                    
+                    if(delimitedBusinessUnit.contains(woRecord.UNITY_Business_Unit__c)){
+                        system.debug('@@@setCustomerServiceContract woRecord.UNITY_Business_Unit__c'+woRecord.UNITY_Business_Unit__c);
+                        woRecord.UNITY_Customer_Service_Contract__c = serviceContract.Id;
+                        system.debug('@@@setCustomerServiceContract woRecord.UNITY_Customer_Service_Contract__c:'+woRecord.UNITY_Customer_Service_Contract__c );
+                        return true;
+                        
+                        break;
+                    }        
+                }
+            }
+            
+            return false;           
+        }
+        
+        return false; 
+    }
+
+    private static Boolean setCustomerServiceToBusinessUnitDefault(WorkOrder woRecord, List<UNITY_Service_Contract__c> serviceContractList, Boolean isResidential){
+        System.debug('Izay: in setCustomerServiceToBusinessUnitDefault()');
+        if ( serviceContractList != null ) {
+            for (UNITY_Service_Contract__c serviceContract : serviceContractList) {
+                if ( serviceContract.Default_Customer_Service_Contract__c && serviceContract.Residential__c == isResidential) {
+                    woRecord.UNITY_Customer_Service_Contract__c = serviceContract.Id;
+                    system.debug('@@@setCustomerServiceToBusinessUnitDefault woRecord.UNITY_Customer_Service_Contract__c:'+woRecord.UNITY_Customer_Service_Contract__c );
+                    return true;
+                }
+            }       
+        }
+        return false; 
+    }
 
 }

@@ -17,15 +17,23 @@ public with sharing class UNITY_AccountHandler extends UNITY_BaseHandler{
             setHasPreferredPart();
         }
         if (trigger.isUpdate || trigger.isInsert){
-            //populate ultimate company text field
+            
             for (Sobject sobj: trigger.new){
                 Account acct = (Account)sobj;
+                //populate ultimate company text field
                 acct.UNITY_Company_Text__c = acct.UNITY_Company__c;
+
+                //lets set the PM PIN while we're here
+                if (acct.RecordTypeId == UNITY_Constants.ACCOUNT_VENDOR_RECORDTYPE && acct.UNITY_Vendor_Type_PM__c == true && acct.UNITYPM_PIN__c == null){
+                    acct.UNITYPM_PIN__c = UNITY_Utils.generateRandomPin();
+                }
             }
         }
         
     }
     
+
+
     public void setHasPreferredPart(){
         
         Map<Id, Decimal> serviceContractMap = new Map<Id, Decimal>();

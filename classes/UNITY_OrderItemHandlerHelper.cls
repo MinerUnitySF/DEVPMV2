@@ -389,5 +389,31 @@ public with sharing class UNITY_OrderItemHandlerHelper {
         return workWindowBegin.format('kk:mm', customerTimezone); 
     }
     
+    public static void setPMFieldValuesBasedOnType(OrderItem item, PricebookEntry pbe){
+        if(String.isNotBlank(pbe.Product2.UNITY_Product_Type__c)){
+            //Defaults for all others ***LABOR***
+            item.UNITY_Number_of_Techs__c = null;
+            item.UNITY_Is_Vendor_Supply__c = true;
+            if(pbe.Product2.UNITY_Product_Type__c.contains('Labor') ){
+                item.UNITY_Type__c = 'Vendor Services';
+                item.UNITY_Activity_Type__c = 'Vendor Standard Labor';
+            //Default for all others ***TRAVEL***
+            }else if(pbe.Product2.UNITY_Product_Type__c.contains('Travel')){
+                item.UNITY_Type__c = 'Vendor Services';
+                item.UNITY_Activity_Type__c = 'Vendor Standard Travel';
+            //Default for ALL ***PARTS***
+            }else if(pbe.Product2.UNITY_Product_Type__c.contains('Part')){
+                item.UNITY_Type__c = 'Vendor Services';
+                item.UNITY_Activity_Type__c = 'Field Supplies';
+            //Default for ALL ***FREIGHT***
+            }else if(pbe.Product2.UNITY_Product_Type__c.contains('Freight')){
+                item.UNITY_Type__c = 'Parts';
+                item.UNITY_Activity_Type__c = 'Freight - Service and Remodel';
+            }else if(pbe.Product2.UNITY_Product_Type__c.contains('Rental')){
+                item.UNITY_Type__c = 'Rental';
+                item.UNITY_Activity_Type__c = 'Rental - Services and Remodel';
+            }
+        }            
+    }
             
 }

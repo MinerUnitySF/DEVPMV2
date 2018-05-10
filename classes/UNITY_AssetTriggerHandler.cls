@@ -2,8 +2,6 @@ public with sharing class UNITY_AssetTriggerHandler extends UNITY_BaseHandler {
    
     private Map< id, id> recordIdTemplateId = new Map< id, id>();
 
-    
-
     public override void bulkAfter(){
                
         if (Trigger.isInsert || Trigger.isUpdate){
@@ -12,35 +10,43 @@ public with sharing class UNITY_AssetTriggerHandler extends UNITY_BaseHandler {
         
         if (trigger.isUpdate){
             //calculateAccountAssetForUpdate(trigger.new, trigger.oldMap);
-            calculateAccountAsset(trigger.new, trigger.oldMap);
+            if ( isFirstTriggerRun_AfterUpdate){
+              calculateAccountAsset(trigger.new, trigger.oldMap);
+            }
         }
         
         if(trigger.isDelete){
-            //calculateAccountAssetForDelete(trigger.old);
-            calculateAccountAsset(trigger.old, null);
+            if (isFirstTriggerRun_AfterDelete){
+                //calculateAccountAssetForDelete(trigger.old);
+                calculateAccountAsset(trigger.old, null);
+            }
         }
         
         if(trigger.isInsert || trigger.isUndelete){
-           //calculateAccountAssetForInsert(trigger.new);
-           calculateAccountAsset(trigger.new, null);
+            if ( isFirstTriggerRun_AfterInsert){
+               //calculateAccountAssetForInsert(trigger.new);
+               calculateAccountAsset(trigger.new, null);
+            }
         }
     }
     
     public override void bulkBefore(){
         
         if (trigger.isInsert){
-            UNITY_AutopopulateChildController.autopopulateFieldsIfApplicableBulkified(trigger.new, 'Asset');
+            if (isFirstTriggerRun_BeforeInsert){
+              UNITY_AutopopulateChildController.autopopulateFieldsIfApplicableBulkified(trigger.new, 'Asset');
+            }
         }
     }
 
     public override void beforeUpdate(SObject oldSO, SObject newSO){
-
-        Asset newAsset = (Asset)newSO;
-        Asset oldAsset = (Asset)oldSO;
-
-        this.populateLastYearDownServiceTime(newAsset,oldAsset);
-        this.populateLastYearTotalCostOwnership(newAsset,oldAsset);
-
+       if (isFirstTriggerRun_BeforeUpdate){
+            Asset newAsset = (Asset)newSO;
+            Asset oldAsset = (Asset)oldSO;
+    
+            this.populateLastYearDownServiceTime(newAsset,oldAsset);
+            this.populateLastYearTotalCostOwnership(newAsset,oldAsset);
+       }
     }
 
     private void populateLastYearDownServiceTime(Asset newAsset,Asset oldAsset){
@@ -237,4 +243,59 @@ public with sharing class UNITY_AssetTriggerHandler extends UNITY_BaseHandler {
         update accounts;
     }
     */
+    
+     /**
+    *** This variable and method are used to prevent triggers recursion on before insert/update
+    */
+    public static Boolean isFirstTriggerRun_BeforeInsert = true;
+    public static Boolean runTriggerOnce_BeforeInsert(){
+        if(isFirstTriggerRun_BeforeInsert){
+            isFirstTriggerRun_BeforeInsert = false;
+            return true;
+        }else{
+            return isFirstTriggerRun_BeforeInsert;
+        }
+    }
+   
+    public static Boolean isFirstTriggerRun_BeforeUpdate = true;
+    public static Boolean runTriggerOnce_BeforeUpdate(){
+        if(isFirstTriggerRun_BeforeUpdate){
+            isFirstTriggerRun_BeforeUpdate = false;
+            return true;
+        }else{
+            return isFirstTriggerRun_BeforeUpdate;
+        }
+    }
+    /**
+    *** This variable and method are used to prevent triggers recursion on after insert/update
+    */
+    public static Boolean isFirstTriggerRun_AfterUpdate = true;
+    public static Boolean runTriggerOnce_AfterUpdate(){
+        if(isFirstTriggerRun_AfterUpdate){
+            isFirstTriggerRun_AfterUpdate = false;
+            return true;
+        }else{
+            return isFirstTriggerRun_AfterUpdate;
+        }
+    }
+   
+    public static Boolean isFirstTriggerRun_AfterDelete = true;
+    public static Boolean runTriggerOnce_AfterDelete(){
+        if(isFirstTriggerRun_AfterDelete){
+            isFirstTriggerRun_AfterDelete = false;
+            return true;
+        }else{
+            return isFirstTriggerRun_AfterDelete;
+        }
+    }
+    
+    public static Boolean isFirstTriggerRun_AfterInsert = true;
+    public static Boolean runTriggerOnce_AfterInsert(){
+        if(isFirstTriggerRun_AfterInsert){
+            isFirstTriggerRun_AfterInsert = false;
+            return true;
+        }else{
+            return isFirstTriggerRun_AfterInsert;
+        }
+    }
 }

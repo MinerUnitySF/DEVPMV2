@@ -7,19 +7,38 @@ public class UNITY_WorkOrderLineItemTriggerHandler extends UNITY_BaseHandler{
     }
 
     public override void afterUpdate(SObject oldSO , SObject newSO ){
-        WorkOrderLineItem newWOLI = (WorkOrderLineItem)newSO;
-        WorkOrderLineItem oldWOLI = (WorkOrderLineItem)oldSO;
-        this.checkAsset(newWOLI,oldWOLI);
+        if (isFirstTriggerRun_AfterUpdate){
+            WorkOrderLineItem newWOLI = (WorkOrderLineItem)newSO;
+            WorkOrderLineItem oldWOLI = (WorkOrderLineItem)oldSO;
+            if (newWoli.UNITY_PM_WOLI__c != true)
+                this.checkAsset(newWOLI,oldWOLI);
+        }
     }
 
     public override void afterInsert(SObject so){
+        if (isFirstTriggerRun_AfterInsert){
+            WorkOrderLineItem woli = (WorkOrderLineItem)so;
+            if (woli.UNITY_PM_WOLI__c != true)
+                this.checkAsset(woli);
+        }
+    }
+
+    public override void beforeDelete(SObject so){
         WorkOrderLineItem woli = (WorkOrderLineItem)so;
-        this.checkAsset(woli);
+
+        system.debug('@@@UNITY_WorkOrderLineItemTriggerHandler beforeDelete');
+        //Check if WO is PM, do not allow delete
+        //if (woli.UNITY_PM_WOLI__c == true)
+        //    woli.addError('You cannot delete work order line items from a Preventative Maintenance Work Order');
+
     }
 
     public override void afterDelete(SObject so){
-        WorkOrderLineItem woli = (WorkOrderLineItem)so;
-        this.checkAsset(woli);
+        if (isFirstTriggerRun_AfterDelete){
+          WorkOrderLineItem woli = (WorkOrderLineItem)so;
+          if (woli.UNITY_PM_WOLI__c != true)
+            this.checkAsset(woli);
+        }
     }
 
 
@@ -31,7 +50,9 @@ public class UNITY_WorkOrderLineItemTriggerHandler extends UNITY_BaseHandler{
 
     }
 
+   //private methods 
     private void checkAsset(WorkOrderLineItem woli){
+        system.debug('//Clay - Entering checkAsset for WOLIs. Should avoid for PM WOLIs.');
         if((woli!=null) && (woli.AssetId!=null)) this.countWOOnAssetIds.add(woli.AssetId);
     }
 
@@ -52,6 +73,37 @@ public class UNITY_WorkOrderLineItemTriggerHandler extends UNITY_BaseHandler{
         UNITY_Utils.countWorkOrdersOnAsset(assetIds, Asset.getSObjectType());
     }
 
-
+    
+   
+    /**
+    *** This variable and method are used to prevent triggers recursion on after insert/update
+    */
+    public static Boolean isFirstTriggerRun_AfterDelete = true;
+    public static Boolean runTriggerOnce_AfterDelete(){
+        if(isFirstTriggerRun_AfterDelete){
+            isFirstTriggerRun_AfterDelete = false;
+            return true;
+        }else{
+            return isFirstTriggerRun_AfterDelete;
+        }
+    }
+     public static Boolean isFirstTriggerRun_AfterInsert = true;
+    public static Boolean runTriggerOnce_AfterInsert(){
+        if(isFirstTriggerRun_AfterInsert){
+            isFirstTriggerRun_AfterInsert = false;
+            return true;
+        }else{
+            return isFirstTriggerRun_AfterInsert;
+        }
+    }
+     public static Boolean isFirstTriggerRun_AfterUpdate = true;
+    public static Boolean runTriggerOnce_AfterUpdate(){
+        if(isFirstTriggerRun_AfterUpdate){
+            isFirstTriggerRun_AfterUpdate = false;
+            return true;
+        }else{
+            return isFirstTriggerRun_AfterUpdate;
+        }
+    }
 
 }

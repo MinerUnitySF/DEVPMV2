@@ -33,5 +33,31 @@ public class UNITY_AssetTriggerHandlerTest{
         delete asset;
         acc2 = [SELECT SSVY_Total_Assets__c FROM Account WHERE Id =: acc2.Id];
         system.assertEquals(0, acc2.SSVY_Total_Assets__c);
+
+		UNITY_AssetTriggerHandler.isFirstTriggerRun_AfterUpdate = true;        
+        UNITY_AssetTriggerHandler.runTriggerOnce_BeforeInsert();
+        UNITY_AssetTriggerHandler.isFirstTriggerRun_AfterUpdate = false;        
+        UNITY_AssetTriggerHandler.runTriggerOnce_BeforeInsert();
+        
+        UNITY_AssetTriggerHandler.isFirstTriggerRun_AfterInsert = true;
+        UNITY_AssetTriggerHandler.runTriggerOnce_AfterInsert();
+        UNITY_AssetTriggerHandler.isFirstTriggerRun_AfterInsert = false;
+        UNITY_AssetTriggerHandler.runTriggerOnce_AfterInsert();
+        
+        UNITY_AssetTriggerHandler.isFirstTriggerRun_AfterDelete = true;
+        UNITY_AssetTriggerHandler.runTriggerOnce_AfterDelete();
+        UNITY_AssetTriggerHandler.isFirstTriggerRun_AfterDelete = false;
+        UNITY_AssetTriggerHandler.runTriggerOnce_AfterDelete();
+        
+        UNITY_AssetTriggerHandler.isFirstTriggerRun_AfterUpdate = true;
+        UNITY_AssetTriggerHandler.runTriggerOnce_AfterUpdate();
+        UNITY_AssetTriggerHandler.isFirstTriggerRun_AfterUpdate = false;
+        UNITY_AssetTriggerHandler.runTriggerOnce_AfterUpdate();
+        
+        UNITY_AssetTriggerHandler.isFirstTriggerRun_BeforeUpdate = true;
+        UNITY_AssetTriggerHandler.runTriggerOnce_BeforeUpdate();
+        UNITY_AssetTriggerHandler.isFirstTriggerRun_BeforeUpdate = false;
+        UNITY_AssetTriggerHandler.runTriggerOnce_BeforeUpdate();
+            
     }
 }

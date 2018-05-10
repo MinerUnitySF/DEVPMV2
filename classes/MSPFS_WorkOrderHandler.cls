@@ -20,6 +20,9 @@ Date:           2/9/2017
 ------------------------------------------------------------*/
 public class MSPFS_WorkOrderHandler {
     
+    public static Set<Id> excludeRTSet = new Set<Id>{UNITY_Constants.WO_PREVENTATIVE_MAINTENANCE_RECORDTYPE}; 
+    public static List<SObject> new_SR_WorkOrders = UNITY_Utils.excludeRecordType(trigger.new, excludeRTSet);
+    
     @InvocableMethod(label='MSPFS Auto Accept Work Order' description='Auto Accept Work Order when the Business Unit is MSP.')
     public static void updateWorkOrder(List<Id> WorkOrderIds){
         if(!System.isFuture())
@@ -137,74 +140,12 @@ public class MSPFS_WorkOrderHandler {
         }
     }
 
-    /**This method creates a service record on work order creation */
-    /* No Longer Needed since we got the FSLI to work */
-    /*
-    public static void createServiceRecord(List<SObject> newList){
-        if(!newList.isEmpty() && Trigger.isAfter){
-            Map<Id,Id> woServiceMap = new Map<Id,Id>();//Map to hold WO Id by the Service record Id to update WO
-            List<CKSW_BASE__Service__c> newServices = new List<CKSW_BASE__Service__c>();
-            for(SObject obj :newList){
-                WorkOrder wo = (WorkOrder)obj;
-                CKSW_BASE__Service__c service = new CKSW_BASE__Service__c(
-                    FSL_INTG__Work_Order__c = wo.Id,
-                    FSO__WorkOrder__c = wo.Id,
-                    CKSW_BASE__Account__c = wo.AccountId,
-                    CKSW_BASE__Auto_Geocode__c = true,
-                    FSL_INTG__Case__c = wo.CaseId,
-                    CKSW_BASE__Comment__c = wo.UNITY_Work_Description__c,
-                    CKSW_BASE__Contact__c = wo.ContactId,
-                    CKSW_BASE__Description__c = wo.Description,
-                    CKSW_BASE__Duration__c = 60,
-                    CKSW_BASE__Duration_Type__c = 'Minutes',
-                    CKSW_BASE__Open_Date__c = Date.today(),
-                    CKSW_BASE__Status__c = 'New'
-                );
-                newServices.add(service);
-            }
-            if(!newServices.isEmpty()){
-                try{
-                    insert newServices;
-                    for(CKSW_BASE__Service__c service :newServices){
-                        woServiceMap.put(service.FSL_INTG__Work_Order__c,service.Id);
-                    }
-                    if(!System.isFuture() && !System.isBatch()){
-                        updateWorkOrderWithService(woServiceMap);
-                    }
-                }catch(Exception e){
-                    Trigger.new[0].addError('Error: ' + e.getMessage());
-                }
-            }
-        }
-    }
-    */
-    /**This method updates the WO with its serice record*/
-    /* No Longer Needed since we got the FSLI to work */
-    /*
-    @future
-    public static void updateWorkOrderWithService(Map<Id,Id> woServiceMap){
-        if(woServiceMap != null && !woServiceMap.keySet().isEmpty()){
-            List<WorkOrder> workOrders = new List<WorkOrder>();//List of work orders to update
-            for(Id id :woServiceMap.keySet()){
-                WOrkOrder wo = new WorkOrder();
-                wo.Id = id;
-                wo.FSL_INTG__Service__c = woServiceMap.get(id);
-                workOrders.add(wo);
-            }
-            try{
-                update workOrders;
-            }catch(Exception e){
-                //Need some sort of exception handling here...
-            }
-        }
-    }
-    */
     /**This method handles sharing Intercompany Transfer WOs with all Dispatchers of the MSP BU
     *@param newList List<WorkOrder> the list of new records in the trigger transaction
     *@param oldMap  Map<Id,WorkOrder> the map of records with their old values in the transaction
     */
     public static void handleIntercompanyTransferSharing(List<SObject> newList, Map<Id,SObject> oldMap){
-        
+
         List<WorkOrder> acceptedWOs = new List<WorkOrder>();
         List<WorkOrderShare> woShare = new List<WorkOrderShare>();
         Set<Id> vendorIds = new Set<Id>();
@@ -281,7 +222,6 @@ public class MSPFS_WorkOrderHandler {
                             if(!sr.isSuccess()){
                                 Database.Error err = sr.getErrors()[0];
                                 if(!(err.getStatusCode() == StatusCode.FIELD_FILTER_VALIDATION_EXCEPTION && err.getMessage().contains('AccessLevel'))){
-                                    //Trigger.new[0].addError(' An error ocurred while sharing the work order with MSP. Error: ' + err.getMessage());
                                     System.debug('###Izay: An error ocurred while sharing the work order with MSP. Error: ' + err.getMessage());
                                 }
                             }
@@ -290,7 +230,7 @@ public class MSPFS_WorkOrderHandler {
                 }
             }
         }
-        
+
     }
 
     public static Database.SaveResult[] shareWorkOrdersWithBU(Map<Id,List<WorkOrder>> buWOMap){
@@ -322,25 +262,6 @@ public class MSPFS_WorkOrderHandler {
                 }
             }
             
-            /*
-            Map<Id,Account> buMap = new Map<Id,Account>([SELECT Id,BU_Unique_Field__c,UNITY_Off_Hour_Queue__c FROM Account WHERE Id IN:buWOMap.keySet()]);
-            Map<Id,String> buQueueName = new Map<Id,String>();//For standard queue
-            Map<Id,String> buQueueName_AH = new Map<Id,String>();//For after hours queue
-            for(Account a :buMap.values()){
-                String qname = 'UNITY_';
-                qName = qName + a.BU_Unique_Field__c.replaceAll(' ', '_');
-                String qname_AH = qName + '_After_Hours';
-                buQueueName.put(a.Id,qName);
-                buQueueName_AH.put(a.Id,qName_AH);
-            }
-            List<Group> queues =  [SELECT Id,DeveloperName FROM Group 
-                                   WHERE DeveloperName IN :buQueueName.values() 
-                                   OR DeveloperName IN :buQueueName_AH.values()];
-            Map<String,Group> queueNameMap = new Map<String,Group>();
-            for(Group q :queues){
-                queueNameMap.put(q.Developername,q);
-            }
-            */
             //Iterate through work orders and get the ids to query related Service and Order records
             Set<Id> woids =  new Set<Id>();
             for(Id buid :buWOMap.keySet()){
@@ -442,28 +363,7 @@ public class MSPFS_WorkOrderHandler {
                             }
                         }
                     }
-                    
-                    /*
-                    if(buMap.containsKey(buid)){
-                        
-                        Id qid = queueNameMap.get(buQueueName.get(buid)).Id;
-                        Id qid_ah = queueNameMap.get(buQueueName_AH.get(buid)).Id;
-
-                        WorkOrderShare woShare = new WorkOrderShare();
-                        woShare.ParentId = wo.Id;
-                        woShare.AccessLevel = 'Edit';
-                        woShare.RowCause = Schema.WorkOrderShare.RowCause.Manual;
-                        woShare.UserOrGroupId = qid;
-                        woShareToInsert.add(woShare);
-
-                        WorkOrderShare woShare_AH = new WorkOrderShare();
-                        woShare_AH.ParentId = wo.Id;
-                        woShare_AH.AccessLevel = 'Edit';
-                        woShare_AH.RowCause = Schema.WorkOrderShare.RowCause.Manual;
-                        woShare.UserOrGroupId = qid_ah;
-                        woShareToInsert.add(woShare_AH);
-                    }
-                    */
+                                        
                 }//End for wo
             }//End for buid
             if(!woShareToInsert.isEmpty()){
@@ -582,7 +482,7 @@ public class MSPFS_WorkOrderHandler {
                 try{
                     update itemsToUpdate;
                 }catch(Exception e){
-                    trigger.new[0].addError(' Error: ' + e.getMessage());
+                    new_SR_WorkOrders[0].addError(' Error: ' + e.getMessage());
                 }
 
             } 
@@ -629,7 +529,7 @@ public class MSPFS_WorkOrderHandler {
             for ( WorkOrder wOrder : techETAChangedWorkOrders.values() ) {
                 if(mspBusinessUnitAccountMap.containsKey(wOrder.UNITY_Business_Unit_Account__c)){
                     if (!workOrderToQuoteListMap.containsKey( wOrder.Id )){
-                        Trigger.new[0].addError('A quote is required before dispatching a Quoted work order');
+                        new_SR_WorkOrders[0].addError('A quote is required before dispatching a Quoted work order');
                     }
                 }
             }
@@ -675,251 +575,4 @@ public class MSPFS_WorkOrderHandler {
             return canHandleIntercompanyTransfer;
         }
     }
-
-    /**This methods handles revenue recognition for MSP on intercompany transfer processes
-    *@param workOrders - List<WorkOrder>: The list of work orders that need to be processes
-    Deprecated: Izay 
-    public static void intercompanyMSPRevenueRecognition(List<WorkOrder> workOrders){
-        if(!workOrders.isEmpty()){
-            //First make sure that the work order is intercompany transfer and that it hasn't been rocessed previously.
-            Map<Id,WorkOrder> validWOsMap = new Map<Id,WOrkOrder>();
-            Set<Id> mspBUIds = new Set<Id>();
-            for(WorkOrder wo :workOrders){
-                if(!wo.MSPFS_Intercompany_MSP_Revenue_Processed__c && wo.MSPFS_Intercompany_Transfer__c && wo.Status == 'Completed' && wo.UNITY_Attachment_Compliant__c){
-                    validWOsMap.put(wo.Id,wo);
-                    mspBUIds.add(wo.UNITY_Accepted_Vendor__c);
-                }
-            }
-            //If there are valid work order... continue with the process
-            if(!validWOsMap.keySet().isEmpty()){
-                //Need to get all the POs related to the WO where the vendor is MSP BU (same as accepted vendor on the WOs)
-                Map<Id,Order> ordersMap = new Map<Id,Order>([SELECT Id,FSO__WorkOrder__c,UNITY_Vendor__c,UNITY_Vendor__r.BU_Unique_Field__c,UNITY_Work_Order_Type__c,EffectiveDate,
-                                                            (SELECT Id,MSPFS_MSP_Cost__c,MSPFS_MSP_Price__c,UNITY_Is_Vendor_Supply__c,PricebookEntry.Product2.UNITY_Product_Type__c,
-                                                            UNITY_Vendor_Adjusted_Quantity__c,UNITY_Total_Cost__c,UNITY_Activity_Type__c
-                                                            FROM OrderItems WHERE UNITY_Is_Vendor_Supply__c = true)
-                                                            FROM Order WHERE FSO__WorkOrder__c IN :validWOsMap.keySet() AND UNITY_Vendor__c IN :mspBUIds AND Status IN ('Accepted','Final')]);
-                if(!ordersMap.keySet().isEmpty()){
-                    //Now need to place the orders in a map by work order id
-                    Map<Id,List<Order>> woOrdersMap = new Map<Id,List<Order>>();
-                    Map<Id,Map<Id,Order>> newOrdersByWOMap = new Map<Id,Map<Id,Order>>();//Holds new orders by the work order id and old order id
-                    Map<Id,List<OrderItem>> newOrderItemsByOldOrderId = new Map<Id,List<orderItem>>();//Holds new order items by old order id
-                    List<Order> ordersToInsert = new List<Order>();//Holds mew orders to be inserted
-                    List<OrderItem> orderItemsToInsert = new List<OrderItem>();//Holds new order items to be inserted
-                    for(Order o :ordersMap.values()){
-                        if(!woOrdersMap.containsKey(o.FSO__WorkOrder__c))
-                            woOrdersMap.put(o.FSO__WorkOrder__c,new List<Order>());
-                        woOrdersMap.get(o.FSO__WorkOrder__c).add(o);
-                    }
-                    //Now need to go through each work order and POs and create New POs to account for MSP Cost
-                    for(WorkOrder wo :validWOsMap.values()){
-                        if(woOrdersMap.containsKey(wo.Id)){
-                            for(Order o :woOrdersMap.get(wo.Id)){
-                                //===================================
-                                // Create the new order
-                                // =================================== 
-                                Order newOrder = new Order();
-                                newOrder.FSO__WorkOrder__c = o.FSO__WorkOrder__c;
-                                newOrder.AccountId = wo.UNITY_Business_Unit_Account__c;
-                                newOrder.UNITY_Customer__c = wo.UNITY_Business_Unit_Account__c;
-                                newOrder.UNITY_GL_Sub_Account__c = null;
-                                newOrder.UNITY_GL_Segment_Account__c = null;
-                                newOrder.UNITY_Business_Unit__c = o.UNITY_Vendor__r.BU_Unique_Field__c;
-                                newOrder.UNITY_Business_Unit_Account__c = o.UNITY_Vendor__c;
-                                newOrder.UNITY_Invoice__c = null;
-                                newOrder.UNITY_Invoiced__c = false;
-                                newOrder.EffectiveDate = o.EffectiveDate;
-                                newOrder.MSPFS_Skip_Pricing_Rules__c= true;
-                                newOrder.Status = 'Draft';
-                                newOrder.UNITY_Tax_Processed__c = true;
-                                //Put the new order in the map by wo id and old order id
-                                if(!newOrdersByWOMap.containsKey(wo.Id))
-                                    newOrdersByWOMap.put(wo.Id, new Map<Id,Order>());
-                                newOrdersByWOMap.get(wo.Id).put(o.Id,newOrder);
-                                //Add the new order in toInsert list
-                                ordersToInsert.add(newOrder);
-                                // ===================================
-                                // Create the new order items
-                                // =================================== 
-                                for(OrderItem oItem :o.OrderItems){
-                                    //=======================================
-                                    //May want to validate here that MSP Cost, MSP Price, and Vendor Adjusted Qty are populated
-                                    //=======================================
-                                    OrderItem newOrderItem = oItem.clone(false,true,false,false);
-                                    newOrderItem.UNITY_Cost__c = oItem.MSPFS_MSP_Cost__c;
-                                    newOrderItem.UNITY_Total_Cost__c = oItem.UNITY_Vendor_Adjusted_Quantity__c * oItem.MSPFS_MSP_Cost__c;
-                                    newOrderItem.UNITY_Price__c = oItem.MSPFS_MSP_Price__c;
-                                    newOrderItem.UnitPrice  = oItem.MSPFS_MSP_Price__c;
-                                    newOrderItem.Quantity = oItem.UNITY_Vendor_Adjusted_Quantity__c;
-                                    newOrderItem.UNITY_Customer_Adjusted_Quantity__c = oItem.UNITY_Vendor_Adjusted_Quantity__c;
-                                    newOrderItem.UNITY_Total_Price__c = oItem.UNITY_Total_Cost__c;
-                                    newOrderItem.MSPFS_MSP_Cost__c = null;
-                                    newOrderItem.MSPFS_MSP_Price__c = null;
-                                    newOrderItem.UNITY_Sales_Tax__c = 0;
-                                    newOrderItem.UNITY_GL_Revenue_Account__c = null;
-                                    newOrderItem.UNITY_GL_Cost_Account__c = null;
-                                    newOrderItem.UNITY_GL_Tax_Account__c = null;
-                                    //Update the line type activity type fields to match what it should be for MSP BU
-                                    if(oItem.PricebookEntry.Product2.UNITY_Product_Type__c.contains('Labor')){
-                                        if(o.UNITY_Work_Order_Type__c == 'Project')
-                                            newOrderItem.UNITY_Type__c = 'Labor - Installation';
-                                        else 
-                                            newOrderItem.UNITY_Type__c = 'Labor - Service';
-                                        if(o.UNITY_Work_Order_Type__c == 'PM')
-                                            newOrderItem.UNITY_Activity_Type__c = 'Preventative Maintenance';
-                                        else
-                                            newOrderItem.UNITY_Activity_Type__c = oItem.UNITY_Activity_Type__c.substring(7);
-                                    }
-                                    if(oItem.PricebookEntry.Product2.UNITY_Product_Type__c.contains('Travel')){
-                                        newOrderItem.UNITY_Type__c = 'Travel';
-                                        if(o.UNITY_Work_Order_Type__c == 'PM')
-                                            newOrderItem.UNITY_Activity_Type__c = 'Preventative Maintenance';
-                                        else
-                                            newOrderItem.UNITY_Activity_Type__c = oItem.UNITY_Activity_Type__c.substring(7);
-                                    }
-                                    if(oItem.PricebookEntry.Product2.UNITY_Product_Type__c.contains('Parts')){
-                                        newOrderItem.UNITY_Type__c = 'Parts';
-                                    }
-                                    if(!newOrderItemsByOldOrderId.containsKey(o.Id))
-                                        newOrderItemsByOldOrderId.put(o.Id,new List<OrderItem>());
-                                    newOrderItemsByOldOrderId.get(o.Id).add(newOrderItem);
-                                }
-                            }
-                        }
-                    }
-                    //Now need to insert the orders
-                    //Then, parent the new order items to the new orders
-                    //Then insert the order items
-                    SavePoint sp = Database.setSavepoint();//Save point to revert back to if an error is thrown
-                    Set<Id> orderItemIds = new Set<Id>();
-                    Map<Id,OrderItem> orderItemsMap = new Map<Id,OrderItem>();
-                    Map<Id,Id> oldOrderIdNewOrderIdMap = new Map<Id,Id>();
-                    System.debug('Izay: ordersToInsert = ' + JSON.serializePretty(ordersToInsert));
-                    try{
-                        insert ordersToInsert;
-                        for(Id woId :newOrdersByWOMap.keySet()){
-                            for(Id oldOrderId :newOrdersByWOMap.get(woId).keySet()){
-                                oldOrderIdNewOrderIdMap.put(oldOrderId,newOrdersByWOMap.get(woId).get(oldOrderId).Id);
-                                for(OrderItem item :newOrderItemsByOldOrderId.get(oldOrderId)){
-                                    item.OrderId = newOrdersByWOMap.get(woId).get(oldOrderId).Id;
-                                    System.debug('Izay: OrderId = ' + item.OrderId);
-                                    orderItemsToInsert.add(item);
-                                }
-                            }
-                        }
-                        insert orderItemsToInsert;
-                        for(OrderItem oi :orderItemsToInsert){
-                            orderItemIds.add(oi.Id);
-                        }
-                        orderItemsMap = new Map<Id,OrderItem>([SELECT Id,UNITY_Price__c,UNITY_Customer_Adjusted_Quantity__c,UNITY_Cost__c,OrderId,
-                                                               UNITY_Sales_Tax__c,UNITY_Discount__c,UNITY_Discount_Amount__c,PricebookEntry.Product2Id,
-                                                               UNITY_Tax_Code__c,UNITY_Is_Vendor_Supply__c,UNITY_GL_Revenue_Account__c,UNITY_GL_Tax_Account__c,
-                                                               UNITY_GL_Sub_Account__c,UNITY_Type__c,UNITY_Activity_Type__c,UNITY_Asset__c,UNITY_Unknown_Part_Description__c
-                                                               FROM OrderItem WHERE Id IN :orderItemIds]);
-                    }catch(Exception e){
-                        Database.rollback(sp);
-                        Trigger.new[0].addError('Error while processing MSP revenue. Error: ' + e.getMessage() + '. Stacktrace: ' + e.getStackTraceString());
-                    }
-                    System.debug('Izay: oldOrderIdNewOrderIdMap = ' + JSON.serializePretty(oldOrderIdNewOrderIdMap));
-                    //If we get to this point with no errors... now need to create the invoice
-                    Map<Id,UNITY_Invoice__c> invoiceByWOId = new Map<Id,UNITY_Invoice__c>();
-                    for(WorkOrder wo :validWOsMap.values()){
-                        if(newOrdersByWOMap.containsKey(wo.Id)){
-                            UNITY_Invoice__c invoice = new UNITY_Invoice__c();
-                            invoice.UNITY_Case__c = wo.CaseId;
-                            invoice.UNITY_Customer__c = wo.UNITY_Business_Unit_Account__c;
-                            invoice.UNITY_Status__c = 'Invoice Creation';
-                            invoice.UNITY_Vendor_Service_Fee__c = 0;
-                            invoice.UNITY_Discount_from_POs__c = 0;
-                            invoice.UNITY_Discount_Amount__c = 0;
-                            invoiceByWOId.put(wo.Id,invoice);
-                        }
-                    }
-                    //Insert the invoice
-                    //Then, create the invoice lines
-                    //And related the POs to the invoice
-                    try{
-                        insert invoiceByWOId.values();
-                        List<Order> ordersToUpdate = new List<Order>();//Orders to update
-                        List<UNITY_Invoice_Line_Item__c> invLines = new List<UNITY_Invoice_Line_Item__c>();//Invoicelines to update
-                        Set<Id> invIds = new Set<Id>();//Holds the invoice ids
-                        for(Id woId :invoiceByWOId.keySet()){
-                            //Add the invoice id to set 
-                            invIds.add(invoiceByWOId.get(woId).Id);
-                            if(newOrdersByWOMap.containsKey(woId)){
-                                for(Id oldOrderId :newOrdersByWOMap.get(woId).keySet()){
-                                    //Associate the PO with the invoice and finalize POs
-                                    newOrdersByWOMap.get(woId).get(oldOrderId).UNITY_Invoice__c = invoiceByWOId.get(woId).Id;
-                                    newOrdersByWOMap.get(woId).get(oldOrderId).UNITY_Invoiced__c = true;
-                                    //newOrdersByWOMap.get(woId).get(oldOrderId).Status = 'Final';
-                                    ordersToUpdate.add(newOrdersByWOMap.get(woId).get(oldOrderId));
-
-                                    for(OrderItem item :newOrderItemsByOldOrderId.get(oldOrderId)){
-                                        
-                                        OrderItem oItem;
-                                        if(orderItemsMap.containsKey(item.Id)){
-                                            oItem =  orderItemsMap.get(item.Id);
-                                        }
-                                        if(oItem != null){
-                                            //Need to create the invoice lines here...
-                                            UNITY_Invoice_Line_Item__c invLine = new UNITY_Invoice_Line_Item__c();
-                                            invLine.UNITY_Invoice__c = invoiceByWOId.get(woId).Id;
-                                            invLine.UNITY_Total_Price__c = oItem.UNITY_Price__c * oItem.UNITY_Customer_Adjusted_Quantity__c;
-                                            invLine.UNITY_Cost__c = oItem.UNITY_Cost__c * oItem.UNITY_Customer_Adjusted_Quantity__c;
-                                            //invLine.UNITY_Sales_Tax__c = oItem.UNITY_Sales_Tax__c;
-                                            invLine.UNITY_PO_Price__c = oItem.UNITY_Price__c; 
-                                            invLine.UNITY_Quantity__c = oItem.UNITY_Customer_Adjusted_Quantity__c;
-                                            
-                                            invLine.UNITY_Adjusted_Quantity__c = oItem.UNITY_Customer_Adjusted_Quantity__c;
-
-                                            //Izay: Added this additional fields to the invoice ceration
-                                            //to support SL Integration
-                                            invLine.UNITY_Discount__c = oItem.UNITY_Discount__c;
-                                            invLine.UNITY_Discount_Amount__c = oItem.UNITY_Discount_Amount__c;
-                                            invLine.Product__c = oItem.PricebookEntry.Product2Id;
-                                            //invLine.UNITY_Tax_Code__c = oItem.UNITY_Tax_Code__c;
-                                            invLine.UNITY_Is_Vendor_Supply__c = oItem.UNITY_Is_Vendor_Supply__c;
-                                            invLine.UNITY_GL_Revenue_Account__c = oItem.UNITY_GL_Revenue_Account__c;
-                                            invLine.UNITY_GL_Tax_Account__c = oItem.UNITY_GL_Tax_Account__c;
-                                            invLine.UNITY_GL_Sub_Account__c = oItem.UNITY_GL_Sub_Account__c;
-                                            invLine.UNITY_Type__c = oItem.UNITY_Type__c;
-                                            invLine.UNITY_Activity_Type__c = oItem.UNITY_Activity_Type__c;
-                                            invLine.UNITY_WorkOrder__c = woId;
-                                            invLine.UNITY_Asset__c = oItem.UNITY_Asset__c;
-                                            invLine.UNITY_Description__c = oItem.UNITY_Unknown_Part_Description__c;
-
-                                            invLines.add(invLine);
-                                        
-                                        }
-                                            
-                                    }
-                                }
-                            }
-                        }
-
-                        if(!invLines.isEmpty()){
-                            insert invLines;
-                        }
-                        if(!ordersToUpdate.isEmpty()){
-                            //List<Order> temp = new List<Order>();
-                            //temp.addAll(ordersToUpdate);
-                            update ordersToUpdate;
-                        }
-
-                        //Now need to finalize the invoice
-                        List<UNITY_Invoice__c> invoices = [SELECT Id,UNITY_Status__c FROM UNITY_Invoice__c WHERE Id IN :invIds];
-                        for(UNITY_Invoice__c inv :invoices){
-                            inv.UNITY_Status__c = 'Invoice Finalized';
-                            inv.UNITY_Invoice_Status__c =  'Invoice Finalized';
-                        }
-                        update invoices;
-                    }catch(Exception e){
-                        Database.rollback(sp);
-                        //Throw exception to trigger.new[0]
-                        Trigger.new[0].addError('Error while processing MSP revenue. Error: ' + e.getMessage() + '. Stacktrace: ' + e.getStackTraceString());
-                    }
-                }//End if orders
-            }//End if valid work orders
-        }//End if work orders
-    }//End intercompanyMSPRevenueRecognition()
-    */
 }

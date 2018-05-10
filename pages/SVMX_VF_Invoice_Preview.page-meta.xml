@@ -5,8 +5,8 @@
     <confirmationTokenRequired>false</confirmationTokenRequired>
     <label>SVMX VF Invoice Preview</label>
     <packageVersions>
-        <majorNumber>15</majorNumber>
-        <minorNumber>20000</minorNumber>
+        <majorNumber>16</majorNumber>
+        <minorNumber>60000</minorNumber>
         <namespace>SVMXC</namespace>
     </packageVersions>
 </ApexPage>

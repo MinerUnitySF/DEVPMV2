@@ -54,7 +54,7 @@
     <fieldUpdates>
         <fullName>Update_ID_Cost</fullName>
         <field>Detail_Line_Cost__c</field>
-        <formula>Line_Qty__c  *  Work_Detail__r.Vendor_Cost_Per_Unit__c</formula>
+        <formula>Work_Detail__r.SVMXC__Actual_Quantity2__c   *  Work_Detail__r.Vendor_Cost_Per_Unit__c</formula>
         <name>Update ID Cost</name>
         <notifyAssignee>false</notifyAssignee>
         <operation>Formula</operation>
@@ -154,7 +154,7 @@
             <name>Work_Detail_Update_idc</name>
             <type>FieldUpdate</type>
         </actions>
-        <active>true</active>
+        <active>false</active>
         <criteriaItems>
             <field>MH_Invoice__c.Status__c</field>
             <operation>equals</operation>

@@ -26,9 +26,9 @@ public class WorkDetailTriggerHandler {
                 if(wo.Work_Order_Type__c == 'Quoted'){
                     if(woLinesMap.containsKey(wo.Id)){
                         for(SVMXC__Service_Order_Line__c line :woLinesMap.get(wo.Id)){
-                            line.SVMXC__Is_Billable__c = false;
+                            line.SVMXC__Is_Billable__c = true;
                             //line.Work_Complete__c = true;
-                            line.SVMXC__Line_Status__c = 'Canceled';
+                            line.SVMXC__Line_Status__c = 'Open';
                         }
                     }
                 }

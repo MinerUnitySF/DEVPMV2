@@ -195,6 +195,19 @@ Proof of Concept 12/23/13</description>
         <type>Checkbox</type>
     </fields>
     <fields>
+        <fullName>Costing_Qty__c</fullName>
+        <description>Quantity field to hold the actual quantity coming from the Work Detail line to do proper costing of the line on the invoice/invoice details</description>
+        <externalId>false</externalId>
+        <label>Costing Qty</label>
+        <precision>7</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Date_Invoiced__c</fullName>
         <externalId>false</externalId>
         <label>Date Invoiced</label>

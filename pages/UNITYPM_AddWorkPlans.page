@@ -1,0 +1,329 @@
+<apex:page standardController="WorkOrder" showHeader="false" sidebar="false" extensions="UNITYPM_AddWorkPlansControllerExtension"  id="AddAssetsPage">
+     <style>
+      .odd { 
+        background-color: #eeeeee;
+      }
+    .even {
+        background-color:  #FFFFFF;
+    }
+    .info {
+            border: 1px solid;
+            margin: 10px 0px;
+            padding:50px 30px 50px 50px;
+            background-repeat: no-repeat;
+            background-position: 10px center;
+            font-family:Arial, Helvetica, sans-serif; 
+            font-size:18px;
+            background-color: #BDE5F8;
+         }
+       .checkboxOne {
+            width: 18px;
+            height: 18px;
+            background: #555;
+            //margin: 20px 80px;
+            position: relative;
+            border-radius: 5px;
+            }
+        .colomnHeader {
+            font-size: 30px;
+        }
+   </style>
+   
+   <script>
+        function valueAssetSelected(obj){
+           //alert();
+           assetsAddToCommit();    //checked: 1. why after select all , unselect not working for one; 2. after search selected, removed all, leave one, save, now open and try delete last one
+           changeChkState ();
+        }
+        function CloseAndRefresh(){
+            //window.opener.location.href="/{!$CurrentPage.parameters.id}";
+            window.top.close(); 
+        }
+        
+        function CloseWindow()
+        { 
+            window.top.close(); 
+        }
+        
+        function changeStyle(x) {
+            x.style.textDecoration="underline";
+        }
+        function removeLine(x) {
+         x.style.textDecoration="none";    
+        }
+
+          function checkAllOld(cb)
+        {
+            var inputElem = document.getElementsByTagName("input");
+            for(var i=0; i<inputElem.length; i++)
+            {
+                if(inputElem[i].id.indexOf("checkedone")!=-1)
+                inputElem[i].checked = cb.checked;
+            }
+        }
+        function checkAll(cb,cbid)
+        {
+            var inputElem = document.getElementsByTagName("input");                     
+            for(var i=0; i<inputElem.length; i++)
+            {             
+                 if(inputElem[i].id.indexOf(cbid)!=-1){                                        
+                    inputElem[i].checked = cb.checked;
+                }
+            }
+        }
+       
+       
+      function changeChkState() {
+           var inputElem = document.getElementsByTagName("input");
+            for(var i=0; i<inputElem.length; i++)
+            {
+                if(inputElem[i].id.indexOf("checkedall")!=-1){
+                     if ( inputElem[i].checked == true){
+                      inputElem[i].checked = false;
+                    }
+                }
+            }
+        }
+        
+        function resetSearch() {
+           var inputElem = document.getElementsByTagName("input");
+            for(var i=0; i<inputElem.length; i++)
+            {
+                if(inputElem[i].id.indexOf("checkedall")!=-1){
+                     if ( inputElem[i].checked == true){
+                      inputElem[i].checked = false;
+                    }
+                } 
+                 if(inputElem[i].id.indexOf("aType")!=-1){
+                     inputElem[i].value = '';
+                 }
+            }
+        }
+     </script>
+     
+      <apex:outputPanel rendered="{!VendorAssignedStatus}">
+        <apex:form >
+         <apex:pageBlock >
+         <apex:actionFunction name="assetsAddToCommit"  action="{!actionAssetsAddToCommit}" reRender="pnl"/>
+         <apex:actionFunction name="refreshMyPanel" reRender="pnl" />
+         
+         <apex:pageMessages />
+         
+        <h1><span style ="font-size: 13px;text-decoration: underline;">Create Default Assets</span></h1>
+        
+          <apex:pageBlockSection columns="1" id="assetTypeCreate">
+              <apex:pageBlockSectionItem >
+                   <apex:outputPanel id="pna">
+                      <apex:outputLabel value="Asset Type" style="font-size: 12px;"/>&nbsp;&nbsp;
+                       <apex:selectList value="{!selectedAssetVal}" size="1"> 
+                        <apex:selectOptions value="{!DefaultAssetsList}" /> 
+                      </apex:selectList>
+                    
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                     <apex:outputLabel value="Count" style="font-size: 12px;"/>&nbsp;&nbsp;
+                       <apex:selectList value="{!selectedNumVal}" size="1"> 
+                        <apex:selectOptions value="{!NumbersList }" /> 
+                      </apex:selectList>
+                  
+                   &nbsp;&nbsp;&nbsp;&nbsp;  
+                   <apex:commandButton value="Add Default Set of Assets" action="{!addDefaultAssets}" reRender="assetsWorkPlanTable"  status="saveDefaultAssets" style="background:LightCray;width:180px;font-size: 13px;"  oncomplete="javascript:window.top.location.reload()"></apex:commandButton>
+             </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+          </apex:pageBlockSection>
+          
+           <apex:outputPanel >
+             <apex:actionStatus id="saveDefaultAssets" >
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <img src="/img/loading32.gif" width="45" height="45" />
+                            <apex:outputLabel value="(Saving ...)"/>
+                        </apex:outputPanel>            
+                    </apex:facet>
+                </apex:actionStatus> 
+        </apex:outputPanel>
+         
+         <br/><hr/>  <br/>
+          <h1><span style ="font-size: 13px;text-decoration: underline;">Asset Search</span></h1>
+             <apex:pageBlockSection columns="1" id="assetFoSearch">
+              <apex:pageBlockSectionItem >
+                   <apex:outputPanel id="pnaAssetSrch">
+                      <apex:outputLabel value="Filter:" style="font-size: 12px;" />&nbsp;&nbsp;
+                     <apex:inputText id="aType" value="{!searchAsset}" size="30" >
+                          <apex:actionSupport event="onchange" action="{!enableSearchButton}" reRender="pnaAssetSrch"  />
+                     </apex:inputText>
+                     
+                   &nbsp;&nbsp;&nbsp;&nbsp;  
+                 
+                     <apex:outputLabel value="Apply Filter for Assets" style="font-size: 12px;" />&nbsp;&nbsp;
+                       <apex:selectList value="{!selectedSearchAsset}" size="1"> 
+                        <apex:selectOptions value="{!SearchAssetList}" /> 
+                      </apex:selectList>
+                      
+                     &nbsp;&nbsp;&nbsp;&nbsp;
+                      <apex:commandButton value="Add Filter" action="{!searchAssetType}" rerender="assetsWorkPlanTable"  oncomplete="changeChkState()" style="background:LightCray;width:120px;font-size: 13px;"></apex:commandButton>   <!-- disabled="{!! readyForAssetSearch}"-->
+                    &nbsp;&nbsp;&nbsp;&nbsp; 
+                    
+                   <apex:commandButton value="Remove Filter/ Refresh " action="{!ResetAssetsTable}" rerender="assetsWorkPlanTable"  oncomplete="resetSearch()" style="background:LightCray;width:160px;font-size: 13px;"></apex:commandButton>   <!-- disabled="{!! readyForAssetSearch}" -->
+                   
+             </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+          </apex:pageBlockSection>
+          
+          <br/><hr/>  <br/>
+          
+         <h1><span style ="font-size: 13px;text-decoration: underline;">Assets to Select</span></h1>
+            
+        <apex:pageBlockSection columns="1" id="assetsWorkPlanTable">
+        
+        <apex:outputPanel style="margin-top: 5px;">
+            <apex:outputText value="Total Records:" style="font-style: italic;font-size: 12px;text-decoration: underline;" /> &nbsp;&nbsp; <apex:outputText value="{!totalRecCount}" />
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:outputText value="Number of Records per Page:" style="font-style: italic;font-size: 12px;text-decoration: underline;" /> &nbsp;&nbsp;
+            <apex:selectList value="{!RecPerPage}" size="1" >
+               <apex:selectOptions value="{!PageSize}" />
+               <apex:actionSupport event="onchange" action="{!BuildAssetsWorkPlanPageSet}" reRender="assetsTable" />
+            </apex:selectList>
+         </apex:outputPanel> 
+     
+            <apex:pageBlockTable value="{!wplSetAssetWrapper}" var="rec" rowClasses="even,odd" id="assetsTable" border="1">
+                      <!-- <apex:column value="{!rec.numberOfRow}">
+                            <apex:facet name="header">#</apex:facet>
+                        </apex:column>    styleClass="checkboxOne" -->
+                        
+                        <apex:column >
+                            <apex:facet name="header"> 
+                            <apex:inputCheckbox id="checkedall" >
+                            <apex:actionSupport event="onclick" action="{!actionAllAssetsAddToCommit}" onsubmit="checkAll(this, 'checkedone')" rerender="assetsTable,pnl"/>
+                            </apex:inputCheckbox>
+                        </apex:facet>
+                        </apex:column>
+                        
+                      <apex:column >
+                            <apex:facet name="header">
+                            <apex:commandLink value="Selected {!IF(compareField=='selected',IF(sortOrder='asc','▼','▲'),'')}" action="{!sortWrpLst}" reRender="assetsTable,crec" style="text-decoration:none;font-size: 13px;" onmouseover="changeStyle(this)" onmouseout="removeLine(this)">
+                                <apex:param name="compareField" value="selected" assignTo="{!compareField}" />
+                                <apex:param name="sortOrder" value="{!IF(sortOrder='asc', 'desc', 'asc')}" assignTo="{!sortOrder}" />
+                            </apex:commandLink>
+                           
+                        </apex:facet>
+                            
+                            <apex:inputCheckbox value="{!rec.selected}" onclick="valueAssetSelected(this)" id="checkedone" >
+                                <apex:actionSupport event="onchange" reRender="assetsTable"/>
+                            </apex:inputCheckbox>
+                       </apex:column>
+                     
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:commandLink value="Name {!IF(compareField=='Name',IF(sortOrder='asc','▼','▲'),'')}" action="{!sortWrpLst}" reRender="assetsWorkPlanTable" style="text-decoration:none;font-size: 13px;" onmouseover="changeStyle(this)" onmouseout="removeLine(this)">
+                                <apex:param name="compareField" value="Name" assignTo="{!compareField}" />
+                                <apex:param name="sortOrder" value="{!IF(sortOrder='asc', 'desc', 'asc')}" assignTo="{!sortOrder}" />
+                            </apex:commandLink>
+                        </apex:facet>
+                            <apex:outputText value="{!rec.asset.Name}"/>
+                             <apex:inputHidden value="{!rec.asset.ID}"></apex:inputHidden>
+                       </apex:column>
+                       
+                      <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Serial Number</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.UNITY_Serial_No__c}"/>
+                    </apex:column>
+                    
+                    <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Model Number</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.UNITY_Model_No__c}"/>
+                    </apex:column>
+
+                    <apex:column >
+                            
+                        <apex:facet name="header">
+                            <apex:commandLink value="Asset Type {!IF(compareField=='UNITY_Asset_Type__c',IF(sortOrder='asc','▼','▲'),'')}" action="{!sortWrpLst}" reRender="assetsWorkPlanTable" style="text-decoration:none; font-size: 13px;" onmouseover="changeStyle(this)" onmouseout="removeLine(this)">
+                                <apex:param name="compareField" value="UNITY_Asset_Type__c" assignTo="{!compareField}" />
+                                <apex:param name="sortOrder" value="{!IF(sortOrder='asc', 'desc', 'asc')}" assignTo="{!sortOrder}" />
+                            </apex:commandLink>
+                        </apex:facet>
+                        
+                            <apex:outputText value="{!rec.asset.UNITY_Asset_Type__c}"/>
+                    </apex:column>
+                    
+                     <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Work Plan</span></apex:facet>
+                             <apex:selectList size="1" multiselect="false"  value="{!rec.SelectedOption}" id="selectedAsset">
+                              <apex:selectOptions value="{!rec.wplist}"></apex:selectOptions>
+                               <script>
+                                    document.getElementById('{!$Component.selectedAsset}').disabled = {!IF(rec.selected, true, false)};
+                                </script>
+                            </apex:selectList> 
+                    </apex:column>
+            </apex:pageBlockTable>
+    
+          <apex:outputPanel >
+                    <apex:commandButton value="<< Previous" action="{!previous}" disabled="{!!hasPrevious}" reRender="assetsWorkPlanTable"  oncomplete="changeChkState()" styleClass="buttonStyle" style="background:LightCray;width:120px;font-size: 13px;"/>
+                    &nbsp;&nbsp;
+                    <apex:commandButton value="Next >>" action="{!next}" disabled="{!!hasNext}" reRender="assetsWorkPlanTable"  oncomplete="changeChkState()" styleClass="buttonStyle" style="background:LightCray;width:120px; font-size: 13px;"/>
+                </apex:outputPanel>
+      </apex:pageBlockSection>  
+      
+         <apex:outputPanel >
+             <apex:actionStatus id="pageStatus" onStop="CloseWindow();" >
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <img src="/img/loading32.gif" width="45" height="45" />
+                            <apex:outputLabel value="(Saving ...)"/>
+                        </apex:outputPanel>            
+                    </apex:facet>
+                </apex:actionStatus> 
+        </apex:outputPanel>
+        
+         <br/><hr/>  <br/>
+      <h1><span style ="font-size: 13px;text-decoration: underline;">Assets to Commit</span></h1>
+     <apex:outputPanel id="pnl">
+        <apex:pageBlockSection columns="1" id="assetsCommitTable" >
+         <apex:pageBlockTable value="{!RecordsToCommit}" var="rec"  id="crec" border="1">
+                    <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Asset Name</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.Name}"/>
+                             <apex:inputHidden value="{!rec.asset.ID}" id="selectedAssetID"></apex:inputHidden>
+                    </apex:column>
+                    
+                      <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Serial Number</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.UNITY_Serial_No__c}"/>
+                    </apex:column>
+                    
+                    <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Model Number</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.UNITY_Model_No__c}"/>
+                    </apex:column>
+
+                    <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Asset Type</span></apex:facet>
+                            <apex:outputText value="{!rec.asset.UNITY_Asset_Type__c}"/>
+                    </apex:column>
+                    
+                     <apex:column >
+                            <apex:facet name="header"><span style ="font-size: 13px;">Work Plan</span></apex:facet>
+                            <apex:outputText value="{!rec.wpName}"></apex:outputText>
+                            <apex:inputHidden value="{!rec.wpID}" id="myHiddenField"></apex:inputHidden>
+                    </apex:column>
+            </apex:pageBlockTable>
+          </apex:pageBlockSection>
+      </apex:outputPanel>
+     
+      <br/> <br/>  <br/>
+          <apex:outputPanel id="buttonsBlock">
+            <apex:commandButton action="{!addPlan}"  value="Save & Close" oncomplete="javascript:CloseAndRefresh();" status="pageStatus" styleClass="buttonStyle" style="background:LightCray;width:150px;font-size: 13px;" />
+        </apex:outputPanel>
+      <br/> <br/>
+      
+        </apex:pageBlock>    
+
+    </apex:form>
+      </apex:outputPanel>
+      
+       <apex:outputPanel rendered="{!!VendorAssignedStatus}">
+         <div class="info">
+              {!WarningMessage}
+             </div> 
+      </apex:outputPanel>
+     
+</apex:page>

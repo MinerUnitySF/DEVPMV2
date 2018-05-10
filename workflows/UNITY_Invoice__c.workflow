@@ -8,7 +8,7 @@
             <field>UNITY_Agent__c</field>
             <type>userLookup</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Notify_Agents_Invoice_Status</template>
     </alerts>
@@ -33,7 +33,7 @@
             <field>UNITY_Agent__c</field>
             <type>userLookup</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Notify_Agents_Invoice_Status</template>
     </alerts>
@@ -45,7 +45,7 @@
             <field>UNITY_Agent__c</field>
             <type>userLookup</type>
         </recipients>
-        <senderAddress>customersupport@nsbs.net</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Notify_Agents_Invoice_Status</template>
     </alerts>
@@ -57,7 +57,7 @@
             <field>UNITY_Customer_Email__c</field>
             <type>email</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Invoice_Email</template>
     </alerts>
@@ -82,7 +82,7 @@
             <field>UNITY_Customer_Email__c</field>
             <type>email</type>
         </recipients>
-        <senderAddress>customersupport@minercorp.com</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Invoice_Email</template>
     </alerts>
@@ -94,7 +94,7 @@
             <field>UNITY_Customer_Email__c</field>
             <type>email</type>
         </recipients>
-        <senderAddress>customersupport@nsbs.net</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Invoice_Email</template>
     </alerts>

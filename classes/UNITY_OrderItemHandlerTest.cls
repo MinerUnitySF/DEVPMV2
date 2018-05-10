@@ -74,6 +74,8 @@ public class UNITY_OrderItemHandlerTest{
             if(a.RecordTypeId == buRTId)
                 bu = a;
         }
+        cust.UNITY_TimeZoneSidKey__c = 'America/Chicago';
+        update cust;
         //Get the case
         Case c = [SELECT Id FROM Case LIMIT 1];
 
@@ -99,7 +101,17 @@ public class UNITY_OrderItemHandlerTest{
         c.AssetId = a.Id;
         c.UNITY_Customer_Service_Contract__c = sc.Id;
         update c;
-            
+
+        UNITY_Service_Contract__c vendSC = new UNITY_Service_Contract__c();
+        vendSC.UNITY_Account__c = vend.Id;
+        vendSC.UNITY_Trip_Charge__c = 10;
+        vendSC.UNITY_IS_Active__c   = true;
+        vendSC.UNITY_Trip_Charge_Type__c = 'Hourly Rate';
+        vendSC.UNITY_Default_Labor_Rate__c = System.Math.round((System.Math.random()*99)+1);
+        vendSC.UNITY_Invoicing_Increments__c = 'Next ¼ hr';
+        vendSC.UNITY_ServiceReport_Template__c = 'MY TEMPLATE';
+        insert vendSC;
+        
         FSO__Location__c location = new FSO__Location__c(FSO__Geolocation__Latitude__s = 10, FSO__Geolocation__Longitude__s = 10);
         insert location; 
         
@@ -108,7 +120,6 @@ public class UNITY_OrderItemHandlerTest{
         
         RecordType woRecordType = [SELECT Id, DeveloperName FROM RecordType WHERE SobjectType = 'WorkOrder' AND DeveloperName = 'Service_Request'];
         WorkOrder wo = new WorkOrder(UNITY_Work_Window_Begin__c  = datetime.now(), UNITY_Agent__c = UserInfo.getUserId() ,RecordTypeId = woRecordType.Id, UNITY_Customer__c = cust.Id, UNITY_Assigned_Vendor__c = vend.Id, AccountId = cust.Id, CaseId = c.Id, Subject='Test', Status = 'New');
-        
         wo.UNITY_Customer_Service_Contract__c = sc.Id;
         wo.UNITY_Work_Window_Begin__c = Date.today();
         wo.UNITY_Work_Window_End__c = Date.today().addDays(6);
@@ -222,6 +233,19 @@ public class UNITY_OrderItemHandlerTest{
             if(a.RecordTypeId == buRTId)
                 bu = a;
         }
+		
+        cust.UNITY_TimeZoneSidKey__c = 'America/Chicago';
+        update cust;
+        
+        UNITY_Service_Contract__c vendSC = new UNITY_Service_Contract__c();
+        vendSC.UNITY_Account__c = vend.Id;
+        vendSC.UNITY_Trip_Charge__c = 10;
+        vendSC.UNITY_IS_Active__c   = true;
+        vendSC.UNITY_Trip_Charge_Type__c = 'Hourly Rate';
+        vendSC.UNITY_Default_Labor_Rate__c = System.Math.round((System.Math.random()*99)+1);
+        vendSC.UNITY_Invoicing_Increments__c = 'Next ¼ hr';
+        vendSC.UNITY_ServiceReport_Template__c = 'MY TEMPLATE';
+        insert vendSC;
         
         FSO__Location__c location = new FSO__Location__c(
             FSO__Account__c = bu.Id,
@@ -307,7 +331,6 @@ public class UNITY_OrderItemHandlerTest{
         
         oi.UNITY_Asset__c = a.Id;
         update oi;
-        
     }
     
     //Test Stocking PO Lines NO Stock
@@ -338,6 +361,19 @@ public class UNITY_OrderItemHandlerTest{
             if(a.RecordTypeId == buRTId)
                 bu = a;
         }
+        cust.UNITY_TimeZoneSidKey__c = 'America/Chicago';
+        update cust;
+
+        UNITY_Service_Contract__c vendSC = new UNITY_Service_Contract__c();
+        vendSC.UNITY_Account__c = vend.Id;
+        vendSC.UNITY_Trip_Charge__c = 10;
+        vendSC.UNITY_IS_Active__c   = true;
+        vendSC.UNITY_Trip_Charge_Type__c = 'Hourly Rate';
+        vendSC.UNITY_Default_Labor_Rate__c = System.Math.round((System.Math.random()*99)+1);
+        vendSC.UNITY_Invoicing_Increments__c = 'Next ¼ hr';
+        vendSC.UNITY_ServiceReport_Template__c = 'MY TEMPLATE';
+        insert vendSC;
+        
         FSO__Location__c location = new FSO__Location__c(
             FSO__Account__c = bu.Id,
             FSO__Type__c = 'Warehouse',
@@ -431,8 +467,19 @@ public class UNITY_OrderItemHandlerTest{
             if(a.RecordTypeId == buRTId)
                 bu = a;
         }
-        
+        cust.UNITY_TimeZoneSidKey__c = 'America/Chicago';
+        update cust;
         Case testCase = [SELECT Id FROM Case LIMIT 1];
+        
+        UNITY_Service_Contract__c vendSC = new UNITY_Service_Contract__c();
+        vendSC.UNITY_Account__c = vend.Id;
+        vendSC.UNITY_Trip_Charge__c = 10;
+        vendSC.UNITY_IS_Active__c   = true;
+        vendSC.UNITY_Trip_Charge_Type__c = 'Hourly Rate';
+        vendSC.UNITY_Default_Labor_Rate__c = System.Math.round((System.Math.random()*99)+1);
+        vendSC.UNITY_Invoicing_Increments__c = 'Next ¼ hr';
+        vendSC.UNITY_ServiceReport_Template__c = 'MY TEMPLATE';
+        insert vendSC;
         
         //Create a Work Order
         WorkOrder wo = new WorkOrder();
@@ -512,6 +559,9 @@ public class UNITY_OrderItemHandlerTest{
         //Verify the stock quantity updated
         FSO__LocationStock__c updatedLocStock= [SELECT FSO__Quantity__c FROM FSO__LocationStock__c WHERE Id = :locStock.Id];
         System.Assert(updatedLocStock.FSO__Quantity__c == 400);
+        
+        UNITY_OrderItemHandlerHelper.setPMFieldValuesBasedOnType(oi, pbe1);
+
     }
     
     //Check the stock quantity updated when Order Record Type  = UNITY_Stocking_Purchase_Order
@@ -539,6 +589,17 @@ public class UNITY_OrderItemHandlerTest{
             if(a.RecordTypeId == buRTId)
                 bu = a;
         }
+        cust.UNITY_TimeZoneSidKey__c = 'America/Chicago';
+        update cust;
+        UNITY_Service_Contract__c vendSC = new UNITY_Service_Contract__c();
+        vendSC.UNITY_Account__c = vend.Id;
+        vendSC.UNITY_Trip_Charge__c = 10;
+        vendSC.UNITY_IS_Active__c   = true;
+        vendSC.UNITY_Trip_Charge_Type__c = 'Hourly Rate';
+        vendSC.UNITY_Default_Labor_Rate__c = System.Math.round((System.Math.random()*99)+1);
+        vendSC.UNITY_Invoicing_Increments__c = 'Next ¼ hr';
+        vendSC.UNITY_ServiceReport_Template__c = 'MY TEMPLATE';
+        insert vendSC;
         
         Case testCase = [SELECT Id FROM Case LIMIT 1];
         

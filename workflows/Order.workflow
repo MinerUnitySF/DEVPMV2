@@ -8,7 +8,7 @@
             <field>UNITY_Vendor_Email__c</field>
             <type>email</type>
         </recipients>
-        <senderAddress>vendorsupport@minercorp.com</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Multiple_Shipment_Notification</template>
     </alerts>
@@ -33,7 +33,7 @@
             <field>UNITY_Vendor_Email__c</field>
             <type>email</type>
         </recipients>
-        <senderAddress>vendorsupport@minercorp.com</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Multiple_Shipment_Notification</template>
     </alerts>
@@ -45,7 +45,7 @@
             <field>UNITY_Vendor_Email__c</field>
             <type>email</type>
         </recipients>
-        <senderAddress>vendorsupport@nsbs.net</senderAddress>
+        <senderAddress>vendorsupport_uat@minercorp.com</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>UNITY_Email_Templates/UNITY_Multiple_Shipment_Notification</template>
     </alerts>

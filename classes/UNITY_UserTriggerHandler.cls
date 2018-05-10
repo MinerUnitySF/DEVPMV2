@@ -11,6 +11,17 @@ public class UNITY_UserTriggerHandler extends UNITY_BaseHandler {
             // just for testing enabling for update
             if(Trigger.isInsert) {
                 createManualSharing();   
+                  
+               //added 
+               List<Id> accountIds = new List<Id>();
+                for(User user : (List<User>)Trigger.new) {
+                    if(user.AccountId != null && user.IsPortalEnabled == true) {
+                        accountIds.add(user.AccountId);
+                    }
+                }
+               if (accountIds.size()> 0)
+                  userCustomerPortalAccount(accountIds);
+                  
             }
         } catch(Exception ex) {
             for(User user : (List<User>)Trigger.new) {
@@ -18,6 +29,22 @@ public class UNITY_UserTriggerHandler extends UNITY_BaseHandler {
             }
         }
         
+    }
+    
+     @future
+    private static void userCustomerPortalAccount(List<ID> accountIds){
+         List<Account> accUpdate = new List<Account>();
+         
+         for (Account acc: [SELECT Id, IsCustomerPortal, UNITY_Has_Community_Member__c FROM Account  WHERE Id IN :accountIds] ){
+                System.debug('#### acc.UNITY_Has_Community_Member__c  ####' + acc.UNITY_Has_Community_Member__c);
+                acc.UNITY_Has_Community_Member__c = acc.IsCustomerPortal;
+                accUpdate.add(acc);
+         }
+        
+          System.debug('#### accUpdate ####' + accUpdate);
+          
+         if (accUpdate.size()> 0)
+            update accUpdate;
     }
     
     private void handleUserSkillVendorsFlow() {
