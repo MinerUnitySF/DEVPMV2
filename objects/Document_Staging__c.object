@@ -75,6 +75,15 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>DocParser_Link__c</fullName>
+        <externalId>false</externalId>
+        <label>DocParser Link</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Url</type>
+    </fields>
+    <fields>
         <fullName>Document_Count__c</fullName>
         <externalId>false</externalId>
         <label>Document Count</label>

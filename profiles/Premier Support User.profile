@@ -41,6 +41,18 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>BarcodeChildData</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>BarcodeData1</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>BarcodeDetails</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>BarcodeLineItem</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -362,6 +374,14 @@
     </classAccesses>
     <classAccesses>
         <apexClass>SFPS_GNC_GetNextCaseTest</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>STK_WrapperClass</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>STK_WrapperParentClass</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -2256,6 +2276,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Document_Staging_Item__c.Page_Count__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Document_Staging_Item__c.Parent_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -2272,6 +2297,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Document_Staging__c.DocParser_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.DocParser_Link__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

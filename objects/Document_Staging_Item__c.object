@@ -106,6 +106,17 @@
         </valueSet>
     </fields>
     <fields>
+        <fullName>Page_Count__c</fullName>
+        <externalId>false</externalId>
+        <label>Page Count</label>
+        <precision>3</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Parent_Id__c</fullName>
         <externalId>false</externalId>
         <label>Parent Id</label>

@@ -16,15 +16,16 @@ global class UNITY_DocParserUtility{
         Document_Staging__c docStaging = [SELECT Id, Status__c, DocParser_Id__c FROM Document_Staging__c WHERE Id = :documentStagingId];
 
         //Check if the document staging record has a File or an Attachment
-        List<Attachment> a = [SELECT ID,Name,Body FROM Attachment WHERE ParentId = :documentStagingId];
+        List<Attachment> a = [SELECT ID,Name,Body, ContentType, BodyLength FROM Attachment WHERE ParentId = :documentStagingId];
         system.debug('@@@UploadDocumentToDocParser attachment a: '+a);
+        //4826251
 
         //look for file if attachment is null
         ContentVersion cv = null;
         if (a.size() == 0){
             List<ContentDocumentLink> cdl = [SELECT Id,ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId=:documentStagingId];
             if (cdl != null && cdl.size() > 0) {
-                cv = [SELECT Id, title, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId = :cdl[0].ContentDocumentId];
+                cv = [SELECT Id, title, ContentDocumentId, VersionData, FileType, ContentSize, ContentUrl, ExternalDocumentInfo1 FROM ContentVersion WHERE ContentDocumentId = :cdl[0].ContentDocumentId];
                 system.debug('@@@UploadDocumentToDocParser content version cv: '+cv);
             }
         }
@@ -62,9 +63,11 @@ global class UNITY_DocParserUtility{
         String strSeparationKey = '';
 
         system.debug('@@@UploadDocumentToDocParser - strTargetURL:'+strTargetURL);
-        
+
+        system.debug('@@@heap size remaining:'+Limits.getLimitHeapSize() );
         // assemble the body payload
-        String strHeader = '--' + strSeparationKey + '\nContent-Disposition: form-data; name="file"; filename="' + filename + '"\nContent-Type: application/octet-stream\n\n';
+        String contentDisposition  = '\nContent-Disposition: form-data; name="file"; filename="' + filename;
+        String strHeader = '--' + strSeparationKey + contentDisposition + '"\nContent-Type: application/octet-stream\n\n';
         String strBody = EncodingUtil.base64Encode(a.size() != 0 ? a[0].Body : cv.VersionData);
         String strFooter = '\n--' + strSeparationKey + '--';
 
@@ -88,10 +91,12 @@ global class UNITY_DocParserUtility{
         } else {
             blobBody = EncodingUtil.base64Decode(strHeaderEncoded+strBodyEncoded+strFooterEncoded);
         }
-        
-        if(blobBody.size()>3000000) {
+
+        return'';
+/*
+        if(blobBody.size()>8000000) {
             // throw new CustomException('File size limit is 3 MBytes');
-            system.debug('File size limit is 3 MBytes');
+            system.debug('File size limit is 8 MBytes');
         }else{
             system.debug('blobBody.size()'+blobBody.size());
         }
@@ -121,7 +126,7 @@ global class UNITY_DocParserUtility{
         }
 
         system.debug('@@@UploadDocumentToDocParser - docParserId:' + docParserId);
-        if (docParserId != null) {
+        if (docParserId != null && !String.isEmpty(docParserId)) {
             docStaging.DocParser_Id__c = docParserId;
             docStaging.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_UPLOADED;
             docStaging.Comments__c = 'Document Upload Successful. DocParserID: '+ docParserId + ' \r\n';
@@ -134,7 +139,7 @@ global class UNITY_DocParserUtility{
             update docStaging;
             return 'Failed';
         }
-
+*/
     }
     
     public static List<DocParserBarcodeData> getParsedInfoFromDocParser(String docparserId){
@@ -165,14 +170,101 @@ global class UNITY_DocParserUtility{
         Http http = New Http();
         HTTPResponse res = http.send(req);
 
-        List<DocParserBarcodeData> result = null;
+        List<DocParserBarcodeData> result = new List<DocParserBarcodeData>();
         if (res.getStatusCode() == 200){
             String responseBody = res.getBody();
             system.debug('@@@getParseInfo responseBody:'+responseBody);
 
-            result = DocParserBarcodeData.parse(responseBody);
-            system.debug('@@@getParseInfo result :' + result );
+            List<Object> untypedResults = (List<Object>)JSON.deserializeUntyped(responseBody);
+            system.debug('@@@getParseInfo untypedResults :' + untypedResults );
+
+            for(Object rootObj: untypedResults){
+                Map<String, Object> rootMap = (Map<String, Object>)rootObj;
+                system.debug('@@@getParseInfo rootObj:' + rootObj );
+
+                DocParserBarcodeData dp = new DocParserBarcodeData();
+
+                for(String attrLabel: rootMap.keySet()){
+                    Object obj = rootMap.get(attrLabel);
+                    if (attrLabel == 'id'){
+                        dp.id = (String)obj;
+                    } else if (attrLabel == 'document_id'){
+                        dp.document_id = (String)obj;
+                    }else if (attrLabel == 'remote_id'){
+                        dp.remote_id = (String)obj;
+                    }else if (attrLabel == 'file_name'){
+                        dp.file_name = (String)obj;
+                    }else if (attrLabel == 'media_link'){
+                        dp.media_link = (String)obj;
+                    }else if (attrLabel == 'media_link_original'){
+                        dp.media_link_original = (String)obj;
+                    }else if (attrLabel == 'media_link_data'){
+                        dp.media_link_data = (String)obj;
+                    }else if (attrLabel == 'page_count'){
+                        dp.page_count = (Integer)obj;
+                    }else if (attrLabel == 'uploaded_at'){
+                        dp.uploaded_at = (String)obj;
+                    }else if (attrLabel == 'processed_at'){
+                        dp.processed_at = (String)obj;
+                    }else if (attrLabel == 'barcodedata'){
+                        dp.barcodedata = parsetBarcodeDetailsList(obj);
+                    }else if (attrLabel == 'wafdetails'){
+                        dp.wafdetails = parsetBarcodeDetailsList(obj);
+                    }else if (attrLabel == 'ccadetails'){
+                        dp.ccadetails = parsetBarcodeDetailsList(obj);
+                    }else if (attrLabel == 'ccadata'){
+                        dp.ccadata = parseBarcodeDetails(obj);
+                    }else if (attrLabel == 'wafdata'){
+                        dp.wafdata = parseBarcodeDetails(obj);
+                    }
+
+                }
+                result.add(dp);
+            }
+
+
         }
+        system.debug('@@@result:'+result);
+        return result;
+    }
+
+    public  static BarcodeDetails parseBarcodeDetails(Object o){
+
+        BarcodeDetails bd = null;
+
+        if (o == null)
+            return bd;
+
+        bd = new BarcodeDetails();
+        Map<String, Object> mapObj = (Map<String, Object>)o;
+        for(String key: mapObj.keySet()){
+            if (key == 'key_0')
+                bd.key_0 = (String)mapObj.get(key);
+            if (key == 'key_1')
+                bd.key_1 = (String)mapObj.get(key);
+            if (key == 'key_2')
+                bd.key_2 = (String)mapObj.get(key);
+        }
+        return bd;
+    }
+
+    public static List<BarcodeDetails> parsetBarcodeDetailsList(Object obj){
+        List<BarcodeDetails> result = null;
+
+        if (obj == null)
+            return result;
+
+        //result has to be null if there is no data
+        result = new List<BarcodeDetails>();
+
+        if (obj instanceof List<Object>) {
+            List<Object> lObj = (List<Object>)obj;
+            for (Object o : lObj)
+                result.add(parseBarcodeDetails(o));
+        } else if (obj != null) {
+            result.add(parseBarcodeDetails(obj));
+        }
+
         return result;
     }
 

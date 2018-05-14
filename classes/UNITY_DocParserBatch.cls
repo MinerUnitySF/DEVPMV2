@@ -26,8 +26,8 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
             List<DocParserBarcodeData> httpresult = UNITY_DocParserUtility.getParsedInfoFromDocParser(ds.DocParser_Id__c);
 
             //no response from DocParser
-            if (httpresult == null) {
-                ds.Comments__c += 'Retrieve parsed data: Httpresult is null.  Document not ready.\r\n';
+            if (httpresult == null || httpresult.size() <= 0) {
+                ds.Comments__c += 'Retrieve parsed data: Httpresult is null.  Document not ready or no barcode found.\r\n';
                 continue;
             }
 
@@ -36,11 +36,14 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
 
             //Parse result from DocParser
             Integer counter = 0;
-            for (DocParserBarcodeData barcodData : httpresult) {
+            for (DocParserBarcodeData barcodeData : httpresult) {
                 counter++;
 
                 Document_Staging_Item__c dsi = new Document_Staging_Item__c();
-                dsi.DocPaser_Link__c = barcodData.media_link;
+                dsiToInsert.add(dsi);
+
+                dsi.DocPaser_Link__c = barcodeData.media_link;
+                dsi.Page_Count__c = barcodeData.page_count;
                 dsi.Document_Staging__c = ds.Id;
                 dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_NEW;
                 dsi.Comments__c = '';
@@ -50,14 +53,14 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
                 Id recordId = null;
 
                 //if there is data from DocParser that has a document type of CCA; get document code and record id
-                if (barcodData.ccadata != null) {
-                    documentCode = barcodData.ccadata.key_0;
-                    recordId = barcodData.ccadata.key_1;
+                if (barcodeData.ccadata != null) {
+                    documentCode = barcodeData.ccadata.key_0;
+                    recordId = barcodeData.ccadata.key_1;
                 }
                 //if there is data from DocParser that has a document type of WAF; get document code and record id
-                if (barcodData.wafdata != null) {
-                    documentCode = barcodData.wafdata.key_0;
-                    recordId = barcodData.wafdata.key_1;
+                if (barcodeData.wafdata != null) {
+                    documentCode = barcodeData.wafdata.key_0;
+                    recordId = barcodeData.wafdata.key_1;
                 }
 
                 //if there's no barcode data, log and continue
@@ -69,10 +72,30 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
                     continue;
                 }
 
+                //if there are barcode details, compare the number of pages with the number of details, if they don't match, fail
+                if (barcodeData.ccadetails != null){
+                    if (barcodeData.ccadetails.size() != barcodeData.page_count  && barcodeData.ccadata.key_2 != 'CP'){
+                        ds.Comments__c += 'Error page count does not match for line item: ' + counter;
+                        dsi.Comments__c += 'Error page count does not match.  Page count: (' + barcodeData.page_count + ') ccadetails(' + barcodeData.ccadetails.size() + ')\r\n';
+                        dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
+                        ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
+                        continue;
+                    }
+                }
+                if (barcodeData.wafdetails != null){
+                    if (barcodeData.wafdetails.size() != barcodeData.page_count && barcodeData.wafdata.key_2 != 'CP'){
+                        ds.Comments__c += 'Error page count does not match for line item: ' + counter;
+                        dsi.Comments__c += 'Error page count does not match.  Page count: (' + barcodeData.page_count + ') wafdetails(' + barcodeData.wafdetails.size() + ')\r\n';
+                        dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
+                        ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
+                        continue;
+                    }
+                }
+
                 //if there are barcode data, popualte the values to the Document Staging Id
                 dsi.Parent_Id__c = recordId;
                 dsi.Document_Type_Code__c = documentCode;
-                dsi.Comments__c += 'Document code(' + documentCode + ') or recordid(' + recordId + ')\r\n';
+                dsi.Comments__c += 'Document code(' + documentCode + ') and Recordid(' + recordId + ')\r\n';
 
                 //try to find the document type based on the document code
                 String docType = docCodeAndTypeMap.get(documentCode);
@@ -99,8 +122,6 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
                     ds.Comments__c += 'Cannot download document from media link for line item (' + counter + ')\r\n';
                     ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
                 }
-
-                dsiToInsert.add(dsi);
 
                 //add ds to a map, will be referenced later
                 if (ds.Status__c != UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED)
