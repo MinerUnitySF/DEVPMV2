@@ -4,8 +4,8 @@
 
 global with sharing class UNITY_DocParserBatch implements Database.Batchable<sObject>, Database.AllowsCallouts{
 
-    String query = 'SELECT Id, DocParser_Id__c, Status__c, Comments__c FROM Document_Staging__c WHERE DocParser_Id__c != null AND Status__c = \'Uploaded\'';
-
+    String query = 'SELECT Id, DocParser_Id__c, Status__c, Comments__c, Name FROM Document_Staging__c WHERE DocParser_Id__c != null AND Status__c = \'Processing\' '; 
+ 
     global Database.QueryLocator start(Database.BatchableContext bc){
         return Database.getQueryLocator(query);
     }
@@ -27,12 +27,11 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
 
             //no response from DocParser
             if (httpresult == null || httpresult.size() <= 0) {
-                ds.Comments__c += 'Retrieve parsed data: Httpresult is null.  Document not ready or no barcode found.\r\n';
                 continue;
             }
 
             //Set number of child documents; >1 if it's a multi-doc document
-            ds.Document_Count__c = httpresult.size();
+            ds.DocParser_Page_Count__c = httpresult.size();
 
             //Parse result from DocParser
             Integer counter = 0;
@@ -43,7 +42,8 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
                 dsiToInsert.add(dsi);
 
                 dsi.DocPaser_Link__c = barcodeData.media_link;
-                dsi.Page_Count__c = barcodeData.page_count;
+                dsi.DocParser_Page_Count__c = barcodeData.page_count;
+                dsi.DocParser_Id__c = barcodeData.document_id;
                 dsi.Document_Staging__c = ds.Id;
                 dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_NEW;
                 dsi.Comments__c = '';
@@ -65,7 +65,7 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
 
                 //if there's no barcode data, log and continue
                 if (documentCode == null || recordId == null) {
-                    ds.Comments__c += 'Error obtaining document code for line item: ' + counter;
+                    ds.Comments__c = 'There was an error obtaining barcode information from document #' + counter + '.';
                     dsi.Comments__c += 'Error obtaining document code(' + documentCode + ') or recordid(' + recordId + ')\r\n';
                     dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
                     ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
@@ -75,7 +75,7 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
                 //if there are barcode details, compare the number of pages with the number of details, if they don't match, fail
                 if (barcodeData.ccadetails != null){
                     if (barcodeData.ccadetails.size() != barcodeData.page_count  && barcodeData.ccadata.key_2 != 'CP'){
-                        ds.Comments__c += 'Error page count does not match for line item: ' + counter;
+                        ds.Comments__c = 'The system found page(s) with no barcode.  Please use a cover page if you have documents with no barcodes.';
                         dsi.Comments__c += 'Error page count does not match.  Page count: (' + barcodeData.page_count + ') ccadetails(' + barcodeData.ccadetails.size() + ')\r\n';
                         dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
                         ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
@@ -84,7 +84,7 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
                 }
                 if (barcodeData.wafdetails != null){
                     if (barcodeData.wafdetails.size() != barcodeData.page_count && barcodeData.wafdata.key_2 != 'CP'){
-                        ds.Comments__c += 'Error page count does not match for line item: ' + counter;
+                        ds.Comments__c = 'The system found page(s) with no barcode.  Please use a cover page if you have documents with no barcodes.';
                         dsi.Comments__c += 'Error page count does not match.  Page count: (' + barcodeData.page_count + ') wafdetails(' + barcodeData.wafdetails.size() + ')\r\n';
                         dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
                         ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
@@ -104,7 +104,7 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
                     dsi.Comments__c += 'Document code found.  Type: ' + docType + '\r\n';
                 }
                 else{
-                    ds.Comments__c += 'Document type not found for line item (' + counter + ') using code: ' + documentCode + '\r\n';
+                    ds.Comments__c = 'Error obtaining barcode information from document #' + counter + '.';
                     ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
                     dsi.Comments__c += 'Document type not found using code: ' + documentCode + '\r\n';
                     dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
@@ -119,7 +119,7 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
                 else{
                     dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
                     dsi.Comments__c += 'Cannot download document from media link\r\n';
-                    ds.Comments__c += 'Cannot download document from media link for line item (' + counter + ')\r\n';
+                    ds.Comments__c = 'Error attaching the file to the work order.  Please contact an agent and mention document ' + ds.Name;
                     ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
                 }
 
@@ -173,8 +173,10 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
             if (!hasFailure && allChildRecordsCompleted && ds.Document_Staging_Items__r != null && ds.Document_Staging_Items__r.size() > 0) {
                 ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_COMPLETE;
             }
-            if (hasFailure)
+            if (hasFailure){
+                ds.Comments__c = 'There was an issue with this document.  Please contact an agent and mention document ' + ds.Name;
                 ds.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
+            }
         }
 
         update dsList;
@@ -208,16 +210,15 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
     }
 
     private static void processWorkOrderRecords(List<Document_Staging_Item__c> itemsToProcess, Map<String, Blob> fileFromDocLinkUrlMap){
-        //Create unity attachment records
-        Map<String, UNITY_Attachment__c> unityToInsert = new Map<String, UNITY_Attachment__c>();
-        for (Document_Staging_Item__c dsi: itemsToProcess){
-            Id recordID = (Id)dsi.Parent_Id__c;
-            String externalId = recordID + dsi.Document_Type_Code__c;
 
+        Map<String, UNITY_Attachment__c> unityToInsert = new Map<String, UNITY_Attachment__c>();
+
+        //Create unity attachment records
+        for (Document_Staging_Item__c dsi: itemsToProcess){
             UNITY_Attachment__c uAtt = new UNITY_Attachment__c();
-            uAtt.Work_Order__c = recordID;
+            uAtt.Work_Order__c = (Id)dsi.Parent_Id__c;
             uAtt.UNITY_Type__c = dsi.Document_Type__c;
-            unityToInsert.put(externalId, uAtt);
+            unityToInsert.put(dsi.DocParser_Id__c, uAtt);
         }
 
         Database.SaveResult[] unityInsertResults = Database.insert(unityToInsert.values());
@@ -241,15 +242,23 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
             if (dsi.Status__c != 'Parsed')
                 continue;
 
-            String externalId = (Id)dsi.Parent_Id__c + dsi.Document_Type_Code__c;
-
             //Check if unity insertion was successful, if so, create attachment
-            if (!uAttSuccess.contains(unityToInsert.get(externalId).Id))
+            UNITY_Attachment__c att = unityToInsert.get(dsi.DocParser_Id__c);
+            if (att == null){
+                dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
+                dsi.Comments__c += 'Cannot find UNITY Attachment \r\n';
                 continue;
+            }
 
-            attToInsert.add(new Attachment(Name = 'docparser', ParentId = unityToInsert.get(externalId).Id, Body = fileFromDocLinkUrlMap.get(dsi.DocPaser_Link__c)));
+            if (!uAttSuccess.contains(att.Id)){
+                dsi.Status__c = UNITY_Constants.DOCUMENT_STAGING_STATUS_FAILED;
+                dsi.Comments__c += 'Failed to create UNITY Attachment Id\r\n';
+                continue;
+            }
 
-            unityAndStagingItemMap.put(unityToInsert.get(externalId).Id, dsi);
+            attToInsert.add(new Attachment(Name = 'docparser', ParentId = att.Id, Body = fileFromDocLinkUrlMap.get(dsi.DocPaser_Link__c)));
+
+            unityAndStagingItemMap.put(att.Id, dsi);
         }
 
         Database.SaveResult[] attchmentInsertResults = Database.insert(attToInsert);
@@ -278,7 +287,6 @@ global with sharing class UNITY_DocParserBatch implements Database.Batchable<sOb
             }
         }
         update dsiToUpdate;
-
     }
 
 

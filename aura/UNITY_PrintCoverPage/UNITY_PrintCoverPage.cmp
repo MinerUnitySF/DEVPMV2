@@ -1,0 +1,19 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="UNITY_AuraPrintCoverPage">
+    <aura:attribute name="docTypes" type="List"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.loadDocTypes}"/>
+    
+    <div class="slds-p-top_small">
+        <br/>
+        <h1>PRINT A BARCODE COVER PAGE</h1>
+        <br/>
+        <lightning:select aura:id="docSelection" name="docSelection" label="Select Document Type" >
+            <aura:iteration items="{!v.docTypes}" var="docType">
+                <option value="{!docType}" text="{!docType}"></option>
+            </aura:iteration>            
+        </lightning:select>
+        <br/>
+        <lightning:button variant="brand" label="Print" onclick="{! c.downloadPDF}" />
+        
+    </div>
+</aura:component>

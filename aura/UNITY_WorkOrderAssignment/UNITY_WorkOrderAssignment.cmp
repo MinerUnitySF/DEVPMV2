@@ -1,0 +1,88 @@
+<aura:component controller="UNITY_AuraWOAssignmentController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+<aura:handler name="init" value="{!this}" action="{!c.loadWorkOrders}"/>    
+     <aura:attribute name="wrapperWOList" type="UNITY_AuraWOAssignmentController.VendorWOWrapper"/>     
+     <aura:attribute name="acceptSelectedCount" type="integer" default="0"/>
+     <aura:attribute name="rejectSelectedCount" type="integer" default="0"/>
+    <aura:attribute name="workOrdersUpdatedCount" type="integer" default="0"/>
+     <aura:registerEvent name="toastEvent" type="force:showToast"/>   
+    
+     <div class="slds-page-header">
+         <h2 class="slds-page-header__title slds-truncate" title="">Work Orders Pending Acceptance</h2><br/>
+         <span class="slds-badge"><b>Total Work Orders: &nbsp;&nbsp;{!v.wrapperWOList.length}</b></span> 
+         <span class="slds-badge"><b>Accept Selected Work Orders: &nbsp;&nbsp;{!v.acceptSelectedCount}</b></span>
+         <span class="slds-badge"><b>Reject Selected Work Orders: &nbsp;&nbsp;{!v.rejectSelectedCount}</b></span> 
+         &nbsp;&nbsp; &nbsp;&nbsp;   
+         <span class="slds-badge slds-badge_inverse slds-text-align_center"><b>Work Orders Updated: &nbsp;&nbsp;{!v.workOrdersUpdatedCount}</b></span>         
+         
+      <div class="slds-grid slds-grid--align-end">          
+           <button class="slds-button slds-button--brand slds-button--destructive updateWO" onclick="{!c.updateSelected}">Update Work Orders</button>         
+      </div>
+   </div>
+    
+    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+      <thead>
+        <tr class="slds-text-title--caps slds-is-sortable">
+          <th scope="col"><span  class="slds-truncate">Work<br/>Order</span > </th>
+          <th scope="col"><span  class="slds-truncate">Customer<br/> Name</span ></th>
+          <th scope="col"><span  class="slds-truncate">Site Address</span ></th>
+          <th scope="col"><span  class="slds-truncate slds-hyphenate slds-is-sortable">Priority</span ></th> 
+          <th scope="col"><span  class="slds-truncate slds-hyphenate">Acceptance  <br/>  Deadline</span ></th> 
+          <th scope="col"><span  class="slds-truncate" >Not to <br/>Exceed <br/> Amount</span > </th>
+          <th scope="col"><span  class="slds-truncate">Work<br/>Description</span ></th>
+          <th scope="col"><span  class="slds-truncate">Deadline<br/>to Perform Work</span ></th>
+          <th scope="col"><span  class="slds-truncate">Accept</span ></th>
+          <th scope="col"><span  class="slds-truncate">Reject</span ></th>
+        </tr>
+      </thead>
+     
+      <tbody>
+        <aura:iteration items="{!v.wrapperWOList}" var="wo" indexVar="index">
+          <tr>
+              <td  class="slds-cell-wrap"><a onclick="{!c.navigateToWorkOrder}" data-index="{!index}">{!wo.workOrder.WorkOrderNumber}</a></td>
+              <td class="slds-cell-wrap">{!wo.workOrder.Account.Name}</td>
+              <td class="slds-cell-wrap">{!wo.workOrder.UNITY_Work_Site_for_Community__c}</td>
+              <td class="slds-cell-wrap">{!wo.workOrder.Priority}</td>
+              <td class="slds-cell-wrap">{!wo.deadlinePerformWork}</td>
+              <td  class="slds-cell-wrap">$ {!wo.doNotExceedAmount}</td>
+              <td  class="slds-cell-wrap"><span class="underline"><b>Trade:</b></span>&nbsp;{!wo.tradeName}<br/><span  class="underline"><b>Description:</b></span>&nbsp;{!wo.workOrder.UNITY_Work_Description__c} </td>               
+              <td scope="row" class="slds-cell-wrap">{!wo.window_End}</td>                
+               
+             
+              <td scope="row" class="slds-text-align--center" >
+                  <div class="slds-form-element">
+                     <div class="slds-form-element__control">                      
+                          <label class="slds-checkbox  checkbox">
+                           <ui:inputCheckbox text="{!wo.workOrder.WorkOrderNumber}" aura:id="boxAccepted" name="{!index}"
+                                 value="{!wo.acceptChecked}" disabled="{!wo.acceptDisabled}"  change="{!c.acceptCheckboxSelect}"/>                           
+                           <span class="slds-checkbox--faux"></span>
+                           <span class="slds-form-element__label text"></span>
+                        </label>
+                     </div>
+                  </div>                    
+               </td>              
+              <td scope="row" class="slds-text-align--center" >
+                  <div class="slds-form-element" >
+                     <div class="slds-form-element__control">
+                        <label class="slds-checkbox  checkbox">
+                           <ui:inputCheckbox text="{!wo.workOrder.WorkOrderNumber}" aura:id="boxRejected" name="{!index}"
+                             value="{!wo.rejectChecked}" disabled="{!wo.rejectDisabled}" change="{!c.rejectCheckboxSelect}"/>                          
+                           <span class="slds-checkbox--faux"></span>
+                           <span class="slds-form-element__label text"></span>
+                        </label>
+                     </div>
+                  </div>
+               </td>
+              
+          </tr>
+        </aura:iteration>
+      </tbody>
+    </table> 
+    <br/>
+    <div class="slds-grid">
+		<div class="slds-col">
+         </div>
+		<div class="slds-col">
+
+        </div>
+	</div>   
+</aura:component>

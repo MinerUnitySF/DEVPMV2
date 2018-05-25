@@ -1,0 +1,33 @@
+<aura:component controller="UNITY_AuraAttachmentListController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:handler name="init" action="{!c.myAction}" value="{!this}" />
+    <aura:attribute name="attachmentWrapper" type="UNITY_AuraAttachmentListController.UNITYAttachmentWrapper" />
+    
+    <div class="slds-scrollable" 
+         style="{!v.attachmentWrapper.isCase == true ? 'height: 13.5rem; width: 45rem;' : 'height: 13.5rem; width: 35rem;'}">
+	<table class="slds-table slds-table--bordered slds-border_left slds-border_right">
+        <thead>
+            <tr>
+                <th scope="col" height="38"><span class="slds-truncate slds-text-title">ATTACHMENT NAME</span></th>
+                <aura:if isTrue="{!v.attachmentWrapper.isCase}">
+	                <th scope="col"><span class="slds-truncate slds-text-title">WORK ORDER</span></th>
+                </aura:if>
+                <th scope="col"><span class="slds-truncate slds-text-title">TYPE</span></th>
+                <th scope="col"><span class="slds-truncate slds-text-title">CREATED DATE</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.attachmentWrapper.attachmentList}" var="a" indexVar="index">
+                <tr>
+                    <td ><a onclick="{!c.navigateToRecord}" style="width:100%;" data-index="{!index}">{!a.Name}</a></td>
+                    <aura:if isTrue="{!v.attachmentWrapper.isCase}">
+	                    <td><a onclick="{!c.navigateToWorkOrder}" style="width:100%;" data-index="{!index}">{!a.Work_Order__r.WorkOrderNumber}</a></td>
+                    </aura:if>
+                    <td>{!a.UNITY_Type__c}</td>
+                    <td><ui:outputDate value="{!a.CreatedDate}"/></td>
+                    <td></td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    </div>
+</aura:component>

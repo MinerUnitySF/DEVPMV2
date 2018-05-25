@@ -1,9 +1,9 @@
 /**This is a helper class for attachments
 ** @programer: Izay Ramos-Irizarry
-** @version: 2.0
+** @version: 2.0  without sharing
 ** @date: 6/17/2015
 */
-public without sharing class AttachmentHelper {
+public  class AttachmentHelper {
     public static Boolean doNotRunAgain = false;
     
     
@@ -292,6 +292,40 @@ public without sharing class AttachmentHelper {
     
     /** splitting  attachments for document stging   **/     
     
+   
+    /** upload attachments to DocParser */
+    public static void prepareFileUploadToDocParser(List<Attachment> attachmentList){
+
+        //Check if attachment is related to Document Staging
+        Map<Id, Attachment> attachmentForDocStagingMap = new Map<Id, Attachment>();
+        Set<Id> docStagingIds = new Set<Id>();
+
+        system.debug('@@@prepareFileUploadToDocParser attachmentList:'+attachmentList);
+
+        for (Attachment a: attachmentList){
+            String sobjectType = a.ParentId.getSObjectType().getDescribe().getName();
+            if (sobjectType == 'Document_Staging__c'){
+                attachmentForDocStagingMap.put(a.Id, a);
+                docStagingIds.add(a.ParentId);
+            }
+        }
+
+        //Fetch document staging records
+        Map<Id, Document_Staging__c> docStagingMap = new Map<Id, Document_Staging__c>([SELECT Id, Status__c
+                                                    FROM Document_Staging__c
+                                                    WHERE Status__c = 'New'
+                                                    AND DocParser_Id__c = null
+                                                    AND Id = :docStagingIds]);
+
+
+        for (Attachment a: attachmentForDocStagingMap.values()){
+            Document_Staging__c ds = docStagingMap.get(a.ParentId);
+            if (ds != null)
+                UNITY_DocParserUtility.UploadDocumentToDocParserViaLinkF(ds.Id);
+        }
+
+    }
+    
     public static void uploadDocumentstaingAttachments(List<Attachment> newList){
          Map<ID, List<Attachment>> attListForParentMap = new Map<ID, List<Attachment>>();
         for (Attachment att: newList){
@@ -338,37 +372,5 @@ public without sharing class AttachmentHelper {
              }
           }
     }
-
-    /** upload attachments to DocParser */
-    public static void prepareFileUploadToDocParser(List<Attachment> attachmentList){
-
-        //Check if attachment is related to Document Staging
-        Map<Id, Attachment> attachmentForDocStagingMap = new Map<Id, Attachment>();
-        Set<Id> docStagingIds = new Set<Id>();
-
-        system.debug('@@@prepareFileUploadToDocParser attachmentList:'+attachmentList);
-
-        for (Attachment a: attachmentList){
-            String sobjectType = a.ParentId.getSObjectType().getDescribe().getName();
-            if (sobjectType == 'Document_Staging__c'){
-                attachmentForDocStagingMap.put(a.Id, a);
-                docStagingIds.add(a.ParentId);
-            }
-        }
-
-        //Fetch document staging records
-        Map<Id, Document_Staging__c> docStagingMap = new Map<Id, Document_Staging__c>([SELECT Id, Status__c
-                                                    FROM Document_Staging__c
-                                                    WHERE Status__c = 'New'
-                                                    AND DocParser_Id__c = null
-                                                    AND Id = :docStagingIds]);
-
-
-        for (Attachment a: attachmentForDocStagingMap.values()){
-            Document_Staging__c ds = docStagingMap.get(a.ParentId);
-            if (ds != null)
-                UNITY_DocParserUtility.UploadDocumentToDocParserF(ds.Id);
-        }
-
-    }
+   
 }

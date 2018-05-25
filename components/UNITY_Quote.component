@@ -1,0 +1,456 @@
+<apex:component controller="UNITY_QuoteController" access="global">
+    <apex:attribute name="quote" 
+                    type="Id" 
+                    description="the proposal object" 
+                    assignTo="{!quoteID}"/>
+    <html>
+       <head>
+          <style type="text/css" media="print">
+    
+             @page :first {
+                 size: 8.5in 11in;
+                 margin: 140px 20px 170px 20px;
+                 @top-center {
+                     content: element(header);
+                 }
+                 @bottom-center {
+                     content: element(footer);
+                 }
+             }
+             
+             @page {
+                 size: 8.5in 11in;
+                 margin: 150px 20px 0px 20px;
+                 @top-center {
+                     content: element(header);
+                 }
+                 @bottom-center {
+                     content: element(footerContainer);
+                 }
+             }
+             
+             /*
+             div{
+                 border: 1px solid black;
+             }
+             */
+             
+             div.header {
+                 padding: 20px 0px 0px 0px;
+                 margin: 0px;
+                 position: running(header);
+                 width: 100%;
+                 height: 200px;
+                 display: table;
+             }
+             div.footer {
+                 padding: 0px 0px 10px 0px;
+                 position: running(footer);
+                 width: 100%;
+                 display: table;
+             }
+             div.footerContainer{
+                 padding: 0px 0px 10px 0px;
+                 width: 100%;
+                 display: table;
+                 text-align: center;
+             }
+             body {
+                 margin: 0px;
+                 padding: 0px;
+                 font-family: Arial, Helvetica, sans-serif;
+             }
+             .pagebreak {
+                 page-break-before: always;
+                 display: block;
+                 width: 100%;
+             }
+             
+             .titleheader {
+                 width: 100%;
+                 height: 110px;
+                 text-align: center;
+                 position: relative;
+             }
+             .headerlabel {
+                 margin: 0 auto;
+                 heigth: 40px;
+                 width: 350px;
+                 font-size: 30px;
+             }
+             .row {
+                 display: inline-block;
+                 height: 100%;
+             }
+             .font1 {
+                 font-size: 10px;
+             }
+             .font2,
+             .fontImportant2 {
+                 font-size: 12px;
+             }
+             .font3,
+             .fontImportant3 {
+                 font-size: 15px;
+             }
+             .font4,
+             .fontImportant4 {
+                 font-size: 20px;
+                 font-weight: bold;
+             }
+             .font5 {
+                 font-size: 30px;
+                 font-weight: bold;
+             }
+             .fontImportant1,
+             .fontImportant2,
+             .fontImportantHeader,
+             .fontImportant4 {
+                 color: #ff0000;
+             }
+             
+             table {
+                 width: 100%;
+                 border-spacing:0;
+             }
+             
+             th, tr {
+                 border-collapse: collapse;
+             }
+            
+             #leftheader,
+             .leftblock {
+                 float: left;
+             }
+             #leftheader {
+                 width: 215px;
+                 height: 100%;
+             }
+             .leftblock {
+                 width: 40%;
+                 position: relative;
+                 height: 100%;
+             }
+             .centerblock {
+                 margin: 0 auto;
+                 width: 120px;
+                 height: 120px;
+                 background: #00ff00;
+             }
+             #rightheader,
+             .rightblock {
+                 float: right;
+                 position: relative;
+                 width: 130px;
+                 height: 50px;
+             }
+             #rightheader {
+                 margin: 35px 0px 0px 0px;
+                 padding: 0px 0px 0px 0px;
+                 width: 215px;
+                 height: 50px;
+                 line-height: 25px;
+              	 border-left: 1px solid #000000;
+                 border-right: 1px solid #000000;
+             }
+             
+             #rightheader span {
+                 display: inline-block;
+                 vertical-align: middle;
+             }
+             
+             .rightblock {
+                 width: 40%;
+                 height: 100%;
+             }
+             #proposalLabel {
+                 color: #ffffff;
+                 font-size: 40px;
+                 font-weight: bold;
+                 border: 2px solid #ffffff;
+                 background: #000000;
+                 width: 100%;
+                 height: 50px;
+                 text-align:center;
+                 vertical-align:middle;
+             }
+             #containerblock {
+                 height: 150px;
+                 text-align: center;
+                 display: block;
+             }
+             .noborder,
+             .noborder tr,
+             .noborder th,
+             .noborder td {
+                 border: none;
+             }
+
+             .border1, .border1 th, .border3{
+                 border: 2px solid #000000;
+             }
+             .border1 th, .border3 th {
+                 background: #ff0000;
+                 text-align: center;
+                 height: 30px;
+             }
+    
+             .border3 th{
+                 border: 2px solid #000000;
+                 color: #ffffff;
+             }
+             .border3 td{
+                 text-align: center;
+                 height: 25px;
+             }
+              
+             .border2, .border2 td{
+                 border-top: 2px solid #000000;
+                 margin-left: 5px;
+                 padding-left: 2px;
+                 height: 30px;
+             }
+             .backgroundgrey {
+                 background-color: #888888;
+             }
+             .tableblock {
+                 height: 140px;
+             }
+             .textcenter {
+                 text-align: center;
+             }
+             .borderred {
+                 border: 1px solid #ff0000;
+             }
+             .parentblock{
+                 margin: 10px 0px 10px 0px;
+                 position: relative;
+                 overflow: hidden;
+             }
+             #termsandconditions p {
+                 text-align: justify;
+                 text-justify: inter-word;
+                 display:table-row;
+                 font-size: 8pt;
+                 font-family: Arial, Helvetica, sans-serif;
+             }
+             li {
+                 font-size:12px;
+             }
+             ol.a {
+                 list-style-type: lower-alpha;
+             }
+             
+             .quotetable td, .quotetable th {
+                 font-size: 75%;
+             }
+             .logo {
+                 margin-top:40px;
+             }         
+    
+              .border4 tr, .border4 td{
+              	 border: 1px solid #000000;
+              	 height: 25px;
+              	 text-align: left;
+                 font-size: 95%;
+              }
+              
+              .border4 {
+                 border-collapse: collapse;
+              }
+              
+          </style>
+       </head>
+       <body>
+          <div class="header">
+             <div class="titleheader">
+                <div id="leftheader">
+                   <p id="proposalLabel">
+                      Quote
+                   </p>
+                </div>
+                <div id="rightheader">
+                    <table class="border4">
+                        <tr>
+                            <td>Quote No:</td>
+                            <td>{!relatedTo.Name}</td>
+                        </tr>
+                        <tr>
+                            <td>Date:</td>
+                            <td>{!CreatedDate}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="centerblock">
+                    <apex:image styleClass="logo" width="150" url="{!relatedTo.UNITY_Email_Logo_URL__c}"/>
+                </div>
+             </div>
+          </div>
+          <div class="footer">
+              <div style="margin:0px 0px 20px 0px;">
+                 <p>CUSTOMER ACCEPTANCE</p>
+                 <br/>
+                 <br/>
+                 <table class="noborder border2">
+                    <tr>
+                       <td>Approval Signature</td>
+                       <td>Printed Name</td>
+                       <td>PO#</td>
+                       <td>Date</td>
+                    </tr>
+                 </table>
+              </div>
+              <div class="footerContainer">
+                  <div class="borderred"></div>
+                  {!beginSite}<span style="color:#ff0000">{!middleSite}</span>{!endSite}
+              </div>
+          </div>
+          <div class="pagebreak">
+             <div class="parentblock">
+                 <div class="leftblock">
+                    <table class="noborder border1 tableblock">
+                       <tr>
+                          <th>PREPARED FOR:</th>
+                       </tr>
+                       <tr>
+                          <td>
+                              <c:UNITY_UserInfo aId="{!relatedTo.UNITY_Work_Order__r.UNITY_Customer__c}"/>
+                          </td>
+                       </tr>
+                    </table>
+                 </div>
+                 <div class="rightblock">
+                    <table class="noborder border1 tableblock">
+                       <tr>
+                          <th>PREPARED BY:</th>
+                       </tr>
+                       <tr>
+                          <td>
+                              <c:UNITY_UserInfo uId="{!relatedTo.UNITY_Agent__c}"/>
+                          </td>
+                       </tr>
+                    </table>
+                 </div>
+             </div>
+             <div class="borderred"></div>
+             <div>
+                 <p class="font4 textcenter">
+                    {!relatedTo.UNITY_Work_Order__r.UNITY_Business_Unit_Account__r.Name} is pleased to quote the following equipment per your request.
+                 </p>
+                 <p class="fontImportant4 textcenter">
+                    {!relatedTo.UNITY_Work_Order__r.workOrderNumber}
+                 </p>
+              </div>
+              <table>
+                  <tr>
+                      <td>
+                          <c:UNITY_QuoteLineItems qId="{!relatedTo.Id}"
+                                tPrice="{!relatedTo.UNITY_Total_Price__c}"/>
+                      </td>
+                  </tr>
+              </table>
+          </div>
+          <div id="termsandconditions" class="pagebreak">
+           <p style="font-size:12pt;text-decoration: underline;"><b>Terms &amp; Conditions:</b></p>
+           <p>Unless otherwise stated in writing, the following terms and conditions of sale become a part of the proposal.  “Company” refers to The Miner Corporation.</p>
+           <ol>
+               <li>
+                   <p>PRICES</p>
+                   <ol class="a">
+                       <li>
+                           <p>Are firm for acceptance within 30 days from the date of quotation, provided quotation is for production and for shipment of equipment within 16 weeks from the date of</p>
+                       </li>
+                       <li>
+                           <p>Are subject to increase equal in amount to any tax Company may be required to collect or pay on the sale.</p>
+                       </li>
+                       <li>
+                           <p>Are subject to any price increase resulting from Buyer requested changes in the equipment or changes in the production schedule.</p>
+                       </li>
+                       <li>
+                           <p>Are subject to increase due to surcharges or price increases by manufacturers prior to shipment.</p>
+                       </li>
+                   </ol>
+               </li>
+               <li>
+                   <p>SHIPMENT</p>
+                   <p>Shipment is F.O.B. from place of manufacture.  Buyer shall bear all costs of freight and insurance in connection with delivery.  Upon request of Buyer, Company may prepay freight and insurance charges on behalf of Buyer and bill such charges to Buyer.  In either event, risk of loss or damage in transit passes to Buyer upon delivery to carrier.</p>
+               </li>
+               <li>
+                   <p>DELIVERY</p>
+                   <ol class="a">
+                       <li>
+                           <p>The Company will endeavor to secure shipment of orders as scheduled.  However, all shipment dates are approximate only, and the Company reserves the right to readjust shipment schedules.</p>
+                       </li>
+                       <li>
+                           <p>Under no circumstances will the Company be responsible or incur any liability for costs or damages of any nature (whether general, consequential as a penalty or liquidated damages, or otherwise) arising out of or owing to (1) delays in delivery or (2) failure to make delivery at agreed or specified times due to circumstances beyond its reasonable control.</p>
+                       </li>
+                       <li>
+                           <p>If delivery is refused or shipment is suspended by Buyer, Buyer shall pay (1) Company’s invoice for Equipment as per payout terms, (2) Company’s handling and storage charges, and (3) demurrage charges.</p>
+                       </li>
+                   </ol>
+               </li>
+               <li>
+                   <p>CANCELLATION</p>
+                   <p>Buyer cannot cancel orders placed with the Company except with the Company's expressed written consent, and upon terms and payment to the Company indemnifying the Company against loss, including but not limited to expenses incurred and commitments made by the Company.  Cancellation will be a minimum of 25% of the total Contract Sum.</p>
+               </li>
+               <li>
+                   <p>CONCEALED OR UNKNOWN</p>
+                   <p>Concealed or unknown conditions below the surface of the ground or in an existing structure may be encountered that differ materially from those recognized as inherently part of the contract.  In the event, the Contract Sum shall be equitably adjusted by Change Order upon claim by the Company.</p>
+               </li>
+               <li>
+                   <p>PERFORMANCE REQUIREMENTS</p>
+                   <p>The equipment furnished under the contract will be as stated, and Buyer has selected same based on the specification (type, amount, source end products, and intended use of Buyer) of the material to be handled or processed by Buyer and the Local, State and Federal Regulations in existence on the date of the Proposed Contract.  Changes in the equipment requirements may result from matters determined by surveys, studies, approvals, and permits or from changes in the material specification by Buyer or from changes in the Local, State, and Federal Regulations.  In this event, the Contract Sum shall be equitably adjusted by Change Order upon claim by the Company.</p>
+               </li>
+               <li>
+                   <p>INFORMATION AND SERVICE REQUIRED OF THE BUYER</p>
+                   <ol class="a">
+                       <li>
+                           <p>The Buyer shall furnish all necessary surveys describing the physical characteristics, legal limitations and utility locations for the site of the Project, and legal description of the site.</p>
+                       </li>
+                       <li>
+                           <p>The Buyer shall secure and pay for all necessary surveys, studies, approvals, easements, assessments, notices, and permits required for the construction and use of permanent structures or for permanent changes to existing facilities.</p>
+                       </li>
+                       <li>
+                           <p>Information or services under the Buyer’s control shall be furnished by the Buyer with reasonable promptness to avoid delay in the orderly progress of the work.</p>
+                       </li>
+                       <li>
+                           <p>Roof or wall openings, flashing, and counter flashing shall be furnished by the Buyer.</p>
+                       </li>
+                       <li>
+                           <p>Electric, water, steam, fuel, compressed air, storm/sanitary drain, and other utility sources or connections shall be furnished by the Buyer.</p>
+                       </li>
+                       <li>
+                           <p>Labor and material required to make connection between the equipment furnished under the contract and the utilities shall be provided by the Buyer.</p>
+                       </li>
+                       <li>
+                           <p>Labor and material required to make field connections between equipment components (except reconnection of items dismantled for shipment) shall be provided by the buyer.</p>
+                       </li>
+                       <li>
+                           <p>Site access and site conditions to allow for unimpeded use of installation equipment are the responsibility of the Buyer.</p>
+                       </li>
+                       <li>
+                           <p>The Buyer shall secure and pay for all testing required by Local, State, and Federal Regulations</p>
+                       </li>
+                   </ol>
+               </li>
+               <li>
+                   <p>SERVICE WARRANTY</p>
+                   <p>Company warrants all service performed hereunder to be performed in a workmanlike manner and free from defects in workmanship upon completion.  Company's obligation and Buyer's sole remedy, hereunder shall be limited to repair by Company of any defects discovered and reported in writing to company within 90 days after completion of services hereunder, without charge to Buyer, or (at Company's option) return of the contract price for such defective devices.</p>
+               </li>
+               <li>
+                   <p>EQUIPMENT AND PARTS WARRANTY</p>
+                   <p>Company's obligation, and Buyer's sole remedy relative to equipment and parts warranty by manufacturers thereof, is to secure manufacturer's warranty on behalf of Buyer, and assist Buyer in the presentation of any warranty claim, but Company makes no warranty in addition thereto.</p>
+               </li>
+               <li>
+                   <p>ACCEPTANCE AND GOVERNING PROVISIONS</p>
+                   <p>This writing constitutes an offer by the Company to sell products and/or services described herein and expires upon written notice or thirty (30) days from this date, whichever occurs first.  This offer is, however, entirely contingent upon acceptance by Company's supplier of a corresponding purchase order from Company.  Acceptance of this offer is limited to the terms and conditions hereof, and any such other matter in buyer's forms or correspondence shall not become part hereof and same shall not be binding upon Company unless agreed to in writing, signed by an Officer of the Company.  When accepted by Buyer, this writing shall constitute the entire agreement between Company and Buyer on the subject hereof, except as amended by a writing signed by Company.  This offer and any agreement arising out of it shall be governed by and construed in accordance with the internal laws of the State of Texas.</p>
+               </li>
+           </ol>
+           <div class="footerContainer" style="margin-top:70px;">
+                  <div class="borderred"></div>
+                  {!beginSite}<span style="color:#ff0000">{!middleSite}</span>{!endSite}
+           </div>
+          </div>
+       </body>
+    </html>
+</apex:component>

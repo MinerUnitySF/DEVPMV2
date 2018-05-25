@@ -470,7 +470,7 @@ global class UNITY_Constants {
     public static final String VENDOR_PREFERENCE_DO_NOT_USE  = 'Do Not Use';
 
     // Barcode Parsing Status
-    public static final String DOCUMENT_STAGING_STATUS_UPLOADED   = 'Uploaded';
+    public static final String DOCUMENT_STAGING_STATUS_UPLOADED   = 'Processing';
     public static final String DOCUMENT_STAGING_STATUS_PARSED   = 'Parsed';
     public static final String DOCUMENT_STAGING_STATUS_ATTACHED   = 'Attached';
     public static final String DOCUMENT_STAGING_STATUS_FAILED  = 'Failed';

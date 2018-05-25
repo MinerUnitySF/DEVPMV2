@@ -1,0 +1,18 @@
+<apex:component controller="UNITY_WorkOrderAssignmentController" access="global">
+    <apex:attribute name="workOrder" 
+                    type="WorkOrder" 
+                    description="the work order object" 
+                    assignTo="{!relatedTo}"/>
+<ul>
+<li><b>Customer Name: </b> {!relatedTo.Account.Name}</li>
+<li><b>Site Address: </b> {!relatedTo.Account.ShippingStreet}, {!relatedTo.Account.ShippingCity}, {!relatedTo.Account.ShippingState} {!relatedTo.Account.ShippingPostalCode}</li>
+<li><b>Deadline to perform work: </b> {!Window_End}</li>
+<li><b>Not to Exceed Amount: </b> <apex:outputText value="${0, number, ###,##0.00}">
+                                  <apex:param value="{!relatedTo.UNITY_Initial_Vendor_PO_Cost__c}"/>
+                                 </apex:outputText>
+                                 </li>
+
+<li><b>Description of Work</b><span>: {!relatedTo.UNITY_Trade__r.name},  {!relatedTo.UNITY_Work_Description__c} </span> </li>
+</ul>
+    
+</apex:component>

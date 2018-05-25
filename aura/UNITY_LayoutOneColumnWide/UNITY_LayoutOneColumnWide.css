@@ -1,0 +1,18 @@
+.THIS .contentPanel:before,
+.THIS .contentPanel:after {
+    content: " ";
+    display: table;
+    padding: 10px 10px;
+}
+
+.THIS .maincontent {
+    width: 100%;
+}
+
+.THIS .ui-widget {
+    padding: 10px 10px 10px 10px;
+}
+
+.THIS .tabHeader {
+    width: 133%;
+}

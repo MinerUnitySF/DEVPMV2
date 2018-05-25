@@ -1,0 +1,20 @@
+<aura:component implements="forceCommunity:searchInterface" access="global" controller="UNITY_AuraCustomSearchController">
+	<aura:attribute name="searchText" type="String" default=""/>
+	   
+    <div class="big-search-container selfServiceSearchWrapper forceCommunityOmniBox">
+        <div class="image-wrapper">
+        	<div class="no-assigned-image"></div>
+        </div>
+        <div class="body-search">
+            <div class="search-container">
+                <span class="search-input-group">
+                    <span class="search-field-group">
+                        <ui:inputText value="{!v.searchText}" class="search-field input uiInput uiInputTextForAutocomplete uiInput--default uiInput--input" maxlength="255" placeholder="Search..." keyup="{!c.search}" />
+                    </span>
+                    <lightning:button class="slds-button search-button uiButton customSearchButton" variant="brand" label="Search" iconName="utility:search" iconPosition="left" onclick="{! c.handleClick }" />
+                </span>
+            </div>
+		</div>            
+    </div>
+    
+</aura:component>

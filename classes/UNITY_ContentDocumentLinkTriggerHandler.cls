@@ -82,6 +82,7 @@ public class UNITY_ContentDocumentLinkTriggerHandler {
         //Check if File is related to Document Staging
         Map<Id, ContentDocumentLink> filesForDocStagingMap = new Map<Id, ContentDocumentLink>();
         Set<Id> docStagingIds = new Set<Id>();
+        Set<Id> contentDocIds = new Set<Id>();
 
         system.debug('@@@prepareFileUploadToDocParser contentDocLinkList:'+contentDocLinkList);
 
@@ -90,8 +91,59 @@ public class UNITY_ContentDocumentLinkTriggerHandler {
             if (sobjectType == 'Document_Staging__c'){
                 filesForDocStagingMap.put(cd.Id, cd);
                 docStagingIds.add(cd.LinkedEntityId);
+                contentDocIds.add(cd.ContentDocumentId);
             }
         }
+
+        //if there are no files related to Document Staging, return
+        if (docStagingIds.size() <= 0)
+            return;
+
+        system.debug('@@@prepareFileUploadToDocParser contentDocIds'+contentDocIds);
+
+        //Get content document
+        Map<Id, ContentDocument> cdMap = new Map<Id, ContentDocument>([SELECT Id, LatestPublishedVersionId,Title FROM ContentDocument
+                                                                        WHERE Id in :contentDocIds]);
+
+        system.debug('@@@prepareFileUploadToDocParser contend document map cdMap:'+cdMap);
+
+        //Create a content distribution for each file, so it can be externally accessed
+        List<ContentDistribution> contentDistributionToInsert = new List<ContentDistribution>();
+        for (ContentDocumentLink cdl : filesForDocStagingMap.values()){
+            ContentDocument cd = cdMap.get(cdl.ContentDocumentId);
+            if (cd == null)
+                continue;
+            ContentDistribution cdist = new ContentDistribution();
+            cdist.Name = cd.Title;
+            cdist.ContentVersionId = cd.LatestPublishedVersionId;
+            cdist.PreferencesAllowOriginalDownload = true;
+            cdist.PreferencesAllowPDFDownload = true;
+            cdist.PreferencesAllowViewInBrowser = true;
+            cdist.PreferencesExpires = false;
+            cdist.PreferencesPasswordRequired = false;
+            contentDistributionToInsert.add(cdist);
+        }
+
+        Database.SaveResult[] result = Database.Insert(contentDistributionToInsert, false);
+
+        system.debug('@@@prepareFileUploadToDocParser Content Distribution save result:'+result);
+
+        //Get Ids of successful insert
+        Set<Id> cdistLinkIds = new Set<Id>();
+        for (Database.SaveResult r : result){
+            if (r.isSuccess())
+                cdistLinkIds.add(r.getId());
+        }
+
+        Map<Id, ContentDistribution> contentDistMap = new Map<Id, ContentDistribution>([SELECT Id, PdfDownloadUrl, ContentDownloadUrl, ContentDocumentId
+                                                    FROM ContentDistribution WHERE Id in :cdistLinkIds]);
+
+        system.debug('@@@prepareFileUploadToDocParser Content Distribution map: '+contentDistMap);
+        Map<Id, Id> contentDocAndcontentDistMap = new Map<Id,Id>();
+        for (ContentDistribution cdist: contentDistMap.values()){
+            contentDocAndcontentDistMap.put(cdist.ContentDocumentId, cdist.Id);
+        }
+        system.debug('@@@prepareFileUploadToDocParser Content Doc & Content Dist Map: '+contentDocAndcontentDistMap);
 
         //Fetch document staging records
         Map<Id, Document_Staging__c> docStagingMap = new Map<Id, Document_Staging__c>([SELECT Id, Status__c
@@ -103,9 +155,23 @@ public class UNITY_ContentDocumentLinkTriggerHandler {
 
         for (ContentDocumentLink a: filesForDocStagingMap.values()){
             Document_Staging__c ds = docStagingMap.get(a.LinkedEntityId);
-            if (ds != null)
-                UNITY_DocParserUtility.UploadDocumentToDocParserF(ds.Id);
+            Id cdistId = contentDocAndcontentDistMap.get(a.ContentDocumentId);
+            ContentDistribution cdist = contentDistMap.get(cdistId);
+            ds.Content_Download_URL__c = cdist.ContentDownloadUrl;
+            ds.Pdf_Download_Url__c = cdist.PdfDownloadUrl;
+            ContentDocument cd = cdMap.get(a.ContentDocumentId);
+            ds.File_Name__c = cd.Title;
         }
+        update docStagingMap.values();
+
+        system.debug('@@@prepareFileUploadToDocParser updated docStagingMap: '+docStagingMap);
+
+        for (ContentDocumentLink a: filesForDocStagingMap.values()){
+            Document_Staging__c ds = docStagingMap.get(a.LinkedEntityId);
+            if (ds != null)
+                UNITY_DocParserUtility.UploadDocumentToDocParserViaLinkF(ds.Id);
+        }
+
 
     }
 

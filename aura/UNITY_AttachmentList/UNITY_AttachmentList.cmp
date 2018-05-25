@@ -1,0 +1,24 @@
+<aura:component controller="UNITY_AuraAttachmentListController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:handler name="init" action="{!c.myAction}" value="{!this}" />
+    <aura:attribute name="attachments" type="UNITY_Attachment__c[]" />
+    
+	<table class="slds-table slds-table--bordered">
+        <thead>
+            <tr>
+                <th scope="col"><span class="slds-truncate">Attachment</span></th>
+                <th scope="col"><span class="slds-truncate">Work Order</span></th>
+                <th scope="col"><span class="slds-truncate">Type</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.attachments}" var="attachment" indexVar="index">
+                <tr>
+                    <td><a onclick="{!c.navigateToRecord}" style="width:100%;" data-index="{!index}">{!attachment.Name}</a></td>
+                    <td><a onclick="{!c.navigateToWorkOrder}" style="width:100%;" data-index="{!index}">{!attachment.Work_Order__r.WorkOrderNumber}</a></td>
+                    <td>{!attachment.UNITY_Type__c}</td>
+                    <td></td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+</aura:component>

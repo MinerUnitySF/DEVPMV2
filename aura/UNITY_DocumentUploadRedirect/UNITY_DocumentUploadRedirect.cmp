@@ -1,0 +1,52 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller='UNITY_AuraDocUploadRedirectController' >
+    <aura:attribute name="isFirstPage" type="boolean" default="true"/>
+    <aura:attribute name="stagingList" type="List"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.getStagingItems}" />
+    
+    <aura:if isTrue="{!v.isFirstPage}">    
+        <div class="slds-col">
+            <a href="" onclick="{!c.generateNewDocumentStagingRecord}">Click here to drop documents with Barcode.</a>
+        </div>    
+        
+        <aura:if isTrue="{!v.stagingList.length  > 0}"> 
+            <br/>
+            <br/>
+            <table style="border: 1px solid black;">
+                <tr style="border: 1px solid black;">
+                    <th>Created Date</th>
+                    <th>File Name</th>
+                    <th>Doc Reference ID</th>
+                    <th># of PDF Documents</th>
+                    <th>Document Source</th>
+                    <th>Status</th>                
+                    <th>Errors</th>   
+                </tr>
+                
+                <aura:iteration items="{!v.stagingList}" var="item">
+                    <tr style="border: 1px solid black;">
+                        <td><ui:outputDate value="{!item.CreatedDate}"/></td>
+                        <td><ui:outputText value="{!item.File_Name__c}" /></td>
+                        <td><ui:outputText value="{!item.Name}" /></td>
+                        <td><ui:outputText value="{!item.DocParser_Page_Count__c}" /></td>
+                        <td><ui:outputText value="{!item.Document_Source__c}" /></td>
+                        <td><ui:outputText value="{!item.Status__c}" /></td>
+                        <td style="width: 300px"><ui:outputText value="{!item.Comments__c}" /></td>
+                    </tr>
+                </aura:iteration>
+            </table>
+        </aura:if>             
+        <div class="slds-p-top_xx-large" style="font-style: italic;font-weight: bold;">
+            <span>To ensure proper barcode detection, documents must come in a professional scan quality.</span>
+            <br/>
+            <span>A high quality scan has the following attributes:</span>
+            <ol class="slds-list--dotted">
+                <li>a resolution of 200-300 DPI</li>
+                <li>well aligned and no skewing</li>
+                <li>high black and white contrast</li>
+                <li>no scanning artifacts (pixel noise, black paper borders, ..)</li>
+            </ol>
+        </div>
+        
+    </aura:if>    
+</aura:component>

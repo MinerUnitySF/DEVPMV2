@@ -1,0 +1,46 @@
+.THIS .slds-spinner_container {  
+      z-index: 10000;
+      position: fixed;   
+}
+
+.THIS .woLink{
+    color : #ff0f00;
+    text-decoration: underline;
+    font-weight: bold;
+}
+.THIS .updateWO1{
+    background-color: #ff0f00;
+    border: none;
+    color: white;
+    padding: 10px 22px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+    font-weight: bold;
+    border: 1px solid black;
+}
+
+.THIS .updateWO{
+    background-color: #ff0f00; 
+}
+
+.THIS .checkbox{
+    font-weight: bold;
+    font-size: .25em;
+    align-content: right;
+    margin: 2px 4px;
+    padding: 5px 6px;
+    text-decoration:none;
+    text-align:right;
+    border-radius:6px;
+    border:0;
+    border-top:1px solid rgba(255,255,255,.45);
+    background:#DDDFE1;
+    background:linear-gradient(#F8F8F9,#DDDFE1);
+    box-shadow:0 3px 3px rgba(0, 0, 0, 0.7),0 1px 0 rgba(0, 0, 0, 0.3) ;
+    text-shadow:0 2px 1px #FFF;	
+}
+.THIS .underline{
+    text-decoration: underline;
+}

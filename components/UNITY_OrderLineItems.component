@@ -1,0 +1,37 @@
+<apex:component controller="UNITY_OrderLineItemsController" access="global">
+    <apex:attribute name="oId" 
+                    type="ID" 
+                    description="the work order id" 
+                    assignTo="{!orderId}"/>
+
+    <apex:dataTable value="{!items}" var="item" styleClass="body" style="border-collapse: collapse;border-spacing: 0px;">
+        <apex:column >
+            <apex:facet name="header">Product Name</apex:facet>
+            {!item.UNITY_Product_Code__c}
+        </apex:column>
+        <apex:column >
+            <apex:facet name="header">Description</apex:facet>
+            {!item.UNITY_Product_Description__c}&nbsp;{!item.UNITY_Unknown_Part_Description__c}
+        </apex:column>
+        <apex:column style="text-align: right;">
+            <apex:facet name="header">Cost</apex:facet>
+            <apex:outputText value="${0,number,###,##0.00}">
+                <apex:param value="{!item.UNITY_Cost__c}"/>
+            </apex:outputText>
+        </apex:column>
+        <apex:column style="text-align: right;">
+            <apex:facet name="header">Quantity</apex:facet>
+            {!item.Quantity}
+        </apex:column>
+        <apex:column style="text-align: right;">
+            <apex:facet name="header">Vendor Adjusted Quantity</apex:facet>
+            {!item.UNITY_Vendor_Adjusted_Quantity__c}
+        </apex:column>
+        <apex:column style="text-align: right;">
+            <apex:facet name="header">Total Cost</apex:facet>
+            <apex:outputText value="${0,number,###,##0.00}">
+                <apex:param value="{!item.UNITY_Total_Cost__c}"/>
+            </apex:outputText>
+        </apex:column>
+    </apex:dataTable>
+</apex:component>

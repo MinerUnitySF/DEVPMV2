@@ -861,6 +861,10 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>UNITY_AuraPrintCoverPage</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>UNITY_AuraProductDetailCont_UT</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -878,6 +882,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>UNITY_AutopopulateChildControllerTest</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>UNITY_BarcodeCoverPageController</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -2261,6 +2269,16 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Document_Staging_Item__c.DocParser_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging_Item__c.DocParser_Page_Count__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Document_Staging_Item__c.DocPaser_Link__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -2272,11 +2290,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Document_Staging_Item__c.Document_Type__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Document_Staging_Item__c.Page_Count__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -2296,6 +2309,16 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Document_Staging__c.Content_Download_URL__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.DocParser_Filesize__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Document_Staging__c.DocParser_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -2306,7 +2329,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Document_Staging__c.Document_Count__c</field>
+        <field>Document_Staging__c.DocParser_Page_Count__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -2321,7 +2344,17 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Document_Staging__c.File_Name__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Document_Staging__c.Incoming_Email_Address__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Document_Staging__c.Pdf_Download_Url__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -6629,6 +6662,14 @@
     </pageAccesses>
     <pageAccesses>
         <apexPage>UNITY_AutopopulateChild</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UNITY_BarcodeCoverPage</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UNITY_BarcodeCoverPageGenerator</apexPage>
         <enabled>false</enabled>
     </pageAccesses>
     <pageAccesses>

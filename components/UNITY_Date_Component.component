@@ -1,0 +1,10 @@
+<apex:component controller="UNITY_WorkOrderAssignmentController" access="global">
+    <apex:attribute name="workOrder" 
+                    type="WorkOrder" 
+                    description="the work order object" 
+                    assignTo="{!relatedTo}"/>
+    
+    <li><b>Deadline to perform work</b>: {!Window_End}</li>
+         
+    
+</apex:component>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexComponent xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>36.0</apiVersion>
+    <description>Email body Plain text of Acceptance email</description>
+    <label>UNITY Work Order Acceptance Email Body</label>
+</ApexComponent>

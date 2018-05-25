@@ -1,0 +1,7 @@
+<apex:component controller="UNITY_BarcodeCoverPageController" access="global">
+    <apex:attribute name="recId" type="string" description="the work order id" assignTo="{!strRecordId}"/>
+    <apex:attribute name="docType" type="string" description="the document Type" assignTo="{!documentType}"/>
+        
+    <h2>Cover Page for {!objType} {!objIdentifier} {!documentType}</h2>
+    <GMBLBC:barcode value="{!documentCode} {!recordId} CP" type="code128" displayText="true" width="2"/>
+</apex:component>

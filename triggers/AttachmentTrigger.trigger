@@ -7,17 +7,17 @@ trigger AttachmentTrigger on Attachment (before insert, after insert, after upda
     //Call the emailServiceWorkOrder from AttachmentHelper class
     
     if (Trigger.isInsert && Trigger.isAfter){
-     AttachmentHelper.manageServiceReport(Trigger.New);
+      AttachmentHelper.manageServiceReport(Trigger.New);      
     }
   
     if (Trigger.isUpdate && Trigger.isAfter){
      AttachmentHelper.manageServiceReport(Trigger.New);
-    }    
-         
+    }  
+  
     if (Trigger.isInsert && Trigger.isBefore){
       AttachmentHelper.uploadDocumentstaingAttachments(Trigger.New);
     }
-
+    
     if ((Trigger.isInsert || Trigger.isUpdate) && Trigger.isAfter){
         AttachmentHelper.prepareFileUploadToDocParser(Trigger.New);
     }

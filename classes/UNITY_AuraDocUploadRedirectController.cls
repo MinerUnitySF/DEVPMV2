@@ -7,4 +7,8 @@ public class UNITY_AuraDocUploadRedirectController {
         return ds.id;
     }
     
+    @AuraEnabled
+    public static List<Document_Staging__c> getDocumentStagingList(){
+        return [SELECT Id, File_Name__c, Status__c, CreatedDate, DocParser_Page_Count__c, Document_Source__c, Comments__c, Name FROM Document_Staging__c WHERE OwnerID =: UserInfo.getUserId() ORDER BY CreatedDate];
+    }
 }

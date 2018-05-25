@@ -4,4 +4,9 @@
     <availableInTouch>true</availableInTouch>
     <confirmationTokenRequired>false</confirmationTokenRequired>
     <label>UNITY_WOSummaryPDFForCommunity</label>
+    <packageVersions>
+        <majorNumber>4</majorNumber>
+        <minorNumber>5</minorNumber>
+        <namespace>GMBLBC</namespace>
+    </packageVersions>
 </ApexPage>

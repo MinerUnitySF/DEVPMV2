@@ -1,0 +1,27 @@
+<aura:component controller="UNITY_AuraPOLIListController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:handler name="init" action="{!c.myAction}" value="{!this}" />
+    <aura:attribute name="polis" type="OrderItem[]" />
+    
+	<table class="slds-table slds-table--bordered">
+        <thead>
+            <tr>
+                <th scope="col"><span class="slds-truncate">Product</span></th>
+                <th scope="col"><span class="slds-truncate">Line Description</span></th>
+                <th scope="col"><span class="slds-truncate">Cost</span></th>
+                <th scope="col"><span class="slds-truncate">Vendor Adjusted Quantity</span></th>
+                <th scope="col"><span class="slds-truncate">Total Cost</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.polis}" var="poli" indexVar="index">
+                <tr>
+                    <td><a onclick="{!c.navigateToRecord}" style="width:100%;" data-index="{!index}">{!poli.UNITY_Product_Name__c}</a></td>
+                    <td>{!poli.Description}</td>
+                    <td><ui:outputCurrency value="{!poli.UNITY_Cost__c}"/></td>
+                    <td>{!poli.UNITY_Vendor_Adjusted_Quantity__c}</td>
+                    <td><ui:outputCurrency value="{!poli.UNITY_Total_Cost__c}"/></td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+</aura:component>

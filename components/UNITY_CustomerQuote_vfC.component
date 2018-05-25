@@ -1,0 +1,459 @@
+<apex:component controller="UNITY_CustomerQuoteCtlr" access="global">
+    <apex:attribute name="relatedToId" 
+                    type="Id" 
+                    description="the proposal object" 
+                    assignTo="{!quoteId}"/>
+    <html>
+        <head>
+            <style type="text/css">
+                @page{
+                    margin: 0.5in;
+                    @bottom-right{
+                    	content: counter(page) " of " counter(pages);
+                        font-size: 10px;
+                    }
+                }
+                h1{
+                    font-size: 18px;
+                    margin: 0px 0px 10px 0px;
+                }
+                h2{
+                	font-size: 14px;
+                	margin: 0px 0px 5px 0px;
+                }
+                img.logo{
+                    margin:0px;
+                    padding:0px;
+                    width:200px;
+                }
+                ol{
+                	margin:0px;
+                	padding:0px;
+                }
+                p{
+                	margin:10px 0px;
+                	padding:10px 0px;
+                }
+                table,thead,tbody,th,td{
+                	border-collapse: collapse;
+                	border-spacing: 0px;
+                }
+                .new-page{
+                	page-break-before: always;
+                }
+                table.section-title{
+                	page-break-after: avoid;
+                	margin: 20px 0px 0px 0px;
+                	width:100%;
+                }
+                table.section-title td{
+                	background-color: #c5c5c5;
+                	border:1px solid #333;
+                	font-size: 14px;
+                	padding: 5px 3px;
+                }
+                table.header{
+                    border-collapse:collapse;
+                    font-size: 13px;
+                    margin: 0px 0px 0px;
+                    width: 100%;
+                }
+                table.header td{
+                    margin:0px;
+                    padding:0px;
+                    vertical-align: top;
+                    width: 33%;
+                }
+                table.main-details{
+                    font-size: 12px;
+                    margin:10px 0px;
+                    padding:0px;
+                    vertical-align:top;
+                    width: 100%;
+                }
+                table.main-details td{
+                    padding: 2px 3px;
+                    vertical-align:top;
+                }
+                table.main-details td.label{
+                    font-weight:bold;
+                }
+                table.main-details td.header{
+                    border: 1px solid #333;
+                    background-color: #c5c5c5;
+                }
+                table.body{
+                    font-size: 12px;
+                    margin:0px;
+                    padding:0px;
+                	page-break-inside: avoid;
+                    text-align:center;
+                    width: 100%;
+                    -fs-table-paginate: paginate;
+                }
+                table.body th{
+                    background-color: #d5d5d5;
+                    border:1px solid #333;
+                	color: #333;
+                	padding: 4px;
+                }
+                table.body td{
+                    padding: 2px 4px;
+                	border:1px solid #333;
+                }
+                table.totals-table{
+                    font-size: 12px;
+                    margin:0px;
+                    padding:0px;
+                	page-break-before: never;
+                	page-break-inside: avoid;
+                	position:relative;
+                	width:100%;
+                }
+                table.totals-table td,table.totals-table th{
+                    padding: 2px 2px;
+                }
+                th.short,td.short{
+                	max-width:100px;
+                	width:100px;
+                }
+                th.left,td.left{
+                	text-align: left;
+                }
+                th.right,td.right{
+                	text-align: right;
+                }
+                th.center,td.center{
+                	text-align: center;
+                }
+                table.border,th.border,td.border{
+                	border:1px solid #333;
+                }
+                table.no-border,th.no-border,td.no-border{
+                	border:0px;
+                }
+                table.footer{
+                	width:100%;
+                	border-collapse: separate;
+                	border-spacing: 10px;
+                	font-size: 12px;
+                	margin-top:75px;
+                	page-break-before: avoid;
+                }
+                th.line,td.line{
+                	border:0px;
+                	border-bottom:1px solid #333;
+                	margin:5px;
+                }
+                div.notes{
+                	margin:0px;
+                	padding:0px;
+                	font-size: 11px;
+                }
+            </style>
+        </head>
+        <body>
+            <!-- Header section of the page (logo and BU Account info) -->
+            <table class="header">
+                <tr>
+                    <td>
+                        <img src="{!quote.UNITY_Email_Logo_URL__c}"/>
+                    </td>
+                    <td class="middle center">
+                        <strong>{!buAccount.Name}</strong><br/>
+                        {!buAccount.ShippingStreet}<br/>
+                        {!buAccount.ShippingCity}, {!buAccount.ShippingState} {!buAccount.ShippingpostalCode}
+                        <br/>{!buAccount.Phone}
+                    </td>
+                    <td class="right">
+                        <h1>
+                            Customer Quote
+                        </h1>
+                    </td>
+                </tr>
+            </table>
+            <!-- End of header section -->
+            <br/><br/>
+            <!-- Quote Main Information Section -->
+            <table style="width:100%;">
+                <tr>
+                	<td style="width:33%;">
+                    	<table class="main-details">
+                            <tr>
+                                <td class="label short right">Account Number:</td><td>{!customer.UNITY_Account_ID__c}</td>
+                            </tr>
+                            <tr>
+                                <td class="label short right">Case Number:</td><td>{!quote.UNITY_Case__r.CaseNumber}</td>
+                            </tr>
+                            <tr>
+                                <td class="label short right">Customer PO:</td><td>{!quote.UNITY_Customer_PO__c}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="width:33%;"></td>
+                    <td style="width:33%;">
+                    	<table class="main-details">
+                            <tr>
+                                <td class="label right">Quote Number:</td><td class="short">{!IF(isMaster,quote.Name,quote.UNITY_Master_Quote__r.Name)}</td>
+                            </tr>
+                            <tr>
+                                <td class="label right">Expiration Date:</td>
+                                <td class="short">
+                                    <apex:outputText value="{0,date,M/d/YYYY}"> 
+                                        <apex:param value="{!quote.UNITY_Effective_Till_Date__c}"/> 
+                                    </apex:outputText> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label right">Prepared By:</td><td class="short">{!quote.UNITY_Agent__r.Name}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+                        
+			<table style="width:100%;">
+                <tr>
+                	<td style="width:35%;">
+                    	<table class="main-details" style="width:100%;">
+                            <tr>
+                                <td class="label header center">Customer Information:</td><td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>{!customer.Name}</strong><br/>
+                                    {!customer.BillingStreet}<br/>
+                                    {!customer.BillingCity}, {!customer.BillingState} {!customer.BillingPostalCode}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td></td>
+                    <td style="width:35%;">
+                    	<table class="main-details" style="width:100%;">
+                            <tr>
+                                <td class="label  header center">Job Site Information:</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>{!location.Name}</strong><br/>
+                                    {!location.ShippingStreet}<br/>
+                                    {!location.ShippingCity}, {!location.ShippingState} {!location.ShippingPostalCode}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <!-- End Quote Main Information Section -->
+            <!-- Incurred Charges Information Section -->
+            <table class="section-title">
+                <tr>
+                    <td>Incurred Charges Information (work already completed)</td>
+                </tr>
+            </table>
+            <table class="body">
+                <thead>
+                    <tr>
+                        <th class="short">Product Name</th><th colspan="2">Description</th><th class="short right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <apex:repeat value="{!IF(isMaster,allInc,atTimeInc)}" var="inc">
+                        <tr>
+                            <td>{!inc.type}</td>
+                            <td colspan="2">{!inc.description}</td>
+                            <td class="right">{!inc.total}</td>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>
+            <table style="width:100%;page-break-before:avoid;page-break-inside:avoid;">
+                <tr>
+                	<td style="width:33%;border:1px solid #333;"></td>
+                    <td style="width:33%;border:1px solid #333;"></td>
+                    <td style="width:33%;border:1px solid #333;">
+                        <table class="totals-table">
+                            <tr>
+                                <th class="right">Total Incurred Charges</th>
+                                <td class="right">{!IF(isMaster,totalInc,totalATInc)}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <!-- Description of Additional Work Information Section -->
+            <table class="section-title">
+                <tr>
+                    <td>Description of Additional Work</td>
+                </tr>
+            </table>
+            <table class="body">
+                <tr>
+                    <td class="left">
+                        <apex:outputText escape="false" value="{!quoteComments}"></apex:outputText>
+                    </td>
+                </tr>
+            </table>
+            <!-- Material Description Information Section -->
+            <table class="section-title">
+                <tr>
+                    <td>Material Description</td>
+                </tr>
+            </table>
+            <table class="body">
+                <thead>
+                    <tr>
+                        <th class="short">Product Name</th>
+                        <th>Description</th>
+                        <th class="short">QTY</th>
+                        <th class="short">Unit Price</th>
+                        <th class="short right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <apex:repeat value="{!newQuotes}" var="q" rendered="{!isMaster}">
+                        <apex:repeat value="{!q.Proposal_Line_Items__r}" var="line">
+                            <tr>
+                                <td>{!line.UNITY_Type__c}</td>
+                                <td>{!line.UNITY_Product__r.Name}</td>
+                                <td>{!line.UNITY_Customer_Adjusted_Quantity__c}</td>
+                                <td>{!line.UNITY_Price__c}</td>
+                				<td class="right">{!line.UNITY_Total_Price__c}</td>
+                            </tr>
+                        </apex:repeat>
+                    </apex:repeat>
+                    <apex:repeat value="{!quote.Proposal_Line_Items__r}" var="line" rendered="{!NOT(isMaster)}">
+                        <tr>
+                            <td>{!line.UNITY_Type__c}</td>
+                            <td>{!line.UNITY_Product__r.Name}</td>
+                            <td>{!line.UNITY_Customer_Adjusted_Quantity__c}</td>
+                            <td>{!line.UNITY_Price__c}</td>
+                            <td class="right">{!line.UNITY_Total_Price__c}</td>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>
+            <table style="width:100%;page-break-before:avoid;page-break-inside:avoid;">
+                <tr>
+                	<td style="width:33%;border:1px solid #333;padding:4px;">
+                    	<div class="notes">
+                            Freight is based on groud shipments. If rush delivery is requested additional cost will apply. 
+                            This quote is valid until&nbsp;
+                            <apex:outputText value="{0,date,M/d/YYYY}"> 
+                                <apex:param value="{!quote.UNITY_Effective_Till_Date__c}"/> 
+                            </apex:outputText>. 
+                            Should unusual working conditions be imposed upon us at the onset of the job that were unforeseen at the time of the quote, 
+                            labor cost may be increased to allow for extra time spent at job site.
+                        </div>
+                    </td>
+                    <td style="width:33%;border:1px solid #333;"></td>
+                    <td style="width:33%;border:1px solid #333;padding:0px;">
+                        <table class="totals-table">
+                            <tr>
+                                <td class="right">Net Quote</td>
+                                <td class="right">{!totals.subTotal}</td>
+                            </tr>
+                            <tr>
+                                <td class="right">Service Charge</td>
+                                <td class="right">{!totals.servCharge}</td>
+                            </tr>
+                            <tr>
+                                <td class="right">Less Discount</td>
+                                <td class="right">{!totals.totalDiscount}</td>
+                            </tr>
+                            <tr>
+                                <td class="right">Estimated Sales Tax</td>
+                                <td class="right">{!totals.estSalesTax}</td>
+                            </tr>
+                            <tr>
+                                <th class="right bold-border">Quote Total</th>
+                                <td class="right bold-border">{!totals.total}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            
+                        
+            <!-- Footer (Signature) -->
+            <table class="footer inline">
+                <tr>
+                    <td class="line">&nbsp;</td>
+                    <td class="line">&nbsp;</td>
+                    <td class="line">&nbsp;</td>
+                    <td class="line">&nbsp;</td>
+                </tr>
+                <tr>
+                    <th class="no-border">Approval Signature</th>
+                    <th class="no-border">Printed Name</th>
+                    <th class="short no-border">PO#</th>
+                    <th class="short no-border">Date</th>
+                </tr>
+            </table>
+            <!-- Terms & Conditions Information Section -->
+            <table class="section-title new-page">
+                <tr>
+                    <td>Terms &amp; Conditions</td>
+                </tr>
+            </table>
+            <div class="notes">
+                <p>
+                    Unless otherwise stated in writing, the following terms and conditions of sale become a part of the proposal.  “Company” refers to {!buAccount.Name}.
+                </p>
+                <ol>
+                    <li>PRICES
+                        <ol type="a">
+                            <li>Are firm for acceptance within 30 days from the date of quotation, provided quotation is for production and for shipment of equipment within 16 weeks from the date of quotation.</li>
+                            <li>Are subject to increase equal in amount to any tax Company may be required to collect or pay on the sale.</li>
+                            <li>Are subject to any price increase resulting from Buyer requested changes in the equipment or changes in the production schedule.</li>
+                            <li>Are subject to increase due to surcharges or price increases by manufacturers prior to shipment.</li>
+                        </ol>
+                    </li>
+                    <li>SHIPMENT<br/>
+                        Shipment is F.O.B. from place of manufacture.  Buyer shall bear all costs of freight and insurance in connection with delivery.  Upon request of Buyer, Company may prepay freight and insurance charges on behalf of Buyer and bill such charges to Buyer.  In either event, risk of loss or damage in transit passes to Buyer upon delivery to carrier.
+                    </li>
+                    <li>DELIVERY
+                        <ol type="a">
+                            <li>The Company will endeavor to secure shipment of orders as scheduled.  However, all shipment dates are approximate only, and the Company reserves the right to readjust shipment schedules.</li>
+                            <li>Under no circumstances will the Company be responsible or incur any liability for costs or damages of any nature (whether general, consequential as a penalty or liquidated damages, or otherwise) arising out of or owing to (1) delays in delivery or (2) failure to make delivery at agreed or specified times due to circumstances beyond its reasonable control.</li>
+                            <li>If delivery is refused or shipment is suspended by Buyer, Buyer shall pay (1) Company’s invoice for Equipment as per payout terms, (2) Company’s handling and storage charges, and (3) demurrage charges.</li>
+                        </ol>
+                    </li>
+                    <li>CANCELLATION<br/>
+                        Buyer cannot cancel orders placed with the Company except with the Company's expressed written consent, and upon terms and payment to the Company indemnifying the Company against loss, including but not limited to expenses incurred and commitments made by the Company.  Cancellation will be a minimum of 25% of the total Contract Sum.
+                    </li>
+                    <li>CONCEALED OR UNKNOWN<br/>
+                        Concealed or unknown conditions below the surface of the ground or in an existing structure may be encountered that differ materially from those recognized as inherently part of the contract.  In the event, the Contract Sum shall be equitably adjusted by Change Order upon claim by the Company.
+                    </li>
+                    <li>PERFORMANCE REQUIREMENTS<br/>
+                        The equipment furnished under the contract will be as stated, and Buyer has selected same based on the specification (type, amount, source end products, and intended use of Buyer) of the material to be handled or processed by Buyer and the Local, State and Federal Regulations in existence on the date of the Proposed Contract.  Changes in the equipment requirements may result from matters determined by surveys, studies, approvals, and permits or from changes in the material specification by Buyer or from changes in the Local, State, and Federal Regulations.  In this event, the Contract Sum shall be equitably adjusted by Change Order upon claim by the Company.
+                    </li>
+                    <li>INFORMATION AND SERVICE REQUIRED OF THE BUYER
+                        <ol type="a">
+                            <li>The Buyer shall furnish all necessary surveys describing the physical characteristics, legal limitations and utility locations for the site of the Project, and legal description of the site.</li>
+                            <li>The Buyer shall secure and pay for all necessary surveys, studies, approvals, easements, assessments, notices, and permits required for the construction and use of permanent structures or for permanent changes to existing facilities.</li>
+                            <li>Information or services under the Buyer’s control shall be furnished by the Buyer with reasonable promptness to avoid delay in the orderly progress of the work.</li>
+                            <li>Roof or wall openings, flashing, and counter flashing shall be furnished by the Buyer.</li>
+                            <li>Electric, water, steam, fuel, compressed air, storm/sanitary drain, and other utility sources or connections shall be furnished by the Buyer.</li>
+                            <li>Labor and material required to make connection between the equipment furnished under the contract and the utilities shall be provided by the Buyer.</li>
+                            <li>Labor and material required to make field connections between equipment components (except reconnection of items dismantled for shipment) shall be provided by the buyer.</li>
+                            <li>Site access and site conditions to allow for unimpeded use of installation equipment are the responsibility of the Buyer.</li>
+                            <li>The Buyer shall secure and pay for all testing required by Local, State, and Federal Regulations</li>
+                        </ol>
+                    </li>
+                    <li>SERVICE WARRANTY<br/>
+                        Company warrants all service performed hereunder to be performed in a workmanlike manner and free from defects in workmanship upon completion.  Company's obligation and Buyer's sole remedy, hereunder shall be limited to repair by Company of any defects discovered and reported in writing to company within 90 days after completion of services hereunder, without charge to Buyer, or (at Company's option) return of the contract price for such defective devices.
+                    </li>
+                    <li>EQUIPMENT AND PARTS WARRANTY<br/>
+                        Company's obligation, and Buyer's sole remedy relative to equipment and parts warranty by manufacturers thereof, is to secure manufacturer's warranty on behalf of Buyer, and assist Buyer in the presentation of any warranty claim, but Company makes no warranty in addition thereto.
+                    </li>
+                    <li>ACCEPTANCE AND GOVERNING PROVISIONS<br/>
+                        This writing constitutes an offer by the Company to sell products and/or services described herein and expires upon written notice or thirty (30) days from this date, whichever occurs first.  This offer is, however, entirely contingent upon acceptance by Company's supplier of a corresponding purchase order from Company.  Acceptance of this offer is limited to the terms and conditions hereof, and any such other matter in buyer's forms or correspondence shall not become part hereof and same shall not be binding upon Company unless agreed to in writing, signed by an Officer of the Company.  When accepted by Buyer, this writing shall constitute the entire agreement between Company and Buyer on the subject hereof, except as amended by a writing signed by Company.  This offer and any agreement arising out of it shall be governed by and construed in accordance with the internal laws of the State of Texas.
+                    </li>
+                </ol>
+            </div>
+            
+        </body>
+    </html>
+</apex:component>

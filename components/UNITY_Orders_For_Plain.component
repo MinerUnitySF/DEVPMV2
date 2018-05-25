@@ -1,0 +1,41 @@
+<apex:component controller="UNITY_OrdersController" access="global">
+
+    <apex:attribute name="WOId" 
+                    type="ID" 
+                    description="the work order id" 
+                    assignTo="{!workOrderId}"/>
+    <apex:attribute name="assVendorId" 
+                    type="ID" 
+                    description="The Assigned Vendor id" 
+                    assignTo="{!assignedVendorId}"/>
+    New [{!cOrderWrapper.CreatedDate}] Purchase Order, PO-{!cOrderWrapper.CurrentOrderRecord.OrderNumber}:
+        .Not to Exceed Amount: <apex:outputText value="${0, number, ###,##0.00}">
+                                  <apex:param value="{!cOrderWrapper.CurrentOrderRecord.UNITY_Total_Cost__c}"/>
+                                 </apex:outputText>
+         
+    <apex:repeat value="{!ordersList}" var="order" id="ordersRepeat">
+
+    Previous [{!order.createdDate}] Purchase Order, PO-{!order.OrderRecord.OrderNumber}
+        .Not to Exceed Amount: {!order.orderRecord.UNITY_NTE__c}                               
+       </apex:repeat>
+   <!-- <apex:dataTable headerClass="headerStyle" style="width:100%" value="{!orders}" var="order">
+        <apex:column >
+            <apex:facet name="header" >Order Number</apex:facet>
+            {!order.OrderNumber}
+        </apex:column>
+        <apex:column style="text-align: right;">
+            <apex:facet name="header">Amount</apex:facet>
+            {!order.TotalAmount}
+        </apex:column>
+        <apex:column style="text-align: right;">
+            <apex:facet name="header">Total Cost</apex:facet>
+            {!order.UNITY_Total_Cost__c}
+        </apex:column>
+        <apex:column style="text-align: right;">
+              <apex:facet name="header">Date</apex:facet>
+              <apex:outputText value=" {!order.createdDate}"/>
+      
+        </apex:column>
+                         
+     </apex:dataTable>    -->           
+</apex:component>

@@ -1,0 +1,31 @@
+<apex:component controller="UNITY_QuoteLineItemsController" access="global">
+    <apex:attribute name="qId" 
+                    type="ID" 
+                    description="the quote id" 
+                    assignTo="{!quoteId}"/>
+    <apex:attribute name="tPrice" 
+                    type="String" 
+                    description="total price of the quote" 
+                    assignTo="{!totalPrice}"/>
+    <apex:dataTable id="quoteItemsTable" styleClass="border3 quotetable" value="{!items}" var="item">
+        <apex:column footerClass="backgroundgrey">
+            <apex:facet name="header">Qty</apex:facet>
+            {!item.UNITY_Quantity__c}
+        </apex:column>
+        <apex:column footerClass="backgroundgrey">
+            <apex:facet name="header">Description</apex:facet>
+            {!item.UNITY_Description__c}
+            <apex:facet name="footer"><apex:outputText > TOTAL </apex:outputText></apex:facet>
+        </apex:column>
+        <apex:column footerClass="backgroundgrey">
+            <apex:facet name="header">Unit Price</apex:facet>
+            {!item.UNITY_Unit_Price__c}
+        </apex:column>
+        <apex:column footerClass="backgroundgrey">
+            <apex:facet name="header">Qty Price</apex:facet>
+            {!item.UNITY_Quantity_Price__c}
+            <apex:facet name="footer"><apex:outputLabel >{!totalPrice}</apex:outputLabel></apex:facet>
+        
+        </apex:column>
+    </apex:dataTable>
+</apex:component>

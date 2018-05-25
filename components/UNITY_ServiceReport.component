@@ -1,0 +1,543 @@
+<apex:component controller="UNITY_ServiceReportController" access="global">
+    <apex:attribute name="workOrder" 
+                    type="WorkOrder" 
+                    description="the work order object" 
+                    assignTo="{!relatedTo}"/>
+    <html>
+        <head>
+            <style type="text/css">
+                @page {
+                    size: 8.5in 11in;
+                    margin-top: .15in;
+                    margin-right: .15in;
+                    margin-bottom: .15in; 
+                    margin-left: .15in;
+                    @bottom-right {
+                        font-family: Helvetica;
+                        font-size: 9pt;
+                        content: "Page " counter(page) " of " counter(pages}
+                }
+                body{
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 90%;
+                    margin:0px;
+                    padding:0px;
+                }
+                table{
+                    margin:0px;
+                    padding:0px;
+                    width:100%;
+                }
+                table,thead,tbody,th,td{
+                    border-collapse: collapse;
+                    border-spacing: 0px;
+                    line-height:13px;
+                }
+                h1{
+                    font-size: 2em;
+                }
+                .page-wrapper{
+                    background-color:#fff;
+                    border: 2px solid #000;
+                }
+                .header-table{
+                    border:1px solid #000;
+                }
+                .header-table td{
+                    margin:0px;
+                    padding:0px 3px;
+                    width:33%;
+                    font-size:13px;
+                    font-weight:normal;
+                }
+                .header-table-inner td{
+                    margin:0px;
+                    padding:3px 3px;
+                    font-size:13px;
+                    font-weight:normal;
+                }
+                .header-table-inner th{
+                    margin:0px;
+                    padding:0px 2px;
+                    font-size:13px;
+                    font-weight:bold;
+                }
+                .content-table{
+                    
+                }
+                .content-table th{
+                    background-color:#000;
+                    border:1px solid #000;
+                    color:#fff;
+                    font-size:11px;
+                    padding:1px 3px;
+                    text-align:center;
+                }
+                .content-table td{
+                    border:1px solid #000;
+                    font-size:11px;
+                    padding:1px 3px;
+                }
+                .task-table td{
+                    border:1px solid #000;
+                    padding:0px;
+                    font-size:11px;
+                }
+                .task-table-inner td{
+                    border:1px solid #000;
+                    font-size:11px;
+                    padding:1px 3px;
+                }
+                .task-table-inner th{
+                    border:1px solid #000;
+                    border-top:none;
+                    font-size:11px;
+                    padding:1px 3px;
+                    background-color:#d5d5d5;
+                }
+                .signature-table td{
+                    padding:0px;
+                    border:none;
+                    border-bottom:1px solid #000;
+                    font-size:11px;
+                }
+                .options-table td{
+                    border:none;
+                    padding:3px;
+                    font-size:11px;
+                    text-align:left;
+                }
+                .asset-condition-table th{
+                    background-color:#000;
+                    border:none;
+                    color:#fff;
+                    font-size:11px;
+                    padding:1px 3px;
+                    text-align:center;
+                }
+                .asset-condition-table td{
+                    border:none;
+                    padding:3px 0px 15px;
+                    text-align:center;
+                    font-size:11px;
+                }
+                .store-stamp{
+                    border:2px solid #000;
+                    height:60px;
+                    margin:10px;
+                    position:relative;
+                }
+                .store-stamp-text{
+                    display:block;
+                    position:absolute;
+                    bottom:3px;
+                    left:3px;
+                }
+                .label{
+                    font-weight:bold;
+                }
+                .right{
+                    text-align:right;
+                }
+                .left{
+                    text-align:left;
+                }
+                .center{
+                    text-align:center;
+                }
+                td.no-border,th.no-border,table.no-border,
+                .asset-condition-table td.no-border,
+                .asset-condition-table th.no-border{
+                    border:none;
+                }
+                .check-box{
+                    display:inline-block;
+                    width:7px;
+                    height:7px;
+                    border:1px solid #000;
+                    vertical-align:baseline;
+                }
+            </style>
+        </head>
+        <body>
+            <div style="display:none;">
+                <apex:outputText value="{!relatedTo.UNITY_Tech_ETA_Date_Cust__c}"></apex:outputText>
+                <apex:outputText value="{!relatedTo.UNITY_Trade__c}"></apex:outputText>
+                <apex:outputText value="{!relatedTo.UNITY_Trade__r.Name}"></apex:outputText>
+                <apex:outputText value="{!relatedTo.UNITY_Skill_Broad__c}"></apex:outputText>
+                <apex:outputText value="{!relatedTo.UNITY_Assigned_Vendor__c}"></apex:outputText>
+            </div>
+            <div class="page-wrapper">
+                <div class="page-header">
+                    <table class="header-table">
+                        <tr>
+                            <td style="padding:3px;">
+                                <apex:image styleClass="logo" url="{!relatedTo.UNITY_Email_Logo_URL__c}"/>
+                            </td>
+                            <td>
+                                <h1>SERVICE REPORT</h1>
+                            </td>
+                            <td>
+                                <table class="header-table-inner">
+                                    <tr>
+                                        <th class="right">Date:</th><td style="border-bottom:1px solid #000;">{!d}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="right">Work Order #:</th><td>{!relatedTo.WorkOrderNumber}</td>
+                                    </tr>
+                                </table>                            
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Main Page Content -->
+                <div class="page-content">
+                    <!-- Customer Information Table -->
+                    <table id="cust-info-table" class="content-table">
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Store/Building #</th>
+                            <th colspan="2">Contact Name</th>
+                            <th>Phone Number</th>
+                        </tr>
+                        <tr>
+                            <td>{!relatedTo.Account.Name}</td>
+                            <td>{!relatedTo.UNITY_Site_Store_Number__c}</td>
+                            <td colspan="2">{!relatedTo.Contact.Name}</td>
+                            <td>{!relatedTo.UNITY_Site_Contact_Phone__c}</td>
+                        </tr>
+                        <tr>
+                            <th>Street Address</th>
+                            <th>City</th>
+                            <th>Sate</th>
+                            <th>Zip</th>
+                            <th>Customer PO#</th>
+                        </tr>
+                        <tr>
+                            <td>{!relatedTo.Account.ShippingStreet}</td>
+                            <td>{!relatedTo.Account.ShippingCity}</td>
+                            <td>{!relatedTo.Account.ShippingState}</td>
+                            <td>{!relatedTo.Account.ShippingPostalCode}</td>
+                            <td>{!relatedTo.case.UNITY_Customer_PO__c}</td>
+                        </tr>
+                        <tr>
+                            <th colspan="5">Problem Description</th>
+                        </tr>
+                        <tr>
+                            <td colspan="5">{!relatedTo.UNITY_Work_Description__c}</td>
+                        </tr>
+                    </table>
+                    <!-- Work Performed Information Table -->
+                    <table id="work-performed-table" class="content-table">
+                        <tr><th>Work Performed</th></tr>
+                        <tr><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td></tr>
+                    </table>
+                    <!-- Asset Information Section -->
+                    <apex:outputPanel rendered="true">
+                        <table id="asset-info-table" class="content-table">
+                            <tr><th colspan="7">Equipment Serviced</th></tr>
+                            <tr>
+                                <td class="center">
+                                    <strong>Equipment Type</strong>
+                                </td>
+                                <td class="center"><strong>Equipment Manufacturer</strong></td>
+                                <td class="center"><strong>Model Number</strong></td>
+                                <td class="center"><strong>Serial Number</strong></td>
+                                <td class="center">
+                                    <strong>
+                                        <apex:outputText value="{!IF(aType=='MHE','Hour Meter Reading','Position')}"></apex:outputText>
+                                    </strong>
+                                </td>
+                                <td class="center"><strong>Operational</strong></td>
+                                <td class="center"><strong>Safety Devices Operating</strong></td>
+                            </tr>
+                            <apex:repeat value="{!assets}" var="a">
+                                <tr>
+                                    <td class="center">
+                                        <apex:outputText value="{!a.Product2.Name}"  rendered="{!a.Product2 != null}"></apex:outputText>
+                                    </td>
+                                    <td class="center">
+                                        <apex:outputText value="{!a.Product2.Make1__c}" rendered="{!a.Product2 != null}"></apex:outputText>
+                                    </td>
+                                    <td class="center">
+                                        <apex:outputText value="{!a.Product2.Model__c}" rendered="{!a.Product2 != null}"></apex:outputText>
+                                    </td>
+                                    <td class="center">{!a.SerialNumber}</td>
+                                    <td>
+                                        <apex:outputText value="{!a.UNITY_Asset_Location_On_Site__c}" rendered="{!a != null}"></apex:outputText>
+                                    </td>
+                                    <td class="center">Y&nbsp;&nbsp;/&nbsp;&nbsp;N</td>
+                                    <td class="center">Y&nbsp;&nbsp;/&nbsp;&nbsp;N</td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+                    <!-- Products Information Table -->
+                    <table id="product-info-table" class="content-table">
+                        <tr>
+                            <th>Qty</th>
+                            <th>Product Name</th>
+                            <th>Description</th>
+                            <th>PO#</th>
+                            <th>Parts Provided By</th>
+                        </tr>
+                        <apex:repeat value="{!products}" var="p">
+                            <tr>
+                                <td>
+                                    <apex:outputText value="{!p.Quantity}" rendered="{!p.Id != null}"></apex:outputText>&nbsp;
+                                </td>
+                                <td>
+                                    <apex:outputText value="{!p.UNITY_Product_Name__c}" rendered="{!p.Id != null}"></apex:outputText>&nbsp;
+                                </td>
+                                <td>
+                                    <apex:outputText value="{!p.UNITY_Product_Description__c}" rendered="{!p.Id != null}"></apex:outputText>&nbsp;
+                                </td>
+                                <td>
+                                    <apex:outputText value="{!p.Order.OrderNumber}" rendered="{!p.Id != null}"></apex:outputText>&nbsp;
+                                </td>
+                                <td>
+                                    <apex:outputText value="{!'Miner'}" rendered="{!p.Id != null}"></apex:outputText>&nbsp;
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                    <!-- Tasks Information Table -->
+                    <table id="tasks-info-table" class="task-table">
+                        <tr>
+                            <td style="width:60%;vertical-align:top;">
+                                <!-- Task Information Table (Inner) -->
+                                <table class="task-table-inner">
+                                    <tr>
+                                        <th style="border-left:none;">Task</th>
+                                        <th>Initials</th>
+                                        <th>Start Time</th>
+                                        <th>Finish Time</th>
+                                        <th style="border-right:none;">Total Hours</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="left" style="border-left:none;">Travel</th>
+                                        <td>&nbsp;</td>
+                                        <td class="right">:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AM/PM</td>
+                                        <td class="right">:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AM/PM</td>
+                                        <td style="border-right:none;">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="left" style="border-left:none;">Onsite</th>
+                                        <td>&nbsp;</td>
+                                        <td class="right">:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AM/PM</td>
+                                        <td class="right">:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AM/PM</td>
+                                        <td style="border-right:none;">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="left" style="border-left:none;">Onsite</th>
+                                        <td>&nbsp;</td>
+                                        <td class="right">:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AM/PM</td>
+                                        <td class="right">:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AM/PM</td>
+                                        <td style="border-right:none;">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="left" style="border-left:none;">Shop Parts Pickup</th>
+                                        <td>&nbsp;</td>
+                                        <td class="right">:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AM/PM</td>
+                                        <td class="right">:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AM/PM</td>
+                                        <td style="border-right:none;">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="right"  style="border-left:none;"><span class="check-box"></span>&nbsp;JOB COMPLETE</td>
+                                        <td class="right">Total Hours</td>
+                                        <td style="border-right:none;">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" style="padding:1px 10px;border:none;">
+                                            <table class="signature-table">
+                                                <tr><td  colspan="3" class="left no-border">Proudly Serviced By:</td></tr>
+                                                <tr>
+                                                    <td style="width:45%">&nbsp;</td>
+                                                    <td class="no-border"  style="width:10%"></td>
+                                                    <td style="width:45%">&nbsp;</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="no-border">Service Professional (Print)</td>
+                                                    <td class="no-border"  style="width:10%"></td>
+                                                    <td class="no-border">Service Professional (Sign)</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="width:40%;vertical-align:top">
+                                <!-- Options Table -->
+                                <table class="options-table">
+                                    <tr>
+                                        <td><span class="check-box"></span>&nbsp;Weld</td>
+                                        <td><span class="check-box"></span>&nbsp;Specialty Equipment</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="check-box"></span>&nbsp;Cut</td>
+                                        <td><span class="check-box"></span>&nbsp;Emergency / After Hours Call</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="check-box"></span>&nbsp;Crane</td>
+                                        <td>Number of Techs ________</td>
+                                    </tr>
+                                </table>
+                                <!-- Asset Condition Table -->
+                                <table class="asset-condition-table" style="border:none;">
+                                    <tr>
+                                        <th colspan="4">Condition of Serviced Asset</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Poor</td>
+                                        <td>Fair</td>
+                                        <td>Good</td>
+                                        <td>Excellent</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" style="border:none;border-bottom:1px solid #000;border-top:1px solid #000;padding:0px">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" style="border:none;padding:0px">&nbsp;</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- Recommendations Table -->
+                    <table id="work-performed-table" class="content-table">
+                        <tr><th>Safety Recommendations</th><th>Additional Service Suggestions</th></tr>
+                        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td class="left no-border"><span class="check-box"></span>&nbsp;Accepted</td>
+                                        <td class="right no-border"><span class="check-box"></span>&nbsp;Declined</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td class="left no-border"><span class="check-box"></span>&nbsp;Accepted</td>
+                                        <td class="right no-border"><span class="check-box"></span>&nbsp;Declined</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- The Page Additional Lines Section -->
+                <apex:outputPanel rendered="{!additionalProducts.size > 0}">
+                    <div class="additional-content" style="page-break-before:always">
+                        <table id="additional-product-info-table"  class="content-table">
+                            <tr>
+                                <td>Qty</td>
+                                <td>Product Name</td>
+                                <td>Description</td>
+                                <td>PO#</td>
+                                <td>Parts Provided By</td>
+                            </tr>
+                            <apex:repeat value="{!additionalProducts}" var="p">
+                                <tr>
+                                    <td>
+                                        <apex:outputText value="{!p.Quantity}" rendered="{!p.Id != null}"></apex:outputText>
+                                    </td>
+                                    <td>
+                                        <apex:outputText value="{!p.UNITY_Product_Name__c}" rendered="{!p.Id != null}"></apex:outputText>
+                                    </td>
+                                    <td>
+                                        <apex:outputText value="{!p.UNITY_Product_Description__c}" rendered="{!p.Id != null}"></apex:outputText>
+                                    </td>
+                                    <td>
+                                        <apex:outputText value="{!p.Order.OrderNumber}" rendered="{!p.Id != null}"></apex:outputText>
+                                    </td>
+                                    <td>
+                                        <apex:outputText value="{!IF(p.UNITY_Is_Vendor_Supply__c,relatedTo.UNITY_Assigned_Vendor__r.Name,'')}" rendered="{!p.Id != null}"></apex:outputText>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </div>
+                </apex:outputPanel>
+                <!-- Custoper Acceptacnce Section -->
+                <div class="page-content">
+                    <table id="cust-acceptance" class="content-table" style="border:1px solid #000;">
+                        <tr><th colspan="2">Customer Acceptance and Survey</th></tr>
+                        <tr>
+                            <td class="no-border" style="width:60%;vertical-align:top;padding:10px;">
+                                <!-- Customer Survey Table -->
+                                <table class="asset-condition-table" style="border:none;">
+                                    <tr>
+                                        <td colspan="4" class="no-border" style="padding:0px;text-align:left;">Please rate professional performance and additional notes is desired.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Poor</td>
+                                        <td>Fair</td>
+                                        <td>Good</td>
+                                        <td>Excellent</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="no-border" style="border-bottom:1px solid #000;border-top:1px solid #000;padding:0px">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="no-border" style="border-bottom:1px solid #000;border-top:1px solid #000;padding:0px">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="no-border" style="border-bottom:1px solid #000;border-top:1px solid #000;padding:0px">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="no-border" style="padding:0px">&nbsp;</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="no-border" style="width:40%;vertical-align:top;">
+                                <!-- Store Stamp Table -->
+                                <table>
+                                    <tr>
+                                        <td class="no-border" style="vertical-align:top;padding:5px;">
+                                            <table class="signature-table">
+                                                <tr>
+                                                    <td class="no-border right" style="width:50%;">Approver Employee ID#:</td>
+                                                    <td style="width:50%;">&nbsp;</td>
+                                                </tr>
+                                            </table>
+                                            <div class="store-stamp">
+                                                <span class="store-stamp-text">Store Stamp</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="no-border" colspan="2" style="padding:10px; 5px;">
+                                <table class="signature-table">
+                                    <tr>
+                                        <td class="no-border right" style="width:20%;">Customer Printed Name:</td>
+                                        <td style="width:30%;">&nbsp;</td>
+                                        <td class="no-border right" style="width:20%;">Customer Signature:</td>
+                                        <td style="width:30%;">&nbsp;</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- The Page Footer -->
+                <div class="page-footer">
+                    
+                </div>
+            </div>
+            
+        </body>
+    </html>
+</apex:component>

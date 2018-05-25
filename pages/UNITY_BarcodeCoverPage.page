@@ -1,0 +1,5 @@
+<apex:page applyHtmlTag="false" cache="false" contentType="text/HTML" docType="html-5.0" showHeader="false" sidebar="false" standardStylesheets="false" applyBodyTag="false" renderAs="pdf">
+
+	<c:UNITY_BarcodeCoverPage recId="{!$CurrentPage.parameters.Id}" docType="{!$CurrentPage.parameters.docType}"/>
+
+</apex:page>

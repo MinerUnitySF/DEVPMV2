@@ -1,0 +1,45 @@
+<aura:component controller="UNITY_AuraCOIExpiredNotifyController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	  <aura:handler name="init" value="{!this}" action="{!c.loadMessages}"/>     
+      <aura:attribute name="notifications" type="UNITY_AuraCOIExpiredNotifyController.InsuranceExpiredMessages"/>
+      <aura:registerEvent name="toastEvent" type="force:showToast"/>    
+      
+      <div class="container">
+        <!-- Header -->
+        <div class="slds-p-around--x-small slds-border--bottom slds-theme--shade">
+          <div class="slds-grid slds-grid--align-spread slds-grid--vertical-align-center">
+            <div>
+              <span class="slds-badge"><b>{!v.notifications.length}&nbsp;&nbsp;Notifications</b></span>
+            </div>       
+          </div>
+        </div>      
+           
+    <div class="slds-container--fluid slds-scrollable--y content" >
+      <aura:iteration items="{!v.notifications}" var="notification">  
+          
+         <table>
+          <tr class="slds-text-color_regural">
+           <td class="grey">
+            <div class="slds-p-around--small slds-border--top"> 
+                 <aura:if isTrue="{!notification.expiredInsuranceInDays}">
+                     <b>{!notification.noticeExpiration}</b><br/>
+                     {!notification.expiredTypeInsurance}&nbsp;<span class="underline"><b>{!notification.insuranceType}</b></span>{!notification.noticeCertificateExpireInDays} &nbsp;
+                     <span class="slds-text-color_error underline"><b>{!notification.noticeDays}&nbsp;{!notification.noticeInDays}</b> </span> <br/>
+                      {!notification.noticeUpdateCopy} <br/>
+                      {!notification.noticeEmail}<br/>
+                      {!notification.noticeFax} 
+                </aura:if>
+                 <aura:if isTrue="{!notification.expiredInsurance}">
+                     <span class="slds-text-color_error"><b>{!notification.noticeExpiration }</b></span><br/>
+                      {!notification.noticeTypeCertificateExpired}&nbsp;<span class="underline"><b>{!notification.insuranceType}</b></span>{!notification.noticeCertificateExpired } <br/>
+                      <span class="underline"><b>{!notification.noticeCertificateExpiredBold } </b></span> <br/>
+                      {!notification.noticeCertificateExpiredMsg  } <br/>
+                      {!notification.noticeEmail}<br/>
+                      {!notification.noticeFax} 
+                </aura:if>
+               </div>
+          </td></tr>
+         </table>          
+      </aura:iteration>
+    </div>          
+   </div>    
+</aura:component>

@@ -1,0 +1,92 @@
+<apex:component controller="UNITY_WorkOrderController" access="global">
+    <apex:attribute name="workOrder" 
+                    type="WorkOrder" 
+                    description="the work order object" 
+                    assignTo="{!relatedTo}"/>
+   
+<messaging:plainTextEmailBody >
+Dear {!relatedTo.UNITY_Accepted_Vendor__r.Name},
+
+Please see details below and attached regarding new Work Order {!relatedTo.WorkOrderNumber} . 
+
+Customer Name: {!relatedTo.Account.Name} 
+Site Address: {!relatedTo.Account.ShippingStreet}, {!relatedTo.Account.ShippingCity}, {!relatedTo.Account.ShippingState} {!relatedTo.Account.ShippingPostalCode} 
+<!--Deadline to perform work: {!relatedTo.EndDate} -->
+
+Not to Exceed Amount: <apex:outputText value="${0, number, ###,##0.00}">
+                                  <apex:param value="{!relatedTo.UNITY_Current_PO__r.UNITY_Total_Cost__c}"/>
+                                 </apex:outputText>
+
+On-site contact: {!relatedTo.Contact.FirstName} {!relatedTo.Contact.LastName}, {!relatedTo.Contact.Phone} 
+Description of Work: {!relatedTo.UNITY_Trade__r.Name}, {!relatedTo.UNITY_Work_Description__c} 
+
+<apex:outputText value="{!IF(!ISBLANK(relatedTo.UNITY_Account_Bundling_Requirement__c), 'Bundle Requirement: ' + relatedTo.UNITY_Account_Bundling_Requirement__c, '')}" escape="false"/>
+
+<apex:outputText value="{!IF(!ISBLANK(relatedTo.UNITY_Customer_IVR_Pin__c), 'Customer IVR is required to validate billable hours, call: ' + relatedTo.UNITY_Customer_IVR_Pin__c + '; Tracking # ' + IF(ISBLANK(relatedTo.case.UNITY_Customer_WO__c),'N/A',relatedTo.case.UNITY_Customer_WO__c), '')}" escape="false"/>
+
+<apex:outputText value="{!IF(!ISBLANK(relatedTo.UNITY_Miner_IVR_Phone_Number__c), 'Miner IVR is required to validate billable hours, call: ' + relatedTo.UNITY_Miner_IVR_Phone_Number__c + ' Pin: ' + relatedTo.UNITY_Vendor_PIN__c, '')}" escape="false"/>
+
+
+To avoid delay in payment please reiterate to your technician the protocol for running service calls. This is also printed on the purchase order and Sign-Off sheet, both of which are attached here.
+
+After-the-fact request for additional funds for labor or parts will not be authorized or approved.
+
+Proposals for additional repairs need to be submitted within 24 hrs.
+
+Survey and pictures are required for replacement or damage and abuse repairs
+
+Reminder, paperwork needs to be submitted within 24-48 hours from job completion.
+
+Here at {!relatedTo.Case.UNITY_Business_Unit_Account__r.Name}, we appreciate your partnership and thank you for the service you provide on our behalf to our customers.
+</messaging:plainTextEmailBody>
+
+<messaging:htmlEmailBody >
+<div style="display: block; height: 80px;">
+<img src="{!relatedTo.UNITY_Email_Logo_URL__c}" border="0" align="left" alt="Miner Logo" />&nbsp;
+</div>
+<div style="display: block">
+<p>Dear {!relatedTo.UNITY_Accepted_Vendor__r.Name},</p>
+<p>Please see details below <span style="text-decoration: underline;">and attached</span> regarding new Work Order <b>{!relatedTo.WorkOrderNumber}</b>.</p>
+<!-- <p>This Work Order can also be accessed via our Partner Community and Field Technician Application.</p> -->
+<ul>
+<li><b>Customer Name: </b>{!relatedTo.Account.Name}</li>
+<li><b>Site Address: </b>{!relatedTo.Account.ShippingStreet}, {!relatedTo.Account.ShippingCity}, {!relatedTo.Account.ShippingState} {!relatedTo.Account.ShippingPostalCode}</li>
+<!--<li><b>Deadline to perform work: </b>{!relatedTo.EndDate}</li>-->
+<c:UNITY_Date_Component workOrder="{!relatedTo}"/>
+<li><b>Not to Exceed Amount: </b><apex:outputText value="${0, number, ###,##0.00}">
+                                  <apex:param value="{!relatedTo.UNITY_Current_PO__r.UNITY_Total_Cost__c}"/>
+                                 </apex:outputText>
+</li>
+<li><b>On-site contact: </b>{!relatedTo.Contact.FirstName} {!relatedTo.Contact.LastName}, <a href="tel:{!relatedTo.Contact.Phone}">{!relatedTo.Contact.Phone}</a></li>
+<li><b>Description of Work: </b>{!relatedTo.UNITY_Trade__r.Name}, {!relatedTo.UNITY_Work_Description__c}</li>
+
+<apex:outputText value="{!IF(!ISBLANK(relatedTo.UNITY_Account_Bundling_Requirement__c), '<li><b>Bundle Requirement: </b>' + relatedTo.UNITY_Account_Bundling_Requirement__c + '</li>', '')}" escape="false"/>
+
+<apex:outputText value="{!IF(!ISBLANK(relatedTo.UNITY_Customer_IVR_Pin__c), '<li><b>Customer IVR is required to validate billable hours, call: </b>' + relatedTo.UNITY_Customer_IVR_Pin__c + '; Tracking # ' + IF(ISBLANK(relatedTo.case.UNITY_Customer_WO__c),'N/A',relatedTo.case.UNITY_Customer_WO__c) + '</li>', '')}" escape="false"/>
+
+<apex:outputText value="{!IF(!ISBLANK(relatedTo.UNITY_Miner_IVR_Phone_Number__c), '<li><b>' + relatedTo.Case.UNITY_Business_Unit_Account__r.Name + ' IVR is required to validate billable hours, call: </b>' + relatedTo.UNITY_Miner_IVR_Phone_Number__c + ' Pin: ' + relatedTo.UNITY_Vendor_PIN__c + '</li>', '')}" escape="false"/>
+
+</ul>
+</div>
+<br/><br/>
+To avoid delay in payment please reiterate to your technician the protocol for running service calls.  This is also printed on the purchase order and Sign-Off sheet, both of which are attached here.
+<br/><br/>
+<ul>
+<li>
+After-the-fact request for additional funds for labor or parts will not be authorized or approved.
+</li>
+<li>
+Proposals for additional repairs need to be submitted within 24 hrs.
+</li>
+<li>
+Survey and pictures are required for replacement or damage and abuse repairs
+</li>
+<li>
+Reminder, paperwork needs to be submitted within 24-48 hours from job completion.
+</li>
+</ul>
+<br/><br/><br/>
+Here at {!relatedTo.Case.UNITY_Business_Unit_Account__r.Name} we appreciate your partnership and thank you for the service you provide on our behalf to our customers.
+</messaging:htmlEmailBody>
+    
+</apex:component>

@@ -1,0 +1,614 @@
+<apex:component controller="UNITY_WorkOrderController" access="global">
+    <apex:attribute name="workOrder" 
+                    type="WorkOrder" 
+                    description="the work order object" 
+                    assignTo="{!relatedTo}"/>
+
+   
+<html>
+   <head>
+      <style type="text/css" media="print">
+
+         @page :first {
+             size: 8.5in 11in;
+             margin: 150px 20px 160px 20px;
+             @top-center {
+                 content: element(header);
+             }
+             @bottom-center {
+                 content: element(footer);
+             }
+         }
+         
+         @page {
+             size: 8.5in 11in;
+             margin: 150px 20px 10px 20px;
+             @top-center {
+                 content: element(header);
+             }
+             @bottom-center {
+                 content: element(footerContainer);
+             }
+         }
+                table,thead,tbody,th,td{
+                    border-collapse: collapse;
+                    border-spacing: 0px;
+                }
+                table.section-title{
+                    page-break-after: avoid;
+                    margin: 0px 0px 0px 0px;
+                    width:100%;
+                }
+                table.section-title td{
+                    background-color: #d5d5d5;
+                    border:1px solid #333;
+                    font-size: 14px;
+                    padding: 5px 3px;
+                }
+                table.main-details{
+                    font-size: 12px;
+                    margin:5px 0px;
+                    padding:0px;
+                    vertical-align:top;
+                    width: 100%;
+                }
+                table.main-details td{
+          			border:1px solid #333;
+                    padding: 2px 3px;
+                    vertical-align:top;
+                }
+                table.main-details td.label{
+                    font-weight:bold;
+                }
+                table.main-details td.header{
+                    border: 1px solid #333;
+                    background-color: #d5d5d5;
+                    vertical-align:top;
+                }
+                table.body{
+                    font-size: 12px;
+                    margin:0px;
+                    padding:0px;
+                    page-break-inside: avoid;
+                    text-align:center;
+                    width: 100%;
+                    -fs-table-paginate: paginate;
+                }
+                table.body th{
+                    background-color: #d5d5d5;
+                    border:1px solid #333;
+                    color: #333;
+                    padding: 4px;
+                }
+                table.body td{
+                    padding: 2px 4px;
+                    border:1px solid #333;
+                    min-height:14px;
+                }
+                th.short,td.short{
+                    max-width:100px;
+                    width:80px;
+                }
+                th.left,td.left{
+                    text-align: left;
+                }
+                th.right,td.right{
+                    text-align: right;
+                }
+                th.center,td.center{
+                    text-align: center;
+                }
+         /*
+         div{
+             border: 1px solid black;
+         }
+         */
+         
+         div.header {
+             padding: 20px 0px 0px 0px;
+             margin: 0px;
+             position: running(header);
+             width: 100%;
+             height: 200px;
+             display: table;
+         }
+         div.footer {
+             padding: 0px 0px 10px 0px;
+             position: running(footer);
+             width: 100%;
+             display: table;
+         }
+         body {
+             margin: 0px;
+             padding: 0px;
+         }
+         .pagebreak {
+             page-break-before: always;
+             display: block;
+             width: 100%;
+         }
+         
+         .titleheader {
+             width: 100%;
+             height: 110px;
+             text-align: center;
+             position: relative;
+         }
+         .headerlabel {
+             margin: 0 auto;
+             heigth: 40px;
+             width: 350px;
+             font-size: 30px;
+         }
+         .row {
+             display: inline-block;
+             height: 100%;
+         }
+         .font1 {
+             font-size: 10px;
+         }
+         .font2,
+         .fontImportant2 {
+             font-size: 12px;
+         }
+         .font3,
+         .fontImportant3 {
+             font-size: 15px;
+         }
+         .font4,
+         .fontImportant4 {
+             font-size: 20px;
+             font-weight: bold;
+         }
+         .font5 {
+             font-size: 30px;
+             font-weight: bold;
+         }
+         .fontImportant1,
+         .fontImportant2,
+         .fontImportantHeader,
+         .fontImportant4 {
+             color: #ff0000;
+         }
+         
+         table, td table, .table {
+             width: 100%;
+             border-spacing:0;
+             border-collapse: collapse;
+         }
+         .table, table, th, td, tr,td table td {
+          /*border: 1px solid black;*/
+                    cellspacing: 0; 
+                    cellpadding: 0;
+                    margin: 0px;
+                    padding: 0px;
+                }
+                
+                td table td{
+                    padding-left:2px;
+                    padding-right:2px;
+                }
+ 
+                td table th{
+                    padding-left:2px;
+                    padding-right:2px;
+                    text-align:center;
+                }
+         
+         th, tr {
+             border-collapse: collapse;
+         }
+        .tr2 {
+                    height:30px;
+                }
+        .tdInverse1{
+                    background-color:#000000;
+                    color:#ffffff;
+                    text-align:center;
+                }
+         #leftheader,
+         .leftblock {
+             float: left;
+         }
+         #leftheader {
+             width: 280px;
+             height: 110px;
+         }
+         .leftblock {
+             width: 40%;
+             position: relative;
+             height: 100%;
+         }
+         .centerblock {
+             margin: 0 auto;
+             width: 100%;
+             height: 100%;
+             background: #00ff00;
+         }
+                  .rightblock {
+             width: 40%;
+             height: 100%;
+         }
+         #proposalLabel {
+             color: #ffffff;
+             font-size: 30px;
+             border: 1px solid #ffffff;
+             background: #000000;
+             width: 100%;
+             height: 40px;
+             text-align:center;
+             vertical-align:middle;
+             margin-bottom:0px;
+         }
+         #proposalLabel1 {
+             margin-top:0px;
+             padding-top:0px;
+             color: black;
+             font-size: 20px;
+             border: 1px solid black;
+             background:#ffffff;
+             width: 100%;
+             height: 25px;
+             text-align:center;
+             vertical-align:middle;
+         }
+         #containerblock {
+             height: 150px;
+             tex-align: center;
+             display: block;
+         }
+         .noborder,
+         .noborder tr,
+         .noborder th,
+         .noborder td {
+             border: none;
+         }
+         .border1{
+             border: 1px solid #000000;
+         }
+         .border1 th {
+             border: 1px solid #000000;
+             background: #ff0000;
+         }
+         .border2 td{
+             border-top: 1px solid #000000;
+             margin-left: 5px;
+         }
+         .tableblock {
+             height: 140px;
+         }
+         .textcenter {
+             text-align: center;
+         }
+         .borderred {
+             border: 1px solid #ff0000;
+         }
+         .footerContainer{
+             display: table-cell;
+             width: 100%;
+             vertical-align: top;
+             text-align: center;
+         }
+         
+                
+         .parentblock{
+             margin: 10px 0px 10px 0px;
+             position: relative;
+             overflow: hidden;
+         }
+         #termsandconditions p {
+             text-align: justify;
+             text-justify: inter-word;
+             display:table-row;
+             font-size: 8pt;
+             font-family: Arial, Helvetica, sans-serif;
+         }
+         li {
+             font-size:12px;
+         }
+         ol.a {
+             list-style-type: lower-alpha;
+         }
+         .noborder,
+         .noborder tr,
+         .noborder th,
+         .noborder td {
+             border: none;
+         }
+         .border1, .border1 th, .border3{
+             border: 1px solid #000000;
+         }
+         .border1 th, .border3 th {
+             background: #ff0000;
+             text-align: center;
+             height: 30px;
+         }
+
+         .noborder,
+         .noborder tr,
+         .noborder th,
+         .noborder td {
+             border: none;
+         }
+         .border1, .border1 th, .border3{
+             border: 1px solid #000000;
+         }
+         #leftheader,
+         .leftblock {
+             float: left;
+         }
+         #leftheader {
+             width: 280px;
+             height: 100%;
+         }
+         .leftblock {
+             width: 40%;
+             position: relative;
+             height: 100%;
+         }
+         .centerblock {
+             margin: 0 auto;
+             width: 120px;
+             height: 120px;
+             background: #00ff00;
+         }
+         #rightheader,
+         .rightblock {
+             float: right;
+             position: relative;
+             width: 130px;
+             height: 50px;
+         }
+         #rightheader {
+             width: 250px;
+             height: 110px;
+             vertical-align: center;
+             line-height: 110px;
+         }
+         
+         #rightheader span {
+             display: inline-block;
+             vertical-align: middle;
+         }
+         
+         .rightblock {
+             width: 40%;
+             height: 100%;
+         }
+          .borderred {
+             border: 1px solid #ff0000;
+         }
+        .parentblock{
+             margin: 10px 0px 10px 0px;
+             position: relative;
+             overflow: hidden;
+         }
+
+      </style>
+   </head>
+   <body>
+      <div class="header">
+         <div class="titleheader">
+             
+            <div id="leftheader">
+               <p id="proposalLabel">
+                 Purchase Order</p>
+                 <!--<span style="margin-top:0;font-size:20px;background:white;color:black">-->
+                    <p id="proposalLabel1"> {!relatedTo.UNITY_Current_PO__r.ordernumber}
+                 </p>
+            </div>
+            
+            <div id="rightheader">
+                <div style="float:right;margin:0px;padding:0px;">
+                    Date: <apex:outputText value="{0, date,MM/dd/yyyy}">
+                                <apex:param value="{!relatedTo.UNITY_Current_PO__r.CreatedDate}" /> 
+                            </apex:outputText>
+                </div>
+            </div>
+             
+            <div id="centerblock">
+                <apex:image styleClass="logo" url="{!relatedTo.UNITY_Email_Logo_URL__c}"/>
+            </div>
+         </div>
+      </div>
+      <div class="footer">
+                <div class="footerContainer">
+                    <div><apex:outputText value="{!relatedTo.UNITY_Email_Document_Footer__c}" escape="false"/></div>
+                    <!--<div>
+                         Miner Fleet Management - Phone: 888-606-4637
+                    </div>
+                    <div>
+                        For invoice submittal email to servicepartnerppw@minercorp.com
+                    </div>
+                    <div>
+                        For quotes, pictures, or any other correspondence email to servicepartnermns@minercorp.com"
+                    </div>-->
+                </div>
+            </div>
+      <div class="pagebreak">
+        <!--<div>
+          <table>
+              <tr>
+                  <td>
+                      <c:UNITY_OrderLineItems oId="{!relatedTo.UNITY_Current_PO__c}" />
+                  </td>
+              </tr>
+          </table>
+         </div> -->
+          <div class="parentblock">
+              <table style="width:100%;">
+                  <tr>
+                      <td style="width:35%;vertical-align:top;">
+                          <table class="main-details" style="width:100%;">
+                              <tr>
+                                  <td class="label header center">PREPARED FOR:</td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <!--<c:UNITY_UserInfo aId="{!relatedTo.UNITY_Assigned_Vendor__r.Id}"/>-->
+                                      <strong>{!relatedTo.UNITY_Assigned_Vendor__r.Name}</strong><br/>
+                                      <span>{!relatedTo.UNITY_Assigned_Vendor__r.BillingStreet}</span><br/>
+                                      <span>{!relatedTo.UNITY_Assigned_Vendor__r.BillingCity},</span>&nbsp;
+                                      <span>{!relatedTo.UNITY_Assigned_Vendor__r.BillingState}</span>&nbsp;
+                                      <span>{!relatedTo.UNITY_Assigned_Vendor__r.BillingPostalCode}</span>
+                                  </td>
+                              </tr>
+                          </table>
+                      </td>
+                      <td></td>
+                      <td style="width:35%;vertical-align:top;">
+                          <apex:outputPanel rendered="{!relatedTo.recordType.DeveloperName == 'UNITY_Non_Work'}">
+                              <table class="main-details" style="width:100%;">
+                                  <tr>
+                                      <td class="label  header center">SHIP TO ADDRESS:</td>
+                                  </tr>
+                                  <tr>
+                                      <td>
+                                          <strong>{!relatedTo.UNITY_Current_PO__r.UNITY_Ship_To_Account__r.Name}</strong><br/>
+                                          <span>{!relatedTo.UNITY_Current_PO__r.ShippingStreet}</span><br/>
+                                          <span>{!relatedTo.UNITY_Current_PO__r.ShippingCity},</span>&nbsp;
+                                          <span>{!relatedTo.UNITY_Current_PO__r.ShippingState}</span>&nbsp;
+                                          <span>{!relatedTo.UNITY_Current_PO__r.ShippingPostalCode}</span>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>
+                                          <strong>Shipping Method:</strong>&nbsp;<apex:outputText value="{!relatedTo.UNITY_Current_PO__r.UNITY_Shipping_Method__c}"></apex:outputText>
+                                      </td>
+                                  </tr>
+                              </table>
+                          </apex:outputPanel>
+                          <table class="main-details" style="width:100%;">
+                              <tr>
+                                  <td class="label  header center">JOB SITE INFORMATION:</td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <!--<apex:outputText value="{!workOrder.UNITY_Job_Site__c}" escape="false"/>-->
+                                      <strong>Store/Location #:</strong>&nbsp;<span>{!relatedTo.Account.UNITY_LOC__c}</span><br/>
+                                      <strong>{!relatedTo.Account.Name}</strong><br/>
+                                      <span>{!relatedTo.Account.ShippingStreet}</span><br/>
+                                      <span>{!relatedTo.Account.ShippingCity},</span>&nbsp;
+                                      <span>{!relatedTo.Account.ShippingState}</span>&nbsp;
+                                      <span>{!relatedTo.Account.ShippingPostalCode}</span>
+                                  </td>
+                              </tr>
+                          </table>
+                      </td>
+                  </tr>
+              </table>
+                    <!--
+<div class="leftblock">
+<table class=" border1 tableblock">
+<tr>
+<th>PREPARED FOR:</th>
+</tr>
+<tr>
+<td style="padding:5px;">
+<c:UNITY_UserInfo aId="{!relatedTo.UNITY_Assigned_Vendor__r.Id}"/>
+</td>
+</tr>
+</table>
+</div>
+-->
+                    <!--
+<div class="rightblock">
+<table class="border1 tableblock">
+<tr>
+<th>PREPARED BY:</th>
+</tr>
+<tr>
+<td>
+<c:UNITY_UserInfo uId="{!relatedTo.UNITY_Agent__c}"/>
+</td>
+</tr>
+</table>
+</div>
+-->
+                    <!--
+<div class="rightblock">
+<apex:outputPanel rendered="{!relatedTo.recordType.DeveloperName == 'UNITY_Non_Work'}">
+<table class="border1 tableblock">
+<tr>
+<th>SHIP TO ADDRESS:</th>
+</tr>
+<tr>
+<td style="padding:5px;">
+<strong>{!relatedTo.UNITY_Current_PO__r.UNITY_Ship_To_Account__r.Name}</strong><br/>
+<span>{!relatedTo.UNITY_Current_PO__r.ShippingStreet}</span><br/>
+<span>{!relatedTo.UNITY_Current_PO__r.ShippingCity},</span>&nbsp;
+<span>{!relatedTo.UNITY_Current_PO__r.ShippingState}</span>&nbsp;
+<span>{!relatedTo.UNITY_Current_PO__r.ShippingPostalCode}</span>
+</td>
+</tr>
+</table>
+</apex:outputPanel>
+<table class="border1 tableblock">
+<tr>
+<th>JOB SITE INFORMATION:</th>
+</tr>
+<tr>
+<td style="padding:5px;">
+<apex:outputText value="{!workOrder.UNITY_Job_Site__c}" escape="false" />
+</td>
+</tr>
+</table>
+</div>
+-->
+              <!-- Description -->
+              <table class="section-title">
+                  <tr>
+                      <td>Description</td>
+                  </tr>
+              </table>
+              <table class="body" style="display:block;position:relative;">
+                  <tr style="display:block;position:relative;">
+                      <td class="left" style="display:block;position:relative;">
+                          <div style="min-height:25px;max-height:105px;display:block;text-overflow:ellipsis;overflow:hidden;padding:5px;white-space:wrap;width:100%;max-width:100%;">
+                              <apex:outputText value="{!relatedTo.UNITY_Current_PO__r.Description}" escape="false" />
+                          </div>
+                      </td>
+                  </tr>
+              </table>
+              
+          </div>
+       </div>
+       <div class="borderred"></div>
+       <br/><br/>
+       <div>
+        <!--      <table>
+                                                          
+                      <td class="tdInverse1">                    
+
+                     <b>Not to Exceed Amount: </b><apex:outputText value="${0, number, ###,##0.00}">
+                               <apex:param value="{!relatedTo.UNITY_Current_PO__r.UNITY_Total_Cost__c}"/>
+                                </apex:outputText>
+               
+                       </td>               
+                </table>  -->
+
+                <table>                            
+                    <tr class="tr2">
+                      <td class="tdInverse1">PURCHASE ORDER LINE ITEMS</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <c:UNITY_OrderLineItems oId="{!relatedTo.UNITY_Current_PO__c}"/>
+                        <table width="100%" class="body">
+                            <tr>
+                                <td style="text-align:right;padding-right:2px">
+                                    Total: <apex:outputText value="${0, number, ###,##0.00}">
+                                    	<apex:param value="{!relatedTo.UNITY_Current_PO__r.UNITY_Total_Cost__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+
+
+                      </td>
+                    </tr>
+                </table>
+            </div>
+   </body>
+</html>
+</apex:component>

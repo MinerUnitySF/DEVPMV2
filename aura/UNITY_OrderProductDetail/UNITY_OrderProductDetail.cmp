@@ -1,0 +1,57 @@
+<aura:component controller="UNITY_AuraOrderProductDetailController" implements="force:hasRecordId,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="recordId" type="String" />
+	<aura:handler name="init" action="{!c.myAction}" value="{!this}" />
+	<aura:attribute name="Item" type="OrderItem" />
+    <br/>
+    <br/>    
+    <div class="slds-grid">
+		<div class="slds-col">
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Order</p><p class="slds-text-body--regular slds-truncate">{!v.Item.Order.OrderNumber}</p>
+            <br/>
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Line Description</p><p class="slds-text-body--regular slds-truncate">{!v.Item.Description}</p>
+            <br/>
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Vendor Adjusted Quantity</p><p class="slds-text-body--regular slds-truncate">{!v.Item.UNITY_Vendor_Adjusted_Quantity__c}</p>
+            <br/>
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Vendor OT Multiplier</p><p class="slds-text-body--regular slds-truncate"><ui:outputCheckbox value="{!v.Item.UNITY_Vendor_OT_Multiplier__c}"/></p>
+            <br/>
+		    <h3 class="slds-section__title slds-theme--shade"><span class="section-header-title slds-p-horizontal--small slds-truncate">Shipping Information</span></h3>    
+            <br/>
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Part Delivered?</p><p class="slds-text-body--regular slds-truncate"><ui:outputCheckbox value="{!v.Item.UNITY_Part_Delivered__c}"/></p>
+            <br/>
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Shipping Provider</p><p class="slds-text-body--regular slds-truncate">{!v.Item.UNITY_Shipping_Provider__c}</p>
+            <br/>
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Tracking Number</p><p class="slds-text-body--regular slds-truncate">{!v.Item.UNITY_Tracking_Number__c}</p>
+            <br/>
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Tracking URL</p><p class="slds-text-body--regular slds-truncate">{!v.Item.UNITY_Tracking_URL__c}</p>
+        </div>
+		<div class="slds-col">
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Product</p><p class="slds-text-body--regular slds-truncate">{!v.Item.UNITY_Product_Name__c}</p>
+            <br/>
+ 			<p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Cost</p><p class="slds-text-body--regular slds-truncate"><ui:outputCurrency value="{!v.Item.UNITY_Cost__c}"/></p>            
+            <br/>
+ 			<p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Total Cost</p><p class="slds-text-body--regular slds-truncate"><ui:outputCurrency value="{!v.Item.UNITY_Total_Cost__c}"/></p>
+            <br/>
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Vendor Holiday Multiplier</p><p class="slds-text-body--regular slds-truncate"><ui:outputCheckbox value="{!v.Item.UNITY_Vendor_Holiday_Multiplier__c}"/></p>
+            <br/>
+            <br/>
+            <p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Shipment Received</p><p class="slds-text-body--regular slds-truncate"><ui:outputCheckbox value="{!v.Item.UNITY_Shipment_Received__c}"/></p>
+            <br/>
+ 			<p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Expected Quantity</p><p class="slds-text-body--regular slds-truncate">{!v.Item.UNITY_Expected_Quantity__c}</p>            
+            <br/>
+ 			<p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Expected Arrival Date</p><p class="slds-text-body--regular slds-truncate"><ui:outputDate value="{!v.Item.UNITY_Expected_Ship_Date__c}"/></p>            
+            <br/>
+ 			<p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Actual Quantity</p><p class="slds-text-body--regular slds-truncate">{!v.Item.UNITY_Actual_Quantity__c}</p>            
+            <br/>
+ 			<p class="slds-text-title slds-truncate slds-m-bottom--xx-small">Actual Arrival Date</p><p class="slds-text-body--regular slds-truncate"><ui:outputDate value="{!v.Item.UNITY_Actual_Ship_Date__c}"/></p>                        
+        </div>
+	</div>
+    <br/>
+    <br/>
+	<div class="slds-grid">
+		<div class="slds-col">
+         </div>
+		<div class="slds-col">
+
+        </div>
+	</div>    
+</aura:component>

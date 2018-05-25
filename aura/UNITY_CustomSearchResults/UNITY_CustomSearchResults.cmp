@@ -1,0 +1,88 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+    <aura:attribute type="list" name="accountList" />
+	<aura:attribute type="list" name="caseList" />    
+    <aura:attribute type="list" name="attachmentList" />
+    <aura:attribute type="list" name="recordIds" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    <aura:if isTrue="{!(v.accountList.length>0 || v.caseList.length>0 || v.attachmentList.length>0) }">
+        <h1 class="slds-text-heading--medium slds-align_absolute-center">
+            <span class="headlineTitleText">Search Results</span>
+        </h1>
+        <aura:set attribute="else">
+            <h1 class="slds-text-heading--medium slds-align_absolute-left">
+           	 <span class="headlineTitleText">No Results Found.</span>
+            </h1>
+        </aura:set>        
+    </aura:if>
+    
+    <aura:if isTrue="{!v.accountList.length > 0}">
+    <h3 class="slds-text-heading--medium slds-text-color--default">Account</h3>
+    <table class="slds-table slds-table--bordered">
+        <thead>
+            <tr>
+                <th scope="col"><span class="slds-truncate"><h4>Account Name</h4></span></th>
+                <th scope="col"><span class="slds-truncate"><h4>Store/Location Number</h4></span></th>
+                <th scope="col"><span class="slds-truncate"><h4>Shipping Address</h4></span></th>
+                <th scope="col"><span class="slds-truncate"><h4>Phone</h4></span></th>
+            </tr>
+        </thead>
+        <tbody>    
+            <aura:iteration items="{!v.accountList}" var="item" indexVar="index">
+                <tr>
+                    <td class="slds-cell-wrap"><a onclick="{!c.navigateToAccount}" style="width:100%;" data-index="{!index}">{!item.Name}</a></td>
+                    <td>{!item.UNITY_LOC__c}</td>
+                    <td class="slds-cell-wrap">{!item.ShippingStreet}&nbsp;{!item.ShippingCity},&nbsp;{!item.ShippingState}&nbsp;{!item.ShippingPostalCode}&nbsp;{!item.ShippingCountry}</td>
+                    <td>{!item.Phone}</td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+	</aura:if>    
+	<aura:if isTrue="{!v.caseList.length > 0}">
+	<h3 class="slds-text-heading--medium slds-text-color--default">Case</h3>        
+    <table class="slds-table slds-table--bordered ">
+        <thead>
+            <tr>
+                <th scope="col"><span class="slds-truncate"><h4>Case Number</h4></span></th>
+                <th scope="col"><span class="slds-truncate"><h4>Customer WO</h4></span></th>
+                <th scope="col"><span class="slds-truncate"><h4>Customer Status</h4></span></th>
+				<th scope="col"><span class="slds-truncate"><h4>Most Recent Case Notes</h4></span></th>                
+                <th scope="col"><span class="slds-truncate"><h4>Resolution</h4></span></th>
+            </tr>
+        </thead>
+        <tbody>    
+            <aura:iteration items="{!v.caseList}" var="item" indexVar="index">
+                <tr>
+                    <td><a onclick="{!c.navigateToCase}" style="width:100%;" data-index="{!index}">{!item.CaseNumber}</a></td>
+                    <td>{!item.UNITY_Customer_WO__c}</td>
+                    <td>{!item.Customer_Status__c}</td>
+                    <td class="slds-cell-wrap">{!item.Most_Recent_Case_Notes__c}</td>
+                    <td class="slds-cell-wrap">{!item.UNITY_Resolution__c}</td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    </aura:if>
+	<aura:if isTrue="{!v.attachmentList.length > 0}">
+	<h3 class="slds-text-heading--medium slds-text-color--default">Attachments</h3>        
+    <table class="slds-table slds-table--bordered">
+        <thead>
+            <tr>
+                <th scope="col"><span class="slds-truncate"><h4>Name</h4></span></th>
+                <th scope="col"><span class="slds-truncate"><h4>Type</h4></span></th>
+                <th scope="col"><span class="slds-truncate"><h4>Work Order</h4></span></th>
+            </tr>
+        </thead>
+        <tbody>    
+            <aura:iteration items="{!v.attachmentList}" var="item" indexVar="index">
+                <tr>
+                    <td><a onclick="{!c.navigateToAttachment}" style="width:100%;" data-index="{!index}">{!item.Name}</a></td>
+                    <td>{!item.UNITY_Type__c}</td>
+                    <td>{!item.Work_Order__r.WorkOrderNumber}</td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    </aura:if>    
+</aura:component>

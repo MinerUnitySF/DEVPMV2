@@ -1,0 +1,52 @@
+<apex:component controller="UNITY_OrdersController" access="global">
+
+    <apex:attribute name="WOId" 
+                    type="ID" 
+                    description="the work order id" 
+                    assignTo="{!workOrderId}"/>
+    <apex:attribute name="assVendorId" 
+                    type="ID" 
+                    description="The Assigned Vendor id" 
+                    assignTo="{!assignedVendorId}"/>
+    <p style="text-decoration: underline;"><b>New</b> [{!cOrderWrapper.CreatedDate}] Purchase Order, <b>PO-{!cOrderWrapper.CurrentOrderRecord.OrderNumber}</b>:</p>
+    <ul>
+        <li><b>Not to Exceed Amount: </b><apex:outputText value="${0, number, ###,##0.00}">
+                                  <apex:param value="{!cOrderWrapper.CurrentOrderRecord.UNITY_Total_Cost__c}"/>
+                                 </apex:outputText>
+         </li>
+    </ul>
+
+    <apex:repeat value="{!ordersList}" var="order" id="ordersRepeat">
+
+        <p style="text-decoration: underline;"><b>Previous</b> [{!order.createdDate}] Purchase Order, <b>PO-{!order.OrderRecord.OrderNumber}
+</b>:</p>
+<ul>
+    <li><b>Not to Exceed Amount: </b><apex:outputText value="${0, number, ###,##0.00}">
+                                  <apex:param value="{!order.orderRecord.UNITY_Total_Cost__c}"/>
+                                 </apex:outputText>                         
+    </li>
+</ul>
+
+
+    </apex:repeat>
+   <!-- <apex:dataTable headerClass="headerStyle" style="width:100%" value="{!orders}" var="order">
+        <apex:column >
+            <apex:facet name="header" >Order Number</apex:facet>
+            {!order.OrderNumber}
+        </apex:column>
+        <apex:column style="text-align: right;">
+            <apex:facet name="header">Amount</apex:facet>
+            {!order.TotalAmount}
+        </apex:column>
+        <apex:column style="text-align: right;">
+            <apex:facet name="header">Total Cost</apex:facet>
+            {!order.UNITY_Total_Cost__c}
+        </apex:column>
+        <apex:column style="text-align: right;">
+              <apex:facet name="header">Date</apex:facet>
+              <apex:outputText value=" {!order.createdDate}"/>
+      
+        </apex:column>
+                         
+     </apex:dataTable>    -->           
+</apex:component>

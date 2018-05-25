@@ -64,6 +64,27 @@
         <visibleLines>5</visibleLines>
     </fields>
     <fields>
+        <fullName>Content_Download_URL__c</fullName>
+        <externalId>false</externalId>
+        <label>Content Download URL</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Url</type>
+    </fields>
+    <fields>
+        <fullName>DocParser_Filesize__c</fullName>
+        <externalId>false</externalId>
+        <label>DocParser Filesize</label>
+        <precision>15</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>DocParser_Id__c</fullName>
         <externalId>true</externalId>
         <label>DocParser Id</label>
@@ -84,9 +105,9 @@
         <type>Url</type>
     </fields>
     <fields>
-        <fullName>Document_Count__c</fullName>
+        <fullName>DocParser_Page_Count__c</fullName>
         <externalId>false</externalId>
-        <label>Document Count</label>
+        <label>DocParser Page Count</label>
         <precision>3</precision>
         <required>false</required>
         <scale>0</scale>
@@ -132,6 +153,17 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>File_Name__c</fullName>
+        <externalId>false</externalId>
+        <label>File Name</label>
+        <length>50</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Incoming_Email_Address__c</fullName>
         <externalId>false</externalId>
         <label>Incoming Email Address</label>
@@ -140,6 +172,15 @@
         <trackTrending>false</trackTrending>
         <type>Email</type>
         <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Pdf_Download_Url__c</fullName>
+        <externalId>false</externalId>
+        <label>Pdf_Download_Url</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Url</type>
     </fields>
     <fields>
         <fullName>Status__c</fullName>
@@ -159,14 +200,14 @@
                     <label>New</label>
                 </value>
                 <value>
-                    <fullName>Uploaded</fullName>
+                    <fullName>Processing</fullName>
                     <default>false</default>
-                    <label>Uploaded</label>
+                    <label>Processing</label>
                 </value>
                 <value>
-                    <fullName>Processed</fullName>
+                    <fullName>Parsed</fullName>
                     <default>false</default>
-                    <label>Processed</label>
+                    <label>Parsed</label>
                 </value>
                 <value>
                     <fullName>Complete</fullName>
@@ -188,6 +229,7 @@
         <columns>Document_Source__c</columns>
         <columns>Status__c</columns>
         <columns>DocParser_Id__c</columns>
+        <columns>Email_Subject__c</columns>
         <filterScope>Everything</filterScope>
         <label>All</label>
         <language>en_US</language>
@@ -195,11 +237,17 @@
     <listViews>
         <fullName>SPECIFIC</fullName>
         <columns>NAME</columns>
+        <columns>Comments__c</columns>
+        <columns>DocParser_Filesize__c</columns>
+        <columns>DocParser_Id__c</columns>
+        <columns>Status__c</columns>
+        <columns>File_Name__c</columns>
+        <columns>Document_Source__c</columns>
         <filterScope>Everything</filterScope>
         <filters>
-            <field>NAME</field>
-            <operation>contains</operation>
-            <value>94</value>
+            <field>OWNER.FIRST_NAME</field>
+            <operation>equals</operation>
+            <value>Mary</value>
         </filters>
         <label>SPECIFIC</label>
         <language>en_US</language>

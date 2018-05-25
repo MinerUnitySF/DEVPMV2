@@ -1,0 +1,574 @@
+<apex:component controller="UNITY_WorkOrderController" access="global">
+    <apex:attribute name="workOrder" 
+                    type="WorkOrder" 
+                    description="the work order object" 
+                    assignTo="{!relatedTo}"/>
+    <html>
+        <head>
+            <style type="text/css" media="print">
+                @page 
+                {
+                    margin: 150px 20px 70px 20px;
+                    size: 8.5in 11in;/* width height */
+                }
+    
+                @page 
+                {
+                    @top-center 
+                    {
+                        content: element(header);
+                    }
+    
+                    @bottom-center 
+                    {
+                        content: element(footer);
+                    }
+                }
+    
+                div.header 
+                {
+                    padding: 20px 0px 0px 0px;
+                    margin: 0px;
+                    position: running(header);
+                }
+    
+                div.footer 
+                {
+                    padding: 0px 0px 0px 0px;
+                    position: running(footer);
+                    width: 100%;
+                    display: table;
+                }
+                
+                body {
+                    margin: 0px;
+                    padding: 0px;
+                }
+                
+                .pagebreak {
+                    page-break-before:always;
+                }
+                
+                .logo {
+                    float: left;
+                /**
+                    height:105px;
+                    width: 105px;
+                */
+                  }
+                
+                .titleheader {
+                    width: 100%;
+                    height: 110px;
+                    text-align: center;
+                    position:relative;
+                }
+                
+                .headerlabel {
+                    margin: 0 auto;
+                    heigth: 40px;
+                    width: 350px;
+                    font-size: 30px; 
+                }
+                
+                .textAlignedCenter {
+                    text-align:center;
+                }
+                
+                .td1{
+                    width:50%;
+                    height:100%;
+                    text-align:center;
+                }
+                
+                .td2 {
+                    width:17%;
+                }
+                
+                .td3 {
+                    width:33%;
+                }
+                
+                .td4 {
+                    width:13%;
+                    font-size:11px;
+                }
+    
+                .td5 {
+                    width:25%;
+                }
+    
+                .td6 {
+                    width:12%;
+                    font-size:11px;
+                }  
+                  
+          
+                .tdInverse1{
+                    background-color:#000000;
+                    color:#ffffff;
+                    text-align:center;
+                }
+                
+                .tr1 {
+                    height:20px;
+                }
+                
+                .tr2 {
+                    height:30px;
+                }
+                
+                .tr4 {
+                    height:100px;
+                }
+                
+                .tr5 {
+                    height:200px;
+                    vertical-align:top;
+                }
+                
+                .tr6 {
+                    height:110px;
+                    vertical-align:top;
+                }
+                
+                .row {
+                    display: inline-block;
+                    height: 100%;
+                }
+                
+                .font1 {
+                    font-size:10px;
+                }
+                
+                .font2 {
+                    font-size:12px;
+                }
+                
+                .font3 {
+                    font-size:15px;
+                }
+    
+                .font4 {
+                    font-size:20px;
+                    font-weight:bold;
+                }
+                
+                .fontImportant1, .fontImportant2, .fontImportantHeader{
+                    color:#ff0000;
+                }
+                
+                .fontImportant1, .fontImportantHeader{
+                    font-size:15px;
+                }
+    
+                .fontImportant2{
+                    font-size:12px;
+    
+                }
+               
+                .fontImportantHeader{
+                    text-align:center;
+                }
+                
+                .footerContainer{
+                    display: table-cell;
+                    vertical-align: top;
+                    text-align: center;
+                }
+                
+                #mainTable {
+                    width: 100%;
+                }
+                
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+                
+                .table, table, th, td, tr {
+                    border: 2px solid black;
+                    cellspacing: 0; 
+                    cellpadding: 0;
+                    margin: 0px;
+                    padding: 0px;
+                }
+                
+                td{
+                    padding-left:2px;
+                }
+                
+                .noborder, .noborder tr, .noborder th, .noborder td { 
+                    border: none; 
+                }
+    
+                div.block {
+                  float: left;
+                  margin: 0px;
+                  padding: 0px;
+                  text-align: left;
+                }
+                
+                .storestamp {
+                    text-align:center;
+                    margin:10px 20px 0px 0px;
+                    border:1px solid black;
+                    height:60px;
+                }
+                
+                .underline1, .underline2 {
+                        border-bottom:1px solid black;
+                }
+                
+                .underline2 {
+                    margin-top:20px;
+                }
+                
+                .overline1, .overline2 {
+                    border-top:1px solid black;
+                }
+                
+                .overline1 {
+                    margin-top:27px;
+                }
+                
+                .overline2 {
+                    margin-top:20px;
+                }
+                
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <apex:image styleClass="logo" url="{!relatedTo.UNITY_Email_Logo_URL__c}"/>
+                <div class="titleheader">
+                    <div class="headerlabel">
+                        Work Order # {!relatedTo.WorkOrderNumber}
+                    </div>
+                    <!--<div class="headerlabel">
+                        PO # {!relatedTo.UNITY_Current_PO__r.OrderNumber}
+                    </div>-->
+                </div>
+            </div>
+            
+            <div class="footer">
+                <div class="footerContainer">
+                    <div><apex:outputText value="{!relatedTo.UNITY_Email_Document_Footer__c}" escape="false"/></div>
+                    <!--<div>
+                         Miner Fleet Management - Phone: 888-606-4637
+                    </div>
+                    <div>
+                        For invoice submittal email to servicepartnerppw@minercorp.com
+                    </div>
+                    <div>
+                        For quotes, pictures, or any other correspondence email to servicepartnermns@minercorp.com"
+                    </div>-->
+                </div>
+            </div>
+           <div class="pagebreak">
+                <table>
+                  <colgroup>
+                    <col class="td2"></col>
+                    <col class="td3"></col>
+                    <col class="td2"></col>
+                    <col class="td3"></col>
+                   </colgroup>
+                  <tr class="tr1">
+                    <td class="td1 font4" colspan="2">{!relatedTo.WorkOrderNumber}</td>
+                    <td class="td1 font4" colspan="2">DATE ISSUED:{!AssignedDate}</td>
+                    <!--<apex:outputText value="{0, date,'DATE ISSUED: 'MM/dd/yy}">
+                                                                       <apex:param value="{!CreatedDate}" /> 
+                                                                   </apex:outputText>
+                    </td>-->
+                  </tr>
+                  <tr class="tr1">
+                      <td>VENDOR CODE</td>
+                      <td>{!relatedTo.UNITY_Accepted_Vendor__r.UNITY_Account_ID__c}</td>
+                      <td>SITE NAME &amp; #</td>
+                      <td>{!relatedTo.Account.Name}{!IF(ISBLANK(relatedTo.UNITY_Site_Store_Number__c), '', ', #'+relatedTo.UNITY_Site_Store_Number__c)}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td>VENDOR NAME</td>
+                      <td>{!relatedTo.UNITY_Accepted_Vendor__r.Name}</td>
+                      <td>CONTACT</td>
+                      <td>{!relatedTo.Contact.Name}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td>ADDRESS</td>
+                      <td>{!relatedTo.UNITY_Accepted_Vendor__r.BillingStreet}, {!relatedTo.UNITY_Accepted_Vendor__r.BillingCity}, {!relatedTo.UNITY_Accepted_Vendor__r.BillingState} {!relatedTo.UNITY_Accepted_Vendor__r.BillingPostalCode}</td>
+                      <td>ADDRESS</td>
+                      <td>{!relatedTo.Account.ShippingStreet}, {!relatedTo.Account.ShippingCity}, {!relatedTo.Account.ShippingState} {!relatedTo.Account.ShippingPostalCode}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>PHONE</td>
+                      <td>{!relatedTo.UNITY_Site_Contact_Phone__c}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td>NTE</td>
+                      <td>
+                          <apex:outputText value="${0, number, ###,##0.00}">
+                            <apex:param value="{!relatedTo.UNITY_Initial_Vendor_PO_Cost__c}"/>
+                          </apex:outputText>
+                      </td>
+                      <td>CUSTOMER PO</td>
+                      <td>{!relatedTo.Case.UNITY_Customer_PO__c}</td>
+                  </tr>
+                  <!--
+                  <tr class="tr2">
+                      <td class="tdInverse1 font4" colspan="4">NOT TO EXCEED ${!relatedTo.UNITY_Not_To_Exceed_NTE__c}</td>
+                  </tr>
+                  -->
+                  <tr class="tr1">
+                      <td>PRIORITY:</td>
+                      <td>{!relatedTo.Priority}</td>
+                      <td>RECEIVED DATE:</td>
+                      <td>{!CreatedDate}</td>
+                        <!--  <apex:outputText value="{0, date,MM/dd/yy}">
+                             <apex:param value="{!relatedTo.CreatedDate - 0.25}" /> 
+                             <apex:param value="{!CreatedDate}" />
+                          </apex:outputText>
+                      </td>-->
+                  </tr>
+                  <tr class="tr2">
+                  
+                     <td class="fontImportantHeader" colspan="4">REQUIRED DATE &amp; TIME OF SERVICE: {!Window_End}</td>
+                          <!--<apex:outputText value="{0,date,' 'MM/dd/yy' PRIOR TO ' HH:mm}">
+                             <apex:param value="{!Window_End}" /> 
+                          </apex:outputText>
+                      </td>-->
+                  </tr>
+                  <tr class="tr2">
+                      <td class="tdInverse1" colspan="4">PROBLEM REPORTED</td>
+                  </tr>
+                  <tr class="tr4">
+                      <td colspan="4">{!relatedTo.UNITY_Trade__r.Name}, {!relatedTo.UNITY_Work_Description__c}</td>
+                      <!--<td colspan="4">{!relatedTo.Subject}<br/>{!relatedTo.Description}</td>-->
+                  </tr>
+                  <tr class="tr2">
+                      <td class="tdInverse1" colspan="4">TERMS AND CONDITIONS FOR SUBMITTING FOR PAYMENT</td>
+                  </tr>
+                  <tr class="tr5">
+                      <td colspan="4">
+                          <div style="height:200px;position:relative;" >
+                              <div>
+                                  <ul>
+                                      <li>
+                                         <apex:outputText value="{!IF(!ISBLANK(relatedTo.UNITY_Customer_IVR_Pin__c), 'Customer IVR is required to validate billable hours, call: ' + relatedTo.UNITY_Customer_IVR_Pin__c + '; Tracking# ' + IF(ISBLANK(relatedTo.case.UNITY_Customer_WO__c),'N/A',relatedTo.case.UNITY_Customer_WO__c), '')}" escape="false"/>
+                                      </li>
+                                      <li>
+                                         <apex:outputText value="{!IF(!ISBLANK(relatedTo.UNITY_Miner_IVR_Phone_Number__c), relatedTo.Case.UNITY_Business_Unit_Account__r.Name + ' IVR is required to validate billable hours, call: ' + relatedTo.UNITY_Miner_IVR_Phone_Number__c + ' Pin: ' + relatedTo.UNITY_Vendor_PIN__c, '')}" escape="false"/>
+                                      </li>
+                                      <li>
+                                          Vendor’s invoice must not exceed the NTE without prior approval.
+                                      </li>
+                                      <li>
+                                          Exceeding the NTE without approval may result in partial payment.
+                                      </li>
+                                      <li>
+                                           Replacement, Damage and Abuse &amp; Major Repairs - pictures before and after, and surveys must be completed.
+                                      </li>                                      
+                                      <li>
+                                          Vendor must submit a Service Report with legible signature of Manager on Duty &amp; store stamp.
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="fontImportantHeader" style="position:absolute;bottom:0;width:100%;height:50px;">
+                                  ALL PAPER WORK MUST BE EMAILED OR FAXED WITHIN 48 HOURS OF COMPLETION. FAILURE TO COMPLY WILL RESULT IN DELAYED PAY, SHORT PAY OR NON-PAY
+                              </div>
+                              
+                          </div>
+                          
+                      </td>
+                  </tr>
+                </table>
+                <br/><br/>
+                <div class="table fontImportantHeader">
+                    UPON ACCEPTANCE OF THIS PURCHASE ORDER, ALL TERMS AND CONDITIONS OUTLINED IN THE SERVICE PARTNER AGREEMENT &amp; CONTRACTOR AGREEMENT WILL BE ENFORCED
+                </div>
+            </div> 
+            <!--<div class="pagebreak">
+                <table>
+                  <colgroup>
+                    <col class="td2"></col>
+                    <col class="td3"></col>
+                    <col class="td2"></col>
+                    <col class="td3"></col>
+                   </colgroup>
+                  <tr class="tr1">
+                    <td class="td1 font4" colspan="2">{!relatedTo.UNITY_Current_PO__r.OrderNumber}</td>
+                    <td class="td1 font4" colspan="2">
+                          <apex:outputText value="{0, date,'DATE ISSUED: 'MM/dd/yy}">
+                             <apex:param value="{!relatedTo.CreatedDate}" /> 
+                          </apex:outputText>
+                    </td>
+                  </tr>
+                  <tr class="tr1">
+                      <th COLSPAN="2" ROWSPAN="5">
+                          ￼REQUIRED COVER PAGE FOR SUBMITTING AND PROCESSING INVOICE AND SIGN-OFF
+                      </th>
+                      <td>SITE NAME &amp; #</td>
+                      <td>{!relatedTo.Account.Name}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td>CONTACT</td>
+                      <td>{!relatedTo.Contact.Name}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td>ADDRESS</td>
+                      <td>{!contactUser.Street}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td>SITE NUMBER</td>
+                      <td>{!relatedTo.UNITY_Site_Contact_Phone__c}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td>SECONDARY #</td>
+                      <td>{!contactUser.MobilePhone}</td>
+                  </tr>
+                  <tr class="tr2">
+                      <td class="tdInverse1" colspan="4">PROBLEM REPORTED</td>
+                  </tr>
+                  <tr class="tr4">
+                      <td colspan="4">{!relatedTo.Subject}<br/>{!relatedTo.Description}</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td class="fontImportantHeader" colspan="4">ACTION REQUIRED UPON ARRIVAL AT THE SITE</td>
+                  </tr>
+                  <tr>
+                      <td colspan="4">
+                          <div>
+                              <div style="width:100%;">
+                                <div class="td4 block">IVR CHECK IN:</div>
+                                <div class="td4 fontImportant2 block">IVR #</div>
+                                <div class="td6 block">###-###-###</div>
+                                <div class="td4 fontImportant2 block">IVR PIN #</div>
+                                <div class="td6 block">{!relatedTo.UNITY_Vendor_PIN__c}</div>
+                                <div class="td4 fontImportant2 block">WORK ORDER #</div>
+                                <div class="td6 block">{!relatedTo.WorkOrderNumber}"</div>
+                              </div> 
+                          </div>
+                          <div>
+                                  CHECK IN WITH MINER AT: phone:888-606-4637 / IF IVR IS INVALID THEN CALL 1-855-692-7656 LOCATE THE MOD FOR ACKNOWLEDGEMENT ON SITE &amp; REVIEW TROUBLE REPORTED
+                          </div>
+                      </td>
+                  </tr>
+                  <tr class="tr2">
+                      <td class="tdInverse1" colspan="4">EQUIPMENT SERVICED</td>
+                  </tr>
+                  <tr>
+                      <td colspan="4">
+                          <table>
+                              <tr>
+                                  <th>Door # - Location</th>
+                                  <th>Equipment Manufacturer</th>
+                                  <th>Model Number/Door Size</th>
+                                  <th>Serial Number</th>
+                                  <th>Operational</th>
+                                  <th>Lube &amp; Adjust</th>
+                                  <th>Safety Devices Operating</th>                          
+                              </tr>
+                              <tr>
+                                  <td>&nbsp;</td>
+                                  <td>&nbsp;</td>
+                                  <td>&nbsp;</td>
+                                  <td>&nbsp;</td>
+                                  <td>&nbsp;</td>
+                                  <td>&nbsp;</td>
+                                  <td>&nbsp;</td>                          
+                              </tr>
+                          </table>
+                      </td>
+                  </tr>
+                  <tr class="tr2">
+                      <td class="tdInverse1" colspan="4">DESCRIPTION OF WORK PERFORMED</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td colspan="4"></td>
+                  </tr>
+                  <tr class="tr2">
+                      <td class="tdInverse1" colspan="4">SAFETY &amp; SERVICE RECOMMENDATIONS</td>
+                  </tr>
+                  <tr class="tr1">
+                      <td colspan="4"></td>
+                  </tr>
+                  <tr class="tr2">
+                      <td class="tdInverse1" colspan="4">CAUSE OF DAMAGE (CIRCLE ONE)</td>
+                  </tr>
+                  <tr rowspan="2">
+                      <td colspan="4">
+                          <table class="noborder">
+                              <tr>
+                                  <td>Normal Wear and Tear</td>
+                                  <td>Damage and Abuse</td>
+                                  <td>Pest Related</td>
+                                  <td>Other:</td>                          
+                              </tr>
+                          </table>
+                          <table class="noborder">
+                              <tr>
+                                  <td class="fontImportant1">Before and After pictures required for:</td>
+                                  <td>Weather/Break in Damage</td>
+                                  <td>3rd Party Damage</td>                         
+                              </tr>
+                          </table>
+                      </td>
+                  </tr>
+                  <tr class="tr1">
+                      <td class="fontImportantHeader" colspan="4">ACTION REQUIRED PRIOR TO DEPARTING THE SITE</td>
+                  </tr>
+                  <tr>
+                      <td colspan="4">
+                          <div style="height:80px;" >
+                              <div>
+                                  LOCATE THE MOD TO REVIEW REPAIRS PERFORMED &amp; ANY RECOMMENDATIONS IDENTIFIED OBTAIN SIGNATURE FROM MOD ACCEPTING THE WORK PERFORMED TO SATISFACTION CHECK OUT WITH MINER AT: phone:888-606-4637
+                              </div>
+                              <div style="vertical-align:bottom;width:100%;height:50px;">
+                                <div class="td4 block">IVR CHECK OUT:</div>
+                                <div class="td4 fontImportant2 block">IVR #</div>
+                                <div class="td6 block">###-###-###</div>
+                                <div class="td4 fontImportant2 block">IVR PIN</div>
+                                <div class="td6 block">{!relatedTo.UNITY_Vendor_PIN__c}</div>
+                                <div class="td4 fontImportant2 block">WORK ORDER</div>
+                                <div class="td6 block">{!relatedTo.WorkOrderNumber}</div>
+                              </div> 
+                          </div>
+                      </td>
+                  </tr>
+                </table>
+                <div class="row" style="margin-top:7px;vertical-align:top;width:100%;height:90px;">
+                    <div class="block td5">
+                         <div class="font1">STORE:{!relatedTo.Account.Name}</div>
+                         <div class="font1 storestamp">Store Stamp</div>
+                    </div>
+                    <div class="block td5">
+                        <div class="font1 overline1">PRINT NAME</div>
+                        <div class="font1 overline2">SIGNATURE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATE</div>
+                    </div>
+                    <div class="block td5" style="margin-left:20px;margin-top:14px;">
+                        <div class="font2 underline1">Service technician(s): </div>
+                        <div class="font2 underline2">Time In: </div>
+                    </div>
+                    <div class="block td4" style="margin-top:14px;">
+                        <div class="font2 underline1">&nbsp;</div>
+                        <div class="font2 underline2">Time Out:</div>
+                    </div>
+               </div>
+            </div>
+           <div class="pagebreak">
+                <table>
+                    <tr class="tr2">
+                      <td class="tdInverse1">Purchase ORDER LINE ITEMS</td>
+                    </tr>
+                    <tr>
+                      <td>
+                          <c:UNITY_OrderLineItems oId="{!relatedTo.UNITY_Current_PO__c}"/>
+                      </td>
+                    </tr>
+                </table>
+            </div>-->
+        </body>
+    </html>
+    
+</apex:component>

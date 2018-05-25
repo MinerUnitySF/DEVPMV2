@@ -1,0 +1,133 @@
+<apex:component controller="UNITY_InvoicePDFController" access="global">
+    <apex:attribute name="invId" type="ID" description="the invoice id" assignTo="{!invoiceId}"/>
+<head>
+    <style type="text/css">
+        @page {
+            margin-left: 2mm;
+            margin-right: 2mm; 
+            margin-bottom: 1.45cm;
+            @bottom-right {
+                font-family: Helvetica;
+                font-size: 9pt;
+                content: "Page " counter(page) " of " counter(pages);
+            }
+                           
+        }
+        .title {
+            padding: 0px 0px 0px 0px;
+            font-size: 28pt;
+        }
+        .borderedTable {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        .grayHeader {
+            background-color: #b3b3b3;
+        }
+        .invoiceHeaderTable {
+            padding: 170px 0px 0px 0px;
+            min-width: 80%;
+        }
+        .invoiceLineItemTable {
+            padding: 270px 0px 0px 0px;
+            min-width: 80%;
+        }
+    </style>
+    </head>
+    <apex:repeat value="{!pageWrappers}" var="page" rendered="{!NOT(invoiceId = null)}" >
+    <div style="position:relative;height:930px;page-break-after:auto">
+    <img style="left:4%;top:10px;position:absolute;max-width:600px;max-height:300px" id="theImage" src="{!invoice.UNITY_Email_Logo_URL__c}"/>
+    <div style="width:33%;left:32%;top:10px;font-size:80%;position:absolute;text-align:center">{!emailAddress [0]}<br/>{!emailAddress [1]}<br/>{!emailAddress [2]}<br/>{!emailAddress [3]}</div>
+    <table class="borderedTable" style="width:26%;right:4%;top:10px;position:absolute">
+        <tr>
+            <td style="width:40%" class="borderedTable">Invoice No:</td>
+            <td style="width:60%" class="borderedTable">{!invoice.Name}</td>
+        </tr>
+        <tr>
+            <td style="width:40%" class="borderedTable">Date:</td>
+            <td style="width:60%" class="borderedTable">{!dateValue}</td>
+        </tr>
+        <tr>
+            <td style="width:40%" class="borderedTable">Page:</td>
+            <td style="width:60%" class="borderedTable">{!page.pageNumber} of {!totalPages}</td>
+        </tr>
+    </table>
+    <div style="left:4%;top:130px;width:30%;position:absolute;background-color:#b3b3b3;text-align:center;border-style: solid;border-color: black;">Bill To:</div>
+    <div style="right:4%;top:130px;width:30%;position:absolute;background-color: #b3b3b3;text-align:center;border-style: solid;border-color: black;">Job Site Information:</div>
+    <div style="left:4%;top:160px;width:30%;position:absolute;font-size:80%"><apex:outputText value="{!billingAddress[0]}" escape="false" /></div>
+    <div style="right:4%;top:160px;width:30%;position:absolute;font-size:80%"><apex:outputText value="{!shippingAddress[0]}" escape="false" /></div>
+    
+    <div style="left:2%;right:2%;top:280px;position:absolute">
+    <table style="width:100%" class="borderedTable" id="invoiceHeaderTable">
+        <thead class="borderedTable, grayHeader">
+            <tr>
+                <td style="width:30%;text-align:center" class="borderedTable">Customer P.O.</td>
+                <td style="width:20%;text-align:center" class="borderedTable">Customer Id #</td>
+                <td style="width:50%;text-align:center" class="borderedTable">Payment Terms</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align:center;min-height:18px;" class="borderedTable">{!invoice.UNITY_Case__r.UNITY_Customer_PO__c}</td>
+                <td style="text-align:center;min-height:18px;" class="borderedTable">{!invoice.UNITY_Customer__r.UNITY_Account_ID__c}</td>
+                <td style="text-align:center;min-height:18px;" class="borderedTable">{!invoice.UNITY_Customer_Service_Contract__r.UNITY_Net_Payment_Terms__c}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table style="width:100%" class="borderedTable" id="invoiceLineItemTable">
+        <thead class="borderedTable, grayHeader">
+            <tr class="borderedTable">
+                <th style="width:20%;text-align:center" class="borderedTable">Product Name</th>
+                <th style="width:45%;text-align:center" class="borderedTable">Description</th>
+                <th style="width:8%;text-align:center" class="borderedTable">Quantity</th>
+                <th style="width:9%;text-align:center" class="borderedTable">Unit Price</th>
+                <th style="width:9%;text-align:center" class="borderedTable">Total</th>
+                <th style="width:9%;text-align:center" class="borderedTable">Tax</th>
+            </tr>
+        </thead>
+        <tbody>
+        <apex:repeat value="{!page.invoiceLineItemWrappers}" var="ili">
+            <tr style="min-height:16px;" class="borderedTable">
+                <td style="text-align:left;min-height:16px;font-size:75%" class="borderedTable">{!ili.productName}</td>
+                <td style="text-align:left;min-height:16px;font-size:75%" class="borderedTable">{!ili.description}</td>
+                <td style="text-align:center;min-height:16px;font-size:75%" class="borderedTable">{!ili.quantity}</td>
+                <td style="text-align:center;min-height:16px;font-size:75%" class="borderedTable">{!ili.price }</td>
+                <td style="text-align:center;min-height:16px;font-size:75%" class="borderedTable">{!ili.total}</td>        
+                <td style="text-align:center;min-height:16px;font-size:75%" class="borderedTable">{!ili.tax}</td>          
+            </tr>
+        </apex:repeat>
+        </tbody>
+    </table>
+
+    <table style="width:100%" class="borderedTable">
+        <tr>
+            <td style="width:34%;font-size:60%" class="borderedTable">{!invoice.UNITY_Case__r.UNITY_Email_Invoice_Guarantee_Text__c}</td>
+            <td style="width:36%;font-size:80%" class="borderedTable">Please remit to:<br/>{!emailAddress [0]}<br/>{!emailAddress [1]}<br/>{!emailAddress [2]}<br/>{!emailAddress [3]}</td>
+            <td style="width:30%;font-size:90%" class="borderedTable">
+                <apex:outputPanel rendered="{!page.lastPage}">
+                <table >
+                    <tr>
+                        <td>Net Invoice:</td>
+                        <td style="text-align:right"><div style="padding-left:80px">{!net}</div></td>
+                    </tr>
+                    <tr>
+                        <td>Less Discount:</td>
+                        <td style="text-align:right"><div style="padding-left:80px">{!discount}</div></td>
+                    </tr>
+                    <tr>
+                        <td>Sales Tax:</td>
+                        <td style="text-align:right"><div style="padding-left:80px">{!tax}</div></td>
+                    </tr>
+                    <tr>
+                        <td><b>Invoice Total:</b></td>
+                        <td style="text-align:right"><b><div style="padding-left:80px">{!total}</div></b></td>
+                    </tr>
+                </table>
+                </apex:outputPanel> 
+            </td>
+        </tr>
+    </table>
+    </div>
+    </div>
+    </apex:repeat>
+</apex:component>

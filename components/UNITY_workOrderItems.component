@@ -1,0 +1,21 @@
+<apex:component controller="UNITY_WorkOrderLineController" access="global">
+    <apex:attribute name="woId" 
+                    type="ID" 
+                    description="the work order id" 
+                    assignTo="{!workOrderId}"/>
+    
+    <apex:dataTable value="{!items}" var="item">
+  <!---      <apex:column >
+            <apex:facet name="header">Order</apex:facet>
+            {!item.FSO__Order__c}
+        </apex:column>
+        <apex:column >
+            <apex:facet name="header">Name</apex:facet>
+            {!item.LineItemNumber}
+        </apex:column> --->
+        <apex:column >
+            <apex:facet name="header">Description</apex:facet>
+            {!item.Description}
+        </apex:column>
+    </apex:dataTable>
+</apex:component>

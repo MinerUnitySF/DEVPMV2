@@ -1,0 +1,10 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+    <div>
+    	<lightning:fileUpload label="Drop up to 25 documents (7MB or 25 pages maximum per document)" 
+        multiple="true" 
+        accept=".pdf"
+        recordId="{!v.recordId}" 
+        onuploadfinished="{!c.handleUploadFinished}" 
+		class="slds-has-drag-over"/>
+    </div>        
+</aura:component>

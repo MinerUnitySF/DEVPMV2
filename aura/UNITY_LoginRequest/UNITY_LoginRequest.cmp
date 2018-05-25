@@ -1,0 +1,115 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="UNITY_AuraLoginRequestController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:attribute name="customerName" type="string"/>
+    <aura:attribute name="companyName" type="string"/>
+    <aura:attribute name="city" type="string"/>
+    <aura:attribute name="zip" type="string"/>
+    <aura:attribute name="phone" type="string"/>
+    <aura:attribute name="email" type="string"/>
+    <aura:attribute name="emailStatus" type="boolean" default="false"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="states" type="list"/>
+    
+    <div class="slds-grid">
+        <div class="slds-col"><a href="" class="urlRequest" onclick="{!c.openModal}">Company not a user?  <b>CLICK HERE</b> to request a Company Login.</a>
+            <!--ui:outputURL value="" class="urlRequest" label="Company not a user?  CLICK HERE to request a Company Login." click="{!c.openModal}" ></ui:outputURL--></div>
+    </div>
+
+    <br/>
+    <br/>
+
+    <aura:if isTrue="{!v.emailStatus}">
+      <div role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal--prompt">
+         <div class="slds-modal__container">
+            <div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+               <h2 class="slds-text-heading--medium" id="prompt-heading-id">Login Request</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+               <div>
+                  <p>Thank you!  Your request has been submitted.</p>
+               </div>
+            </div>
+            <div class="slds-modal__footer slds-theme--default">
+               <button class="slds-button slds-button--brand" onclick="{!c.closeMessage}">Close</button>
+            </div>
+         </div>
+      </div>
+      <div class="slds-backdrop slds-backdrop--open"></div>
+   </aura:if>
+    
+    <aura:if isTrue="{!v.isOpen}">
+        <div >
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Request a Login</h2>
+                        <p class="slds-m-top_x-small">Please provide the following information and the Miner team will contact you.</p>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-form--horizontal ">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="text-input-id-1">
+    								<abbr class="slds-required" title="required">*</abbr>Name</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText class="slds-input" aura:id="customerName"  value="{!v.customerName}" placeholder="Name" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="text-input-id-1">
+    								<abbr class="slds-required" title="required">*</abbr>Company Name</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText class="slds-input" aura:id="companyName"  value="{!v.companyName}" placeholder="Company Name" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="text-input-id-1">
+    								<abbr class="slds-required" title="required">*</abbr>City</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText class="slds-input" aura:id="city"  value="{!v.city}" placeholder="City" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="text-input-id-1">
+    								<abbr class="slds-required" title="required">*</abbr>State</label>
+                                <div class="slds-select_container slds-form-element__control">
+                                    <ui:inputSelect class="slds-select" aura:id="state">
+                                        <aura:iteration items="{!v.states}" var="item" indexVar="index">
+                                            <ui:inputSelectOption text="{!item}" label="{!item}"/>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </div>
+                            </div>      
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="text-input-id-1">
+    								<abbr class="slds-required" title="required">*</abbr>Zip</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText class="slds-input" aura:id="zip"  value="{!v.zip}" placeholder="Zip" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+                                </div>
+                            </div>      
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="text-input-id-1">
+    								<abbr class="slds-required" title="required">*</abbr>Contact Number</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText class="slds-input" aura:id="phone"  value="{!v.phone}" placeholder="Contact Number" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+                                </div>
+                            </div>      
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="text-input-id-1">
+    								<abbr class="slds-required" title="required">*</abbr>Contact Email</label>
+                                <div class="slds-form-element__control">                                    
+                                   <ui:inputEmail aura:id="email" value="{!v.email}" placeholder="Email" required="true" class="slds-input" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+                                </div>
+                            </div>      
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.cancel}">Cancel</button>
+                        <button class="slds-button slds-button_brand" onclick="{!c.sendMail}">Send</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+</aura:component>

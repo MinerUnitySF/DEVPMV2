@@ -1,0 +1,24 @@
+<apex:component controller="UNITY_UserInfoController" access="global">
+    <apex:attribute name="uId" 
+                    type="ID" 
+                    description="the user id" 
+                    assignTo="{!userId}"/>
+    <apex:attribute name="cId" 
+                    type="ID" 
+                    description="the contact id" 
+                    assignTo="{!contactId}"/>
+    <apex:attribute name="aId"
+                    type="ID"
+                    description="the account id"
+                    assignTo="{!accountId}"/>
+    <div>
+        <span>{!infoDetail.name}</span><br/>
+        <apex:outputPanel rendered="{!infoDetail.companyName != null}"><span>{!infoDetail.companyName}</span><br/></apex:outputPanel>
+        <span>{!infoDetail.street}</span><br/>
+        <span>{!infoDetail.city}, {!infoDetail.state}&nbsp;{!infoDetail.zip}</span><br/>
+        <apex:outputPanel rendered="{!infoDetail.phone != null}"><span>{!infoDetail.phone}</span><br/></apex:outputPanel>
+        <apex:outputPanel rendered="{!infoDetail.email != null}"><span>{!infoDetail.email}</span><br/></apex:outputPanel>
+        <span>{!infoDetail.country}</span>
+    </div>
+        
+</apex:component>
