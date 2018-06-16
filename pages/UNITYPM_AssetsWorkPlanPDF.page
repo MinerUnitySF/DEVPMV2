@@ -1,7 +1,6 @@
 <apex:page standardController="WorkOrder" renderAs="PDf" contentType="application/pdf" lightningStylesheets="true" 
                               extensions="UNITYPM_AssetsWorkPlanPDFCntrlExt" showHeader="false" sidebar="false"
                               standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" docType="html-5.0" >
-    <!-- UNITYPM_AssetsWorkPlanPDFCntrlExtension     -->
         <html>
     <head>
        <style type="text/css"  media="print">
@@ -18,7 +17,6 @@
 	            content: element(footer);
 	        } 
 	         @bottom-right {
-                content: "Page " counter(page) " of " counter(pages);
                 font-family: sans-serif;
                 font-size: 80%;
             }
@@ -100,72 +98,44 @@
                     vertical-align: top;
                     text-align: center;
                 }
-                
-         
-         table {
+       	   
+         table.tableClass {
              width: 100%;
              border-spacing:0;
              border-collapse: collapse;
              border: 2px solid black;
          }
-         
-        
-         .table, table, th, td, tr {
-                    border: 1px solid black;
-                    cellspacing: 0; 
-                    cellpadding: 0;
-                    margin: 0px;
-                    padding: 0px;
-                }
-                
-                td table td{
-                    padding-left:2px;
-                    padding-right:2px;
-                }
- 
-                td table th{
-                    padding-left:2px;
-                    padding-right:2px;
-                }
- 
-         
-         th, tr {
-             border-collapse: collapse;
+         td.tdClass{
+            border: 1px solid black;
+            cellspacing: 0; 
+            cellpadding: 0;
+            margin: 2px;
+            padding: 4px;  
          }
-         
-       /*  
-        table{
-            border:1px solid #000000;
-            border-collapse:collapse;
-            -fs-table-paginate: paginate;}
-        table td{
-            border:1px solid #000000;
-            word-wrap:break-word;
-            white-space:normal;
-            overflow:hidden;
-            text-align:left;
-            line-height:16px;
-            height:16px;
-        
+          tr.trClass{
+            border: 1px solid black;
+            cellspacing: 0; 
+            cellpadding: 0;
+            margin: 0px;
+            padding: 0px;  
+         }
+          th.thClass{
+            border: 1px solid black;
+            cellspacing: 0; 
+            cellpadding: 0;
+            margin: 0px;
+            padding: 0px;  
+         }
+      
+      /*
+         .tableClass, th, td, tr {
+            border: 2px solid black;
+            cellspacing: 0; 
+            cellpadding: 0;
+            margin: 0px;
+            padding: 0px;
         }
-        table tr{
-            page-break-inside:avoid;
-        }
-        table thead tr th{
-            background:#f2f2f2;
-            border:1px solid #000000;
-            text-align:center;
-        }
-        
-        table tr th{
-            background:#f2f2f2;
-            border:1px solid #000000;
-            text-align:center;
-        }
-        */ 
-         
-         
-         
+      */          
         .tr2 {
                     height:30px;
                 }
@@ -408,7 +378,11 @@
             .logo{
                 width: 100px; height: 40px; display: block; 
             }
-                
+            .barcode {
+                    float: right;
+                    margin: 0px;
+                    padding: 0px;
+                }    
     </style> 
     </head>
     <body>
@@ -436,11 +410,13 @@
       
         <tbody>
         <div class="header"  style="page-break-after:always;">
-              <div id="leftheader">
+           <div id="leftheader">
                 <apex:image styleClass="logo" url="{!workOrder.UNITY_Email_Logo_URL__c}"/>
-                <!--	<apex:image url="{!URLFOR($Resource.MinerCorp_Logo)}" width="65px" height="35px" />  -->
+              </div>  
+              <div class="rightheader barcode">
+                  <GMBLBC:barcode value="PMC {!workOrdeID}" type="code128" displayText="true" width="2"/>
               </div>
-              <br/><br/><br/>
+              <br/><br/><br/> <br/>
              <div>
                <table class ="noborder" style ="text-align: center;">
                    <tr class="font3">
@@ -475,10 +451,7 @@
                        <td>Date</td>
                    </tr>
                 </table>
-              </div>
-          <!--  <div  style ="text-align: center;">
-                <span><p><b> {!info}</b></p></span>
-            </div> -->
+            </div>
        </div>
       
         <!-- <tbody>-->
@@ -494,28 +467,32 @@
             <apex:variable var="cnt" value="{!cnt+1}"/>
             <!--   end added -->
             
-            <table id="wotable">
+            <table class ="noborder" width="100%" id="wotable">
                 <tr>
-                    <td style ="text-align: left;"  class="font4">{!page.wpName}</td>
-                     <td style ="text-align: right;"  class="font4">{!workOrderNumber}</td>
+                    <td width="50%" style ="text-align: left;"  class="font4">{!page.wpName}</td>
+                     <td width="50%" style ="text-align: right;"  class="font4">{!workOrderNumber}</td>
                 </tr>
+               
             </table>
        
-       
-            <!--<div style="page-break-after:always; text-align: center;"> -->
-                
-            
-            
-            <!--  Row wrapper asset info  page-break-after:auto;  -->
+        <!--<div style="page-break-after:always; text-align: center;"> -->
+        <!--  Row wrapper asset info  page-break-after:auto;  -->
+        
+    <table style ="border: 2px solid black;">
+        <tr>
+          <td>
             <apex:repeat value="{!page.rowWrapper}" var="row">
-                     <table> 
-                      <tr style ="font-style: italic; font-size: 12px; font-weight: bold;">
-                      <apex:repeat value="{!row.values}" var="value">
-                       <apex:outputText value="{!value}" escape="false"/>
-                     </apex:repeat>
-                     </tr> </table>
-                 </apex:repeat>
-                
+                 <table> 
+                  <tr class ="trClass" style ="font-style: italic; font-size: 12px; font-weight: bold;">
+                    <apex:repeat value="{!row.values}" var="value">
+                        <apex:outputText value="{!value}" escape="false"/>
+                    </apex:repeat>
+                 </tr>
+                </table>
+            </apex:repeat>
+         </td>
+      </tr>
+    </table>      
             <!-- <apex:outputText value="{!page.groupAssets}"></apex:outputText>  -->
             
             <!--   No grouping one asset per page -->   
@@ -523,23 +500,23 @@
             <apex:repeat value="{!page.renderTypeWPLIs}"  var="aPageOfLines" id="theList11">              
                
             <apex:outputPanel rendered="{!aPageOfLines == 'Pass/Fail'}">
-                <table style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
-                    <tr>
-                    <tr class ="fontItalic">
+                <table  class="tableClass" style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
+                    <tr class ="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="60%"></td>
-                    <td width="20%">Pass</td>
-                    <td width="20%">Fail</td>
+                    <td class ="tdClass" width="60%"></td>
+                    <td class ="tdClass" width="20%">Pass</td>
+                    <td class ="tdClass" width="20%">Fail</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable12">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="font2 trClass">
+                        <td class ="tdClass" style="text-align: left;">
                          <apex:outputText value="{!n}"></apex:outputText> 
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td>
-                       <td>Fail</td>
+                       <td class ="tdClass" style="border-right: dashed 	#eceeef;">Pass</td>
+                       <td class ="tdClass">Fail</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -547,73 +524,74 @@
                </apex:outputPanel>
                
             <apex:outputPanel rendered="{!aPageOfLines == 'Yes/No'}">
-                 <table style ="-fs-table-paginate: paginate;border: 0.5px solid white;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;border: 0.5px solid white;">
+                    <tr class ="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                     <td width="60%"></td>
-                    <td width="20%">Yes</td>
-                    <td width="20%">No</td>
+                    <td class="tdClass" width="60%"></td>
+                    <td class ="tdClass" width="20%">Yes</td>
+                    <td class ="tdClass" width="20%">No</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable13">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;">
                           <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td>
-                       <td>No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td>
+                       <td class="tdClass">No</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
                 </table>
-                   </apex:outputPanel>
+            </apex:outputPanel>
                    
             <apex:outputPanel rendered="{!aPageOfLines == 'Done/NA'}">
-                 <table style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
-                    <tr>
-                    <tr class ="fontItalic">
-                    <td width="60%"></td>
-                    <td width="20%">Done</td>
-                    <td width="20%">N/A</td>
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
+                    <td class="tdClass" width="60%"></td>
+                    <td class="tdClass" width="20%">Done</td>
+                    <td class="tdClass" width="20%">N/A</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable14">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;">
                           <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td>
-                       <td>N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td>
+                       <td class="tdClass">N/A</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
                 </table>
             </apex:outputPanel>
           </apex:repeat>
+          
         </apex:outputPanel>
              <!-- text box  grouping -->   
             <apex:outputPanel rendered="{!page.groupAssets == false}">
             <apex:repeat value="{!page.renderTypeWPLIs}"  var="aPageOfLines" id="theList111">
             
             <apex:outputPanel rendered="{!aPageOfLines == 'NumberOfSections'}">
-                 <table style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table class="tableClass" style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!-- <td width="30%">{!aPageOfLines}</td>-->
-                    <td width="20%"></td>
-                    <td width="80%">Number of Sections</td>
+                    <td class="tdClass" width="20%"></td>
+                    <td class="tdClass" width="80%">Number of Sections</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable16">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td height="25"></td>
+                       <td class="tdClass" height="25"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -621,21 +599,21 @@
             </apex:outputPanel>
             
             <apex:outputPanel rendered="{!aPageOfLines == 'TextBox'}">
-                 <table style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate; border: 0.5px solid white;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!-- <td width="30%">{!aPageOfLines}</td>-->
-                    <td width="20%" style ="color: black;">Text Box</td>
-                    <td width="80%"></td>
+                    <td class="tdClass" width="20%" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="80%"></td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable17">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td height="50"></td>
+                       <td class="tdClass" height="50"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -650,35 +628,35 @@
              
                <!-- 5 -->
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 5)}">
-                <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                <table  class="tableClass"  style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Pass</td>
-                    <td width="7%">Fail</td>
-                    <td width="7%">Pass</td>
-                    <td width="7%">Fail</td>
-                    <td width="7%">Pass</td>
-                    <td width="7%">Fail</td>
-                    <td width="7%">Pass</td>
-                    <td width="7%">Fail</td>
-                    <td width="7%">Pass</td>
-                    <td width="7%">Fail</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Pass</td>
+                    <td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td>
+                    <td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td>
+                    <td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td>
+                    <td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td>
+                    <td class="tdClass" width="7%">Fail</td>
                   </tr>  
                  </tr>
                  
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable22">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass" style="text-align: left;">
                        <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -687,30 +665,30 @@
                
                <!-- 4 -->
                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 4)}">
-                <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Pass</td><td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td><td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td><td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td><td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                  
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable224">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass"  style="text-align: left;">
                        <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td>&nbsp;</td><td>&nbsp;</td>
+                       <td class="tdClass"  style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass" >Fail</td>
+                       <td class="tdClass"  style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass" >Fail</td>
+                       <td class="tdClass"  style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass" >Fail</td>
+                       <td class="tdClass"  style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass" >Fail</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" >&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -719,30 +697,30 @@
                
                <!-- 3 -->
                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 3)}">
-                <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Pass</td><td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td><td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td><td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                  
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable223">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass" style="text-align: left;">
                        <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td>&nbsp;</td><td>&nbsp;</td>
-                       <td>&nbsp;</td><td>&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -751,30 +729,30 @@
                
                <!-- 2 -->
                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 2)}">
-                <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Pass</td><td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">Pass</td><td class="tdClass" width="7%">Fail</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                  
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable222">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass" style="text-align: left;">
                        <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                       <td>&nbsp;</td><td>&nbsp;</td>
-                       <td>&nbsp;</td><td>&nbsp;</td>
-                       <td>&nbsp;</td><td>&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -783,30 +761,30 @@
                
                <!-- 1 -->
                   <apex:outputPanel rendered="{!AND(aPageOfLines == 'Pass/Fail', page.renderGroupItem == 1)}">
-                <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Pass</td><td width="7%">Fail</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Pass</td><td width="7%">Fail</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                  
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Pass/Fail'}" var="aline" id="theTable221">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass" style="text-align: left;">
                        <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Pass</td><td>Fail</td>
-                        <td>&nbsp;</td><td>&nbsp;</td>
-                       <td>&nbsp;</td><td>&nbsp;</td>
-                       <td>&nbsp;</td><td>&nbsp;</td>
-                       <td>&nbsp;</td><td>&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Pass</td><td class="tdClass">Fail</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -816,34 +794,34 @@
                
                 <!-- 5 -->
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 5)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="30%"></td>
-                    <td width="7%">Yes</td>
-                    <td width="7%">No</td>
-                    <td width="7%">Yes</td>
-                    <td width="7%">No</td>
-                    <td width="7%">Yes</td>
-                    <td width="7%">No</td>
-                    <td width="7%">Yes</td>
-                    <td width="7%">No</td>
-                    <td width="7%">Yes</td>
-                    <td width="7%">No</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Yes</td>
+                    <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td>
+                    <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td>
+                    <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td>
+                    <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td>
+                    <td class="tdClass" width="7%">No</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable23">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass" style="text-align: left;">
                         <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -852,29 +830,29 @@
                 
                 <!-- 4 -->
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 4)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="30%"></td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable234">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass" style="text-align: left;">
                         <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -884,28 +862,28 @@
                 <!-- 3 -->
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 3)}">
                  <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="30%"></td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td  class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 3)}"  var="aline" id="theTable233">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass" style="text-align: left;">
                         <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -914,29 +892,29 @@
                
                  <!-- 2 -->
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 2)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="30%"></td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable232">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass" style="text-align: left;">
                         <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -945,29 +923,29 @@
                
                  <!-- 1 -->
                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'Yes/No', page.renderGroupItem == 1)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                     <td width="30%"></td>
-                    <td width="7%">Yes</td> <td width="7%">No</td>
-                   <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                   <td class="tdClass" width="7%">Yes</td> <td class="tdClass" width="7%">No</td>
+                   <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Yes/No'}"  var="aline" id="theTable231">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                       <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                       <td class="tdClass" style="text-align: left;">
                         <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Yes</td><td>No</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                        <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Yes</td><td class="tdClass">No</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass"  width="7%">&nbsp;</td>
+                        <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -977,34 +955,34 @@
                
                 <!-- 5 -->    
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 5)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Done</td>
-                    <td width="7%">N/A</td>
-                    <td width="7%">Done</td>
-                    <td width="7%">N/A</td>
-                    <td width="7%">Done</td>
-                    <td width="7%">N/A</td>
-                    <td width="7%">Done</td>
-                    <td width="7%">N/A</td>
-                    <td width="7%">Done</td>
-                    <td width="7%">N/A</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Done</td>
+                    <td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td>
+                    <td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td>
+                    <td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td>
+                    <td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td>
+                    <td class="tdClass" width="7%">N/A</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable24">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;">
                           <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1013,29 +991,29 @@
                 
                 <!-- 4 -->    
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 4)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable244">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;">
                           <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" >&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1045,29 +1023,29 @@
                  
                 <!-- 3-->    
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 3)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable243">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;">
                           <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1077,29 +1055,29 @@
                 
                   <!-- 2-->    
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 2)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable242">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;">
                           <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1108,35 +1086,34 @@
                 
                  <!-- 1-->    
                <apex:outputPanel rendered="{!AND(aPageOfLines == 'Done/NA', page.renderGroupItem == 1)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td>-->
-                    <td width="30%"></td>
-                    <td width="7%">Done</td><td width="7%">N/A</td>
-                   <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
-                    <td width="7%">&nbsp;</td><td width="7%">&nbsp;</td>
+                    <td class="tdClass" width="30%"></td>
+                    <td class="tdClass" width="7%">Done</td><td class="tdClass" width="7%">N/A</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                    <td class="tdClass" width="7%">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'Done/NA'}"  var="aline" id="theTable241">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;">
                           <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td style="border-right: dashed 	#eceeef;">Done</td><td>N/A</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
-                       <td>&nbsp;</td><td width="7%">&nbsp;</td>
+                       <td class="tdClass" style="border-right: dashed 	#eceeef;">Done</td><td class="tdClass">N/A</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
+                       <td class="tdClass">&nbsp;</td><td class="tdClass" width="7%">&nbsp;</td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
                 </table>
                 </apex:outputPanel> 
-                
            
              </apex:repeat>
             </apex:outputPanel>
@@ -1147,25 +1124,29 @@
                
                  <!-- 5 -->   
                  <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 5)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="16%"></td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="16%"></td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable26">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="60">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="60">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td><td width="7%"  colspan="2"></td><td width="7%" colspan="2"></td><td width="7%" colspan="2"></td><td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1174,29 +1155,29 @@
                 
                   <!-- 4 -->   
                  <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 4)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="16%"></td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="16%"></td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
                     <td width="7%"  colspan="2">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable264">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="60">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="60">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1205,29 +1186,29 @@
                 
                  <!-- 3 -->   
                  <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 3)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass"  style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="16%"></td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">&nbsp;</td>
-                    <td width="7%"  colspan="2">&nbsp;</td>
+                    <td class="tdClass" width="16%"></td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable263">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="60">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="60">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1236,29 +1217,29 @@
               
                  <!-- 2 -->   
                  <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 2)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="16%"></td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">&nbsp;</td>
-                    <td width="7%"  colspan="2">&nbsp;</td>
-                    <td width="7%"  colspan="2">&nbsp;</td>
+                    <td class="tdClass" width="16%"></td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable262">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="60">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="60">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1267,29 +1248,29 @@
               
                 <!-- 1 -->   
                  <apex:outputPanel rendered="{!AND(aPageOfLines == 'NumberOfSections', page.renderGroupItem == 1)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="16%"></td>
-                    <td width="7%"  colspan="2">Number of Sections</td>
-                    <td width="7%"  colspan="2">&nbsp;</td>
-                    <td width="7%"  colspan="2">&nbsp;</td>
-                    <td width="7%"  colspan="2">&nbsp;</td>
-                    <td width="7%"  colspan="2">&nbsp;</td>
+                    <td class="tdClass" width="16%"></td>
+                    <td class="tdClass" width="7%"  colspan="2">Number of Sections</td>
+                    <td class="tdClass" width="7%"  colspan="2">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'NumberOfSections'}"  var="aline" id="theTable261">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="60">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="60">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1299,29 +1280,29 @@
                
                 <!-- 5 -->   
                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 5)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="15%"></td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="15%"></td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable27">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="85">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="85">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%" colspan="2"> </td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"> </td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1331,28 +1312,28 @@
                  <!-- 4 -->   
                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 4)}">
                  <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="15%"></td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="15%"></td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable274">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="85">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="85">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%" colspan="2"> </td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"> </td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1361,29 +1342,29 @@
                 
                   <!-- 3 -->   
                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 3)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="15%"></td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="15%"></td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable273">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="85">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="85">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%" colspan="2"> </td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"> </td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1392,29 +1373,29 @@
                 
                   <!-- 2 -->   
                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 2)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="15%"></td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="15%"></td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable272">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="85">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="85">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%" colspan="2"> </td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"> </td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>
@@ -1423,29 +1404,29 @@
                   
                     <!-- 1 -->   
                 <apex:outputPanel rendered="{!AND(aPageOfLines == 'TextBox', page.renderGroupItem == 1)}">
-                 <table  style ="-fs-table-paginate: paginate;">
-                    <tr>
-                    <tr class ="fontItalic">
+                 <table  class="tableClass" style ="-fs-table-paginate: paginate;">
+                    <tr class="trClass">
+                    <tr class ="trClass fontItalic">
                     <!--<td width="30%">{!aPageOfLines}</td> -->
-                    <td width="15%"></td>
-                    <td width="7%"  colspan="2" style ="color: black;">Text Box</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
-                    <td width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="15%"></td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">Text Box</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
+                    <td class="tdClass" width="7%"  colspan="2" style ="color: black;">&nbsp;</td>
                   </tr>  
                  </tr>
                   <apex:repeat value="{!page.renderTypeWPLIs[aPageOfLines]}"  rendered="{!aPageOfLines == 'TextBox'}"  var="aline" id="theTable271">
                     <apex:repeat value="{!aline}" var="n"> 
-                      <tr class ="font2">
-                        <td style="text-align: left;" height="85">
+                      <tr class ="trClass font2">
+                        <td class="tdClass" style="text-align: left;" height="85">
                          <apex:outputText value="{!n}"></apex:outputText>
                        </td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%"  colspan="2"></td>
-                       <td width="7%" colspan="2"> </td>
-                       <td width="7%" colspan="2"></td>
-                       <td width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%"  colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"> </td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
+                       <td class="tdClass" width="7%" colspan="2"></td>
                     </tr>
                     </apex:repeat>  
                    </apex:repeat>

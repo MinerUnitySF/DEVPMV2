@@ -31,4 +31,8 @@ public with sharing class UNITYPM_ServiceContractHandler extends UNITY_BaseHandl
           }
         }
     }
+
+    public override void bulkAfter(List<SObject> newList_SC, List<SObject> oldList_SC, Map<Id,SObject> oldMap_SC, Map<Id,SObject> newMap_SC){
+        
+    }
 }

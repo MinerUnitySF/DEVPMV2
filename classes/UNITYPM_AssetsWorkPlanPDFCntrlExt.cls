@@ -13,6 +13,7 @@ public class UNITYPM_AssetsWorkPlanPDFCntrlExt {
      public String WarningMessage {get;set;}
      public String siteContactPhone {get;set;}
      public String workOrderNumber {get;set;}
+     public String workOrdeID {get;set;}
      
      public  List<string> wlYesNoList  {get;  set;}
      public  List<string> wlPassFailList  {get;  set;}
@@ -39,11 +40,7 @@ public class UNITYPM_AssetsWorkPlanPDFCntrlExt {
            WorkOrder wo= [SELECT CreatedDate, ID, AccountID,Account.ShippingStreet,UNITY_Vendor_Status__c,UNITY_Site_Contact_Phone__c,
                           WorkOrderNumber, UNITY_Work_Site_Address__c, UNITY_WO_Site_Location_City__c,UNITY_WO_Site_Location_State__c,UNITY_Site_Store_Number__c
                               FROM WorkOrder  WHERE id =:id];
-                              //ID (SELECT Work_Order__c  FROM  UNITYPM_Work_Order_Assets_junction__c WHERE Work_Order__c ='0WOW0000000CqC6OAK'];
-                                                   
-             //select id from WorkOrder where id in (select Work_Order__c from UNITYPM_Work_Order_Assets_junction__c where Work_Order__c = '0WOW0000000CqC6OAK')
-           
-             system.debug('@@@@   workorder  @@@@ ' + workorder); 
+               
              storeNo = wo.UNITY_Site_Store_Number__c;
              siteAddress = wo.Account.ShippingStreet;
              siteCity = wo.UNITY_WO_Site_Location_City__c;
@@ -51,6 +48,7 @@ public class UNITYPM_AssetsWorkPlanPDFCntrlExt {
              woCreatedDate = wo.CreatedDate;
              siteContactPhone = wo.UNITY_Site_Contact_Phone__c;
              workOrderNumber = wo.WorkOrderNumber;
+             workOrdeID = wo.ID;
              
              //cerate map of work plan ID and List of assets associated with work plan
             Set<Id> aIds = new Set<Id>();
@@ -268,80 +266,82 @@ public class UNITYPM_AssetsWorkPlanPDFCntrlExt {
    
     public List<RowWrapper> getAllRowWrappers(List<Asset> assetsList)
     {
-         String emptyCell = '<td width="14%">&nbsp;</td>';
+         String emptyCell = '<td style ="border: 1px solid black;" width="14%">&nbsp;</td>';
         List<RowWrapper> rows = new List<RowWrapper>();
         rows=new List<RowWrapper>();
             
             for (Integer idx=0; idx<5; idx++)
                 rows.add(new RowWrapper());
             
-            rows[0].addValue('<td width="30%">Position</td>');
-            rows[1].addValue('<td width="30%">Make/Brand </td>');
-            rows[2].addValue('<td width="30%">Model</td>');
-            rows[3].addValue('<td width="30%">Serial</td>');
-            rows[4].addValue('<td width="30%">Condition </td>');
+            rows[0].addValue('<td style ="border: 1px solid black;" width="30%">Position</td>');
+            rows[1].addValue('<td style ="border: 1px solid black;" width="30%">Make/Brand </td>');
+            rows[2].addValue('<td style ="border: 1px solid black;" width="30%">Model</td>');
+            rows[3].addValue('<td style ="border: 1px solid black;" width="30%">Serial</td>');
+            rows[4].addValue('<td style ="border: 1px solid black;" width="30%">Condition </td>');
             
             system.debug('@@@@   this.assets.size() @@@' + assetsList.size());
-           
+               String empty ='<span style="color: #ffffff;">empty / empty / empty</span>';
+                
                 for (Integer idx=0; idx < assetsList.size(); idx++)
                 {
-                    String productName ='';
+                    String productName =empty;
                     if ( assetsList[idx].Product2.Name != null)
                          productName = assetsList[idx].Product2.Name;
-                         
-                     String modelNo ='';
+                  
+                     String modelNo =empty;
                     if ( assetsList[idx].UNITY_Model_No__c != null)
                          modelNo = assetsList[idx].UNITY_Model_No__c;
                          
-                     String serialNo ='';
+                     String serialNo =empty;
                     if ( assetsList[idx].UNITY_Serial_No__c != null)
                          serialNo = assetsList[idx].UNITY_Serial_No__c;
                        
-                    rows[0].addValue('<td width="14%"> </td>');
-                    rows[1].addValue('<td width="14%">' + productName + '</td>');
-                    rows[2].addValue('<td width="14%">' + modelNo + '</td>');
-                    rows[3].addValue('<td width="14%">' + serialNo + '</td>');
-                    rows[4].addValue('<td width="14%"> Green / Yellow / Red </td>');
+                    rows[0].addValue('<td style ="border: 1px solid black;" width="14%">' + empty + '</td>');
+                    rows[1].addValue('<td style ="border: 1px solid black;" width="14%">' + productName + '</td>');
+                    rows[2].addValue('<td style ="border: 1px solid black;" width="14%">' + modelNo + '</td>');
+                    rows[3].addValue('<td style ="border: 1px solid black;" width="14%">' + serialNo + '</td>');
+                    rows[4].addValue('<td style ="border: 1px solid black;" width="14%"> Green / Yellow / Red </td>');
                 }
     
         return rows;
     }
     public List<RowWrapper> getAllRowWrappersForOne(List<Asset> assetsList)
     {
-         String emptyCell = '<td width="14%">&nbsp;</td>';
+         String emptyCell = '<td style ="border: 1px solid black;" width="14%">&nbsp;</td>';
         List<RowWrapper> rows = new List<RowWrapper>();
         rows=new List<RowWrapper>();
             
             for (Integer idx=0; idx<5; idx++)
                 rows.add(new RowWrapper());
                 
-            rows[0].addValue('<td width="30%">Position</td>');
-            rows[1].addValue('<td width="30%">Make/Brand </td>');
-            rows[2].addValue('<td width="30%">Model </td>');
-            rows[3].addValue('<td width="30%">Serial </td>');
-            rows[4].addValue('<td width="30%">Condition </td>');
+            rows[0].addValue('<td style ="border: 1px solid black;" width="30%">Position</td>');
+            rows[1].addValue('<td style ="border: 1px solid black;" width="30%">Make/Brand </td>');
+            rows[2].addValue('<td style ="border: 1px solid black;" width="30%">Model </td>');
+            rows[3].addValue('<td style ="border: 1px solid black;" width="30%">Serial </td>');
+            rows[4].addValue('<td style ="border: 1px solid black;" width="30%">Condition </td>');
             
             system.debug('@@@@   this.assets.size() @@@' + assetsList.size());
-           
+               String empty ='<span style="color: #ffffff;">empty / empty / empty</span>';
+               
                 for (Integer idx=0; idx < assetsList.size(); idx++)
                 {
-                     String productName ='';
+                     String productName =empty;
                     if ( assetsList[idx].Product2.Name != null)
                          productName = assetsList[idx].Product2.Name;
                          
-                     String modelNo ='';
+                     String modelNo =empty;
                     if ( assetsList[idx].UNITY_Model_No__c != null)
                          modelNo = assetsList[idx].UNITY_Model_No__c;
                          
-                     String serialNo ='';
+                     String serialNo =empty;
                     if ( assetsList[idx].UNITY_Serial_No__c != null)
                          serialNo = assetsList[idx].UNITY_Serial_No__c;
                          
-                    rows[0].addValue('<td width="14%"> </td>');
-                    rows[1].addValue('<td width="14%">' + productName + '</td>');
-                    rows[2].addValue('<td width="14%">' + modelNo + '</td>');
-                    rows[3].addValue('<td width="14%">' + serialNo + '</td>');
-                    rows[4].addValue('<td width="14%"> Green / Yellow / Red </td>');
+                    rows[0].addValue('<td style ="border: 1px solid black;" width="14%">' + empty + '</td>');
+                    rows[1].addValue('<td style ="border: 1px solid black;" width="14%">' + productName + '</td>');
+                    rows[2].addValue('<td style ="border: 1px solid black;" width="14%">' + modelNo + '</td>');
+                    rows[3].addValue('<td style ="border: 1px solid black;" width="14%">' + serialNo + '</td>');
+                    rows[4].addValue('<td style ="border: 1px solid black;" width="14%"> Green / Yellow / Red </td>');
                 }
             
                     rows[0].addValue(emptyCell);
@@ -372,40 +372,41 @@ public class UNITYPM_AssetsWorkPlanPDFCntrlExt {
     }
      public List<RowWrapper> getAllRowWrappersForTwo(List<Asset> assetsList)
     {
-         String emptyCell = '<td width="14%">&nbsp;</td>';
+         String emptyCell = '<td style ="border: 1px solid black;" width="14%">&nbsp;</td>';
         List<RowWrapper> rows = new List<RowWrapper>();
         rows=new List<RowWrapper>();
             
             for (Integer idx=0; idx<5; idx++)
                 rows.add(new RowWrapper());
           
-            rows[0].addValue('<td width="30%">Position</td>');
-            rows[1].addValue('<td width="30%">Make/Brand </td>');
-            rows[2].addValue('<td width="30%">Model</td>');
-            rows[3].addValue('<td width="30%">Serial</td>');
-            rows[4].addValue('<td width="30%">Condition </td>');
+            rows[0].addValue('<td style ="border: 1px solid black;" width="30%">Position</td>');
+            rows[1].addValue('<td style ="border: 1px solid black;" width="30%">Make/Brand </td>');
+            rows[2].addValue('<td style ="border: 1px solid black;" width="30%">Model</td>');
+            rows[3].addValue('<td style ="border: 1px solid black;" width="30%">Serial</td>');
+            rows[4].addValue('<td style ="border: 1px solid black;" width="30%">Condition </td>');
              
             system.debug('@@@@   this.assets.size() @@@' + assetsList.size());
-           
+               String empty ='<span style="color: #ffffff;">empty / empty / empty</span>';
+               
                 for (Integer idx=0; idx < assetsList.size(); idx++)
                 {
-                     String productName ='';
+                     String productName =empty;
                     if ( assetsList[idx].Product2.Name != null)
                          productName = assetsList[idx].Product2.Name;
                          
-                     String modelNo ='';
+                     String modelNo =empty;
                     if ( assetsList[idx].UNITY_Model_No__c != null)
                          modelNo = assetsList[idx].UNITY_Model_No__c;
                          
-                     String serialNo ='';
+                     String serialNo =empty;
                     if ( assetsList[idx].UNITY_Serial_No__c != null)
                          serialNo = assetsList[idx].UNITY_Serial_No__c;
                          
-                    rows[0].addValue('<td width="14%"> </td>');
-                    rows[1].addValue('<td width="14%">' + productName + '</td>');
-                    rows[2].addValue('<td width="14%">' + modelNo + '</td>');
-                    rows[3].addValue('<td width="14%">' + serialNo + '</td>');
-                    rows[4].addValue('<td width="14%"> Green / Yellow / Red </td>');
+                    rows[0].addValue('<td style ="border: 1px solid black;" width="14%">' + empty + '</td>');
+                    rows[1].addValue('<td style ="border: 1px solid black;" width="14%">' + productName + '</td>');
+                    rows[2].addValue('<td style ="border: 1px solid black;" width="14%">' + modelNo + '</td>');
+                    rows[3].addValue('<td style ="border: 1px solid black;" width="14%">' + serialNo + '</td>');
+                    rows[4].addValue('<td style ="border: 1px solid black;" width="14%"> Green / Yellow / Red </td>');
                 }
             
                     rows[0].addValue(emptyCell);
@@ -430,40 +431,41 @@ public class UNITYPM_AssetsWorkPlanPDFCntrlExt {
     }
     public List<RowWrapper> getAllRowWrappersForThree(List<Asset> assetsList)
     {
-         String emptyCell = '<td width="14%">&nbsp;</td>';
+         String emptyCell = '<td style ="border: 1px solid black;" width="14%">&nbsp;</td>';
         List<RowWrapper> rows = new List<RowWrapper>();
         rows=new List<RowWrapper>();
             
             for (Integer idx=0; idx<5; idx++)
                 rows.add(new RowWrapper());
           
-            rows[0].addValue('<td width="30%">Position</td>');
-            rows[1].addValue('<td width="30%">Make/Brand</td>');
-            rows[2].addValue('<td width="30%">Model</td>');
-            rows[3].addValue('<td width="30%">Serial</td>');
-            rows[4].addValue('<td width="30%">Condition </td>');
+            rows[0].addValue('<td style ="border: 1px solid black;" width="30%">Position</td>');
+            rows[1].addValue('<td style ="border: 1px solid black;" width="30%">Make/Brand</td>');
+            rows[2].addValue('<td style ="border: 1px solid black;" width="30%">Model</td>');
+            rows[3].addValue('<td style ="border: 1px solid black;" width="30%">Serial</td>');
+            rows[4].addValue('<td style ="border: 1px solid black;" width="30%">Condition </td>');
             
             system.debug('@@@@   this.assets.size() @@@' + assetsList.size());
-           
+               String empty ='<span style="color: #ffffff;">empty / empty / empty</span>';
+               
                 for (Integer idx=0; idx < assetsList.size(); idx++)
                 {
-                     String productName ='';
+                     String productName = empty;
                     if ( assetsList[idx].Product2.Name != null)
                          productName = assetsList[idx].Product2.Name;
                          
-                     String modelNo ='';
+                     String modelNo =empty;
                     if ( assetsList[idx].UNITY_Model_No__c != null)
                          modelNo = assetsList[idx].UNITY_Model_No__c;
                          
-                     String serialNo ='';
+                     String serialNo =empty;
                     if ( assetsList[idx].UNITY_Serial_No__c != null)
                          serialNo = assetsList[idx].UNITY_Serial_No__c;
                          
-                    rows[0].addValue('<td width="14%"> </td>');
-                    rows[1].addValue('<td width="14%">' + productName + '</td>');
-                    rows[2].addValue('<td width="14%">' + modelNo + '</td>');
-                    rows[3].addValue('<td width="14%">' + serialNo + '</td>');
-                    rows[4].addValue('<td width="14%"> Green / Yellow / Red </td>');
+                    rows[0].addValue('<td style ="border: 1px solid black;" width="14%">' + empty + '</td>');
+                    rows[1].addValue('<td style ="border: 1px solid black;" width="14%">' + productName + '</td>');
+                    rows[2].addValue('<td style ="border: 1px solid black;" width="14%">' + modelNo + '</td>');
+                    rows[3].addValue('<td style ="border: 1px solid black;" width="14%">' + serialNo + '</td>');
+                    rows[4].addValue('<td style ="border: 1px solid black;" width="14%"> Green / Yellow / Red </td>');
                 }
             
                     rows[0].addValue(emptyCell);
@@ -482,40 +484,41 @@ public class UNITYPM_AssetsWorkPlanPDFCntrlExt {
     }
     public List<RowWrapper> getAllRowWrappersForFour(List<Asset> assetsList)
     {
-         String emptyCell = '<td width="14%">&nbsp;</td>';
+         String emptyCell = '<td style ="border: 1px solid black;" width="14%">&nbsp;</td>';
         List<RowWrapper> rows = new List<RowWrapper>();
         rows=new List<RowWrapper>();
             
             for (Integer idx=0; idx<5; idx++)
                 rows.add(new RowWrapper());
           
-            rows[0].addValue('<td width="30%">Position</td>');
-            rows[1].addValue('<td width="30%">Make/Brand </td>');
-            rows[2].addValue('<td width="30%">Model</td>');
-            rows[3].addValue('<td width="30%">Serial</td>');
-            rows[4].addValue('<td width="30%">Condition </td>');
+            rows[0].addValue('<td style ="border: 1px solid black;" width="30%">Position</td>');
+            rows[1].addValue('<td style ="border: 1px solid black;" width="30%">Make/Brand </td>');
+            rows[2].addValue('<td style ="border: 1px solid black;" width="30%">Model</td>');
+            rows[3].addValue('<td style ="border: 1px solid black;" width="30%">Serial</td>');
+            rows[4].addValue('<td style ="border: 1px solid black;" width="30%">Condition </td>');
             
             system.debug('@@@@   this.assets.size() @@@' + assetsList.size());
-           
+             String empty ='<span style="color: #ffffff;">empty / empty / empty</span>';
+             
                 for (Integer idx=0; idx < assetsList.size(); idx++)
                 {
-                    String productName ='';
+                    String productName =empty;
                     if ( assetsList[idx].Product2.Name != null)
                          productName = assetsList[idx].Product2.Name;
                          
-                     String modelNo ='';
+                     String modelNo =empty;
                     if ( assetsList[idx].UNITY_Model_No__c != null)
                          modelNo = assetsList[idx].UNITY_Model_No__c;
                          
-                     String serialNo ='';
+                     String serialNo =empty;
                     if ( assetsList[idx].UNITY_Serial_No__c != null)
                          serialNo = assetsList[idx].UNITY_Serial_No__c;
                          
-                    rows[0].addValue('<td width="14%"> </td>');
-                    rows[1].addValue('<td width="14%">' + productName + '</td>');
-                    rows[2].addValue('<td width="14%">' + modelNo + '</td>');
-                    rows[3].addValue('<td width="14%">' + serialNo + '</td>');
-                    rows[4].addValue('<td width="14%"> Green / Yellow / Red </td>');
+                    rows[0].addValue('<td style ="border: 1px solid black;" width="14%">' + empty + '</td>');
+                    rows[1].addValue('<td style ="border: 1px solid black;" width="14%">' + productName + '</td>');
+                    rows[2].addValue('<td style ="border: 1px solid black;" width="14%">' + modelNo + '</td>');
+                    rows[3].addValue('<td style ="border: 1px solid black;" width="14%">' + serialNo + '</td>');
+                    rows[4].addValue('<td style ="border: 1px solid black;" width="14%"> Green / Yellow / Red </td>');
                 }
             
                     rows[0].addValue(emptyCell);
@@ -528,40 +531,42 @@ public class UNITYPM_AssetsWorkPlanPDFCntrlExt {
     }
     
   
-     public List<RowWrapper> getRowWrappersForOneAsset(List<Asset> assetsList)
-    {
-             String emptyCell = '<td width="14%">&nbsp;</td>';
+     public List<RowWrapper> getRowWrappersForOneAsset(List<Asset> assetsList)    {
+             
+            String empty ='<span style="color: #ffffff;">empty / empty / empty/empty / empty / empty/empty / empty / empty</span>';
+            String emptyCellHeader ='<span style="color: #ffffff;">empty / empty / emptyempty / empty / empty</span>';
             List<RowWrapper> rows = new List<RowWrapper>();
             rows=new List<RowWrapper>();
                 
                 for (Integer idx=0; idx<4; idx++)
                     rows.add(new RowWrapper());
               
-                rows[0].addValue('<td width="30%">Make/Brand </td>');
-                rows[1].addValue('<td width="30%">Model</td>');
-                rows[2].addValue('<td width="30%">Serial</td>');
-                rows[3].addValue('<td width="30%">Condition </td>');
+                rows[0].addValue('<td style ="border: 1px solid black;" width="30%">&nbsp;&nbsp;Make/Brand' + emptyCellHeader +  '</td>');
+                rows[1].addValue('<td style ="border: 1px solid black;" width="30%">&nbsp;&nbsp;Model' + emptyCellHeader +  '</td>');
+                rows[2].addValue('<td style ="border: 1px solid black;" width="30%">&nbsp;&nbsp;Serial' + emptyCellHeader +  '</td>');
+                rows[3].addValue('<td style ="border: 1px solid black;" width="30%">&nbsp;&nbsp;Condition' + emptyCellHeader +  '</td>');
                 
+                //<span style="color: #ffffff;">
                 system.debug('@@@@   this.assets.size() @@@' + assetsList.size());
-               
+                  
                     for (Integer idx=0; idx < assetsList.size(); idx++)
                     {
-                          String productName ='';
+                          String productName =empty;
                             if ( assetsList[idx].Product2.Name != null)
                                  productName = assetsList[idx].Product2.Name;
                                  
-                             String modelNo ='';
+                             String modelNo =empty;
                             if ( assetsList[idx].UNITY_Model_No__c != null)
                                  modelNo = assetsList[idx].UNITY_Model_No__c;
                                  
-                             String serialNo ='';
+                             String serialNo =empty;
                             if ( assetsList[idx].UNITY_Serial_No__c != null)
                                  serialNo = assetsList[idx].UNITY_Serial_No__c;
                          
-                        rows[0].addValue('<td width="70%">' + productName + '</td>');
-                        rows[1].addValue('<td width="70%">' + modelNo + '</td>');
-                        rows[2].addValue('<td width="70%">' + serialNo + '</td>');
-                        rows[3].addValue('<td width="70%"> Green / Yellow / Red </td>');
+                        rows[0].addValue('<td style ="border: 1px solid black;" width="70%">&nbsp;&nbsp;' + productName + '</td>');
+                        rows[1].addValue('<td style ="border: 1px solid black;" width="70%">&nbsp;&nbsp;' + modelNo + '</td>');
+                        rows[2].addValue('<td style ="border: 1px solid black;" width="70%">&nbsp;&nbsp;' + serialNo + '</td>');
+                        rows[3].addValue('<td style ="border: 1px solid black;" width="70%">&nbsp;&nbsp;Green / Yellow / Red </td>');
                     }
         
             return rows;
